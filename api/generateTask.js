@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       ・taskName: タスクの内容
       ・dueDate: 日付 (YYYY-MM-DD形式)。日付が不明な場合はnull。
       ・dueTime: 時間 (HH:MM形式)。時間が不明な場合はnull。
-      ・subTasks: 推定されるサブタスクの配列。なければ空配列[]。
+      ・subTasks: taskNameから想定されるそのタスク遂行に至るまでの過程を細分化して配列にする。 例:taskName[英検2級合格]からリスニング,リーディング,ライティングに細分化する
 
       テキスト: "${text}"
     `;
