@@ -46,8 +46,11 @@ function AITaskColl({ onTaskCreated }) {
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="AIでタスクを自動入力"
+          placeholder="タスクを入力"
           disabled={isLoading}
+          style={{
+            background: "#f0f0f0",
+          }}
         />
         <button type="submit" disabled={isLoading}>
           {isLoading ? '解析中...' : 'AIで追加'}
