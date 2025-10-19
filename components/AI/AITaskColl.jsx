@@ -1,26 +1,11 @@
 import React, { useState } from 'react';
 
-// AIからのレスポンスデータの型を定義
-interface TaskData {
-  taskName: string;
-  dueDate: string | null;
-  dueTime: string | null;
-  subTasks: string[];
-}
-
-// 親から受け取るPropsの型を定義
-interface AITaskInputProps {
-  onTaskCreated: (taskData: TaskData) => void;
-}
-
-// propsを受け取るように変更 ({ onTaskCreated })
-function AITaskColl({ onTaskCreated }: AITaskInputProps) {
+function AITaskColl({ onTaskCreated }) {
   const [text, setText] = useState('');
-  // useStateに型を指定
-  const [taskData, setTaskData] = useState<TaskData | null>(null);
+  const [taskData, setTaskData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setTaskData(null);
@@ -38,17 +23,15 @@ function AITaskColl({ onTaskCreated }: AITaskInputProps) {
         throw new Error('API request failed');
       }
 
-      const data: TaskData = await response.json();
+      const data = await response.json();
       setTaskData(data);
       console.log('AI Response:', data);
 
-      // ★★★ ここが重要 ★★★
-      // 親から渡された関数を実行して、解析結果を渡す
+      // 親コンポーネントに結果を渡す
       onTaskCreated(data);
-      
+
       // 入力欄をクリア
       setText('');
-
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -72,10 +55,21 @@ function AITaskColl({ onTaskCreated }: AITaskInputProps) {
       </form>
 
       {taskData && (
-        <div style={{ marginTop: '20px', background: '#f0f0f0', padding: '10px', borderRadius: '8px' }}>
+        <div
+          style={{
+            marginTop: '20px',
+            background: '#f0f0f0',
+            padding: '10px',
+            borderRadius: '8px',
+          }}
+        >
           <h4>AIによる解析結果:</h4>
-          <p><strong>タスク名:</strong> {taskData.taskName}</p>
-          <p><strong>期限日:</strong> {taskData.dueDate || '未設定'}</p>
+          <p>
+            <strong>タスク名:</strong> {taskData.taskName}
+          </p>
+          <p>
+            <strong>期限日:</strong> {taskData.dueDate || '未設定'}
+          </p>
         </div>
       )}
     </div>
