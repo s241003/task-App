@@ -52,6 +52,8 @@ function AITaskColl({ onTaskCreated }) {
             background: "#f0f0f0",
             margin: "10px",
             padding : "10px",
+            borderRadius: '9px',
+            caretColor: "#0f0f0f",
           }}
         />
         <button type="submit" disabled={isLoading}>
@@ -68,7 +70,8 @@ function AITaskColl({ onTaskCreated }) {
             borderRadius: '8px',
           }}
         >
-          <h4>AIによる解析結果:</h4>
+          <h4>AIによる解析結果</h4>
+          <p>json:{taskData}</p>
           <p><strong>タスク:</strong> {taskData.taskName}</p>
           <p><strong>サブタスク一覧:</strong> {taskData.subTasks}</p>
           <p>
