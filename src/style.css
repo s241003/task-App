@@ -6,9 +6,9 @@ body {
 }
 
 #root {
-  margin: 0; /* 追加 */
-  padding: 0;　/* 追加 */
-  width: 100%;　/* 追加 */
+  margin: 0;/* 追加 */
+  padding: 0;/* 追加 */
+  width: 100%;/* 追加 */
   height: 100vh;
   display: flex;
   flex-direction: column;
