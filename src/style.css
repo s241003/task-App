@@ -65,7 +65,7 @@ body {
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 0;
+  font-size: 0px;
   color: #666;
   transition: all 0.3s;
 }
