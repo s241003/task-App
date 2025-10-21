@@ -305,9 +305,9 @@ button:disabled {
   color: white;
 }
 
-@media (max-width: 480px) { /*追加*/
+/* @media (max-width: 480px) { /*追加*/
   .nav-button {
     font-size: 12px;     
     padding: 12px 0;     
   }
-}
+} */
