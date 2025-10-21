@@ -50,10 +50,12 @@ function AITaskColl({ onTaskCreated }) {
           disabled={isLoading}
           style={{
             background: "#f0f0f0",
+            margin: "10px",
+            padding : "10px",
           }}
         />
         <button type="submit" disabled={isLoading}>
-          {isLoading ? '解析中...' : 'AIで追加'}
+          {isLoading ? '解析中...' : 'AIカモン'}
         </button>
       </form>
 
@@ -67,11 +69,10 @@ function AITaskColl({ onTaskCreated }) {
           }}
         >
           <h4>AIによる解析結果:</h4>
+          <p><strong>タスク:</strong> {taskData.taskName}</p>
+          <p><strong>サブタスク一覧:</strong> {taskData.subTasks}</p>
           <p>
-            <strong>タスク名:</strong> {taskData.taskName}
-          </p>
-          <p>
-            <strong>期限日:</strong> {taskData.dueDate || '未設定'}
+            <strong>期限日:</strong> {taskData.endDate || '未設定'}
           </p>
         </div>
       )}
