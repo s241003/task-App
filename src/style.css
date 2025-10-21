@@ -65,45 +65,55 @@ body {
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0;
   color: #666;
   transition: all 0.3s;
 }
 
 
-/* 非アクティブ時は黒画像 */
-.nav-button.calendar img {
-  content: url('/icons/calendar_black.png');
+/* デフォルト（非アクティブ）の画像 */
+.nav-button.calendar {
+  background: url('/icon/calendar_black.png') no-repeat center;
+  background-size: 24px 24px;
 }
-.nav-button.tasks img {
-  content: url('/icons/task_black.png');
+.nav-button.chat {
+  background: url('/icon/chat_black.png') no-repeat center;
+  background-size: 24px 24px;
 }
-.nav-button.chat img {
-  content: url('/icons/chat_black.png');
+.nav-button.groupwork {
+  background: url('/icon/groupwork_black.png') no-repeat center;
+  background-size: 24px 24px;
 }
-.nav-button.groupwork img {
-  content: url('/icons/groupwork_black.png');
+.nav-button.setting {
+  background: url('/icon/setting_black.png') no-repeat center;
+  background-size: 24px 24px;
 }
-.nav-button.setting img {
-  content: url('/icons/setting_black.png');
-}
-/* アクティブ時は青画像 */
-.nav-button.active.calendar img {
-  content: url('/icons/calendar_blue.png');
-}
-.nav-button.active.tasks img {
-  content: url('/icons/task_blue.png');
-}
-.nav-button.active.chat img {
-  content: url('/icons/chat_blue.png');
-}
-.nav-button.active.groupwork img {
-  content: url('/icons/groupwork_blue.png');
-}
-.nav-button.active.setting img {
-  content: url('/icons/setting_blue.png');
+.nav-button.task {
+  background: url('/icon/task_black.png') no-repeat center;
+  background-size: 24px 24px;
 }
 
+/* アクティブ時 */
+.nav-button.active.calendar {
+  background: url('/icon/calendar_blue.png') no-repeat center;
+  background-size: 24px 24px;
+}
+.nav-button.active.chat {
+  background: url('/icon/chat_blue.png') no-repeat center;
+  background-size: 24px 24px;
+}
+.nav-button.active.groupwork {
+  background: url('/icon/groupwork_blue.png') no-repeat center;
+  background-size: 24px 24px;
+}
+.nav-button.active.setting {
+  background: url('/icon/setting_blue.png') no-repeat center;
+  background-size: 24px 24px;
+}
+.nav-button.active.task {
+  background: url('/icon/task_blue.png') no-repeat center;
+  background-size: 24px 24px;
+}
 
 .nav-button:hover {
   color: #333;
