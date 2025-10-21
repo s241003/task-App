@@ -45,11 +45,12 @@ body {
   bottom: 0;
   left: 0;
   right: 0;/* 追加 */
-  transform: translateX(-50%);
-  /*max-width: 600px;　消したい*/
+  transform: none;     /*translateX(-50%);*/
+  max-width: none; /*600px;*/
   width: 100%;
   display: flex;
   justify-content: space-around;
+  align-items: center;/*追加*/
   background-color: white;
   border-top: 1px solid #ddd;
   padding: 10px 0;
