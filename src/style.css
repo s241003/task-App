@@ -70,6 +70,41 @@ body {
   transition: all 0.3s;
 }
 
+
+/* 非アクティブ時は黒画像 */
+.nav-button.calendar img {
+  content: url('/icons/calendar_black.png');
+}
+.nav-button.tasks img {
+  content: url('/icons/task_black.png');
+}
+.nav-button.chat img {
+  content: url('/icons/chat_black.png');
+}
+.nav-button.groupwork img {
+  content: url('/icons/groupwork_black.png');
+}
+.nav-button.setting img {
+  content: url('/icons/setting_black.png');
+}
+/* アクティブ時は青画像 */
+.nav-button.active.calendar img {
+  content: url('/icons/calendar_blue.png');
+}
+.nav-button.active.tasks img {
+  content: url('/icons/task_blue.png');
+}
+.nav-button.active.chat img {
+  content: url('/icons/chat_blue.png');
+}
+.nav-button.active.groupwork img {
+  content: url('/icons/groupwork_blue.png');
+}
+.nav-button.active.setting img {
+  content: url('/icons/setting_blue.png');
+}
+
+
 .nav-button:hover {
   color: #333;
 }
