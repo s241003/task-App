@@ -25,7 +25,7 @@
 export default NavigationBar*/
 
 
-
+<img src={task_black} alt="task" />
 // NavigationBar.jsx の先頭で画像を import
 import tasks_black from './icons/task_black.png';
 import tasks_blue from './icons/task_blue.png';
