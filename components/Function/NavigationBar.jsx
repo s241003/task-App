@@ -43,7 +43,7 @@ function NavigationBar({ currentPage, onPageChange }) {
           onClick={() => onPageChange(page.id)}
         >
           <img
-            src={`/public/public/icons/${page.id}_${currentPage === page.id ? 'blue' : 'black'}.png`}
+            src={`../../../public/icons/${page.id}_${currentPage === page.id ? 'blue' : 'black'}.png`}
             alt={page.label}
           />
         </button>
