@@ -17,6 +17,11 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'), // srcを@で参照可能に
+  server: {
+    watch: {
+      ignored: ['!**/components/**'], // componentsフォルダも監視対象にする
+    },
+  },
     },
   },
 })
