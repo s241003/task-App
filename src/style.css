@@ -73,45 +73,45 @@ body {
 
 /* デフォルト（非アクティブ）の画像 */
 .nav-button.calendar {
-  background: url('/icon/calendar_black.png') no-repeat center;
+  background: url('/public/icon/calendar_black.png') no-repeat center;
   background-size: 24px 24px;
 }
 .nav-button.chat {
-  background: url('/icon/chat_black.png') no-repeat center;
+  background: url('/public/icon/chat_black.png') no-repeat center;
   background-size: 24px 24px;
 }
 .nav-button.groupwork {
-  background: url('/icon/groupwork_black.png') no-repeat center;
+  background: url('/public/icon/groupwork_black.png') no-repeat center;
   background-size: 24px 24px;
 }
 .nav-button.setting {
-  background: url('/icon/setting_black.png') no-repeat center;
+  background: url('/public/icon/setting_black.png') no-repeat center;
   background-size: 24px 24px;
 }
 .nav-button.task {
-  background: url('/icon/task_black.png') no-repeat center;
+  background: url('/public/icon/task_black.png') no-repeat center;
   background-size: 24px 24px;
 }
 
 /* アクティブ時 */
 .nav-button.active.calendar {
-  background: url('/icon/calendar_blue.png') no-repeat center;
+  background: url('/public/icon/calendar_blue.png') no-repeat center;
   background-size: 24px 24px;
 }
 .nav-button.active.chat {
-  background: url('/icon/chat_blue.png') no-repeat center;
+  background: url('/public/icon/chat_blue.png') no-repeat center;
   background-size: 24px 24px;
 }
 .nav-button.active.groupwork {
-  background: url('/icon/groupwork_blue.png') no-repeat center;
+  background: url('/public/icon/groupwork_blue.png') no-repeat center;
   background-size: 24px 24px;
 }
 .nav-button.active.setting {
-  background: url('/icon/setting_blue.png') no-repeat center;
+  background: url('/public/icon/setting_blue.png') no-repeat center;
   background-size: 24px 24px;
 }
 .nav-button.active.task {
-  background: url('/icon/task_blue.png') no-repeat center;
+  background: url('/public/icon/task_blue.png') no-repeat center;
   background-size: 24px 24px;
 }
 
