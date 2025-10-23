@@ -51,5 +51,5 @@ function NavigationBar({ currentPage, onPageChange }) {
     </nav>
   );
 }
-
+<img src="/vite.svg" alt="test" />
 export default NavigationBar;
