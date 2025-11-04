@@ -1,9 +1,26 @@
+import { createClient } from '@supabase/supabase-js';
+export const supabase = createClient('https://zcbubwuhbkbjoxpneemg.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjYnVid3VoYmtiam94cG5lZW1nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4NTM5NzEsImV4cCI6MjA3NjQyOTk3MX0.1pRZrkCSqD97qRjZBYNM2sd4t1ZFkd-HQP2kUJQMA28');
 import React, { useState } from 'react';
+
+async function saveTaskToSupabase(taskData) {
+  const { data, error } = await supabase
+    .from('tasks')
+    .insert([{
+      task_name: taskData.taskName,
+      sub_tasks: taskData.subTasks,
+      end_date: taskData.endDate,
+      importance: taskData.importance,
+    }]);
+
+  if (error) console.error('保存失敗:', error);
+}
 
 function AITaskColl({ onTaskCreated }) {
   const [text, setText] = useState('');
+  const [importance, setimportance] = useState('');
   const [taskData, setTaskData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,6 +46,7 @@ function AITaskColl({ onTaskCreated }) {
 
       // 親コンポーネントに結果を渡す
       onTaskCreated(data);
+      await saveTaskToSupabase(data);
 
       // 入力欄をクリア
       setText('');
@@ -48,6 +66,22 @@ function AITaskColl({ onTaskCreated }) {
           onChange={(e) => setText(e.target.value)}
           placeholder="タスクを入力"
           disabled={isLoading}
+          style={{
+            background: "#f0f0f0",
+            margin: "10px",
+            padding : "10px",
+            borderRadius: '9px',
+            caretColor: "#0f0f0f",
+          }}
+        />
+        <input
+          type="number"
+          value={importance}
+          onChange={(e) => setimportance(e.target.value)}
+          placeholder="重要度を1~5で設定"
+          disabled={isLoading}
+          max="5"
+          min="1"
           style={{
             background: "#f0f0f0",
             margin: "10px",
