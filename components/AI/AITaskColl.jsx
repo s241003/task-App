@@ -105,7 +105,7 @@ function AITaskColl({ onTaskCreated }) {
           }}
         >
           <h4>AIによる解析結果</h4>
-          <p>json:{taskData}</p>
+          <p>json:{JSON.stringify(taskData)}</p>
           <p><strong>タスク:</strong> {taskData.taskName}</p>
           <p><strong>サブタスク一覧:</strong> {taskData.subTasks}</p>
           <p>
