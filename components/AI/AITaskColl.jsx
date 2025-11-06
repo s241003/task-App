@@ -76,7 +76,7 @@ function AITaskColl({ onTaskCreated }) {
             borderRadius: '9px',
             caretColor: "#0f0f0f",
           }}
-        /><br>
+        /><br />
         <input
           type="number"
           value={importance}
