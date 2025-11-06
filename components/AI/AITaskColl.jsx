@@ -17,7 +17,9 @@ async function saveTaskToSupabase(taskData) {
 
 function AITaskColl({ onTaskCreated }) {
   const [text, setText] = useState('');
-  const [importance, setimportance] = useState('');
+  const [importance, setImportance] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [taskData, setTaskData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -67,24 +69,24 @@ function AITaskColl({ onTaskCreated }) {
           placeholder="タスクを入力"
           disabled={isLoading}
           style={{
-            color: "0f0f0f0",
+            color: "#0f0f0f0",
             background: "#f0f0f0",
             margin: "10px",
             padding : "10px",
             borderRadius: '9px',
             caretColor: "#0f0f0f",
           }}
-        />
+        /><br>
         <input
           type="number"
           value={importance}
-          onChange={(e) => setimportance(e.target.value)}
+          onChange={(e) => setImportance(e.target.value)}
           placeholder="重要度を1~5で設定"
           disabled={isLoading}
           max="5"
           min="1"
           style={{
-            color: "0f0f0f0",
+            color: "#0f0f0f0",
             background: "#f0f0f0",
             margin: "10px",
             padding : "10px",
@@ -92,6 +94,36 @@ function AITaskColl({ onTaskCreated }) {
             caretColor: "#0f0f0f",
           }}
         />
+          <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          placeholder="開始日"
+          disabled={isLoading}
+          style={{
+            color:"#0f0f0f",
+            background: "#f0f0f0",
+            margin: "10px",
+            padding : "10px",
+            borderRadius: '9px',
+            caretColor: "#0f0f0f",
+          }}
+            />
+          <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          placeholder="期日"
+          disabled={isLoading}
+          style={{
+            color:"#0f0f0f",
+            background: "#f0f0f0",
+            margin: "10px",
+            padding : "10px",
+            borderRadius: '9px',
+            caretColor: "#0f0f0f",
+          }}
+            />
         <button type="submit" disabled={isLoading}>
           {isLoading ? '解析中...' : 'AIカモン'}
         </button>
