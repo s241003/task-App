@@ -69,7 +69,7 @@ function AITaskColl({ onTaskCreated }) {
           placeholder="タスクを入力"
           disabled={isLoading}
           style={{
-            color: "#0f0f0f0",
+            color: "#0f0f0f",
             background: "#f0f0f0",
             margin: "10px",
             padding : "10px",
@@ -86,7 +86,7 @@ function AITaskColl({ onTaskCreated }) {
           max="5"
           min="1"
           style={{
-            color: "#0f0f0f0",
+            color: "#0f0f0f",
             background: "#f0f0f0",
             margin: "10px",
             padding : "10px",
