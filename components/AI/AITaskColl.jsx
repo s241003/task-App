@@ -10,6 +10,8 @@ async function saveTaskToSupabase(taskData) {
       sub_tasks: taskData[0].subTasks,
       end_date: taskData[0].endDate,
       importance: taskData[1],
+      start_date: taskData[2],
+      end_date: taskData[3],
     }]);
 
   if (error) console.error('保存失敗:', error);
@@ -52,6 +54,8 @@ function AITaskColl({ onTaskCreated }) {
         [
           data,
           importance,
+          startDate,
+          endDate
         ];
       await saveTaskToSupabase(dataSet);
 
@@ -146,7 +150,7 @@ function AITaskColl({ onTaskCreated }) {
           <h4>AIによる解析結果</h4>
           <p>json:{JSON.stringify(taskData)}</p>
           <p><strong>タスク:</strong> {taskData.taskName}</p>
-          <p><strong>サブタスク一覧:</strong> {taskData.subTasks}</p>
+          <p><strong>サブタスク一覧:</strong> {taskData.subTasks.join()}</p>
           <p>
             <strong>期限日:</strong> {taskData.endDate || '未設定'}
           </p>
