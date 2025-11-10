@@ -9,7 +9,7 @@ async function saveTaskToSupabase(taskData) {
       task_name: taskData.taskName,
       sub_tasks: taskData.subTasks,
       end_date: taskData.endDate,
-      importance: taskData.importance,
+      importance: importance,
     }]);
 
   if (error) console.error('保存失敗:', error);
