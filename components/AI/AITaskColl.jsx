@@ -6,10 +6,10 @@ async function saveTaskToSupabase(taskData) {
   const { data, error } = await supabase
     .from('tasks')
     .insert([{
-      task_name: taskData.taskName,
-      sub_tasks: taskData.subTasks,
-      end_date: taskData.endDate,
-      importance: importance,
+      task_name: taskData.data.taskName,
+      sub_tasks: taskData.data.subTasks,
+      end_date: taskData.data.endDate,
+      importance: taskData.importance,
     }]);
 
   if (error) console.error('保存失敗:', error);
@@ -48,7 +48,12 @@ function AITaskColl({ onTaskCreated }) {
 
       // 親コンポーネントに結果を渡す
       onTaskCreated(data);
-      await saveTaskToSupabase(data);
+      const dataSet =
+        [
+          data,
+          importance,
+        ];
+      await saveTaskToSupabase(dataSet);
 
       // 入力欄をクリア
       setText('');
