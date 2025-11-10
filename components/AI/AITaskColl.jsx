@@ -6,10 +6,10 @@ async function saveTaskToSupabase(taskData) {
   const { data, error } = await supabase
     .from('tasks')
     .insert([{
-      task_name: taskData.data.taskName,
-      sub_tasks: taskData.data.subTasks,
-      end_date: taskData.data.endDate,
-      importance: taskData.importance,
+      task_name: taskData[0].taskName,
+      sub_tasks: taskData[0].subTasks,
+      end_date: taskData[0].endDate,
+      importance: taskData[1],
     }]);
 
   if (error) console.error('保存失敗:', error);
