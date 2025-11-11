@@ -7,7 +7,7 @@ async function saveTaskToSupabase(taskData) {
   const { data, error } = await supabase
     .from('tasks')
     .insert([{
-      input_task: taskData.tex,
+      input_text: taskData.tex,
       task_name: taskData.data.taskName,
       sub_tasks: taskData.data.subTasks,
       importance: taskData.imp,
@@ -19,7 +19,7 @@ async function saveTaskToSupabase(taskData) {
 }
 
 function AITaskColl({ onTaskCreated }) {
-  const [schedules, setSchedules] = useState('');
+  const [schedules, setSchedules] = useState([]);
   const [text, setText] = useState('');
   const [importance, setImportance] = useState('');
   const [startDate, setStartDate] = useState('');
