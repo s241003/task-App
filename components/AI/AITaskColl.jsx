@@ -1,23 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient('https://zcbubwuhbkbjoxpneemg.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjYnVid3VoYmtiam94cG5lZW1nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4NTM5NzEsImV4cCI6MjA3NjQyOTk3MX0.1pRZrkCSqD97qRjZBYNM2sd4t1ZFkd-HQP2kUJQMA28');
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
 
 async function saveTaskToSupabase(taskData) {
   const { data, error } = await supabase
     .from('tasks')
     .insert([{
-      task_name: taskData[0].taskName,
-      sub_tasks: taskData[0].subTasks,
-      end_date: taskData[0].endDate,
-      importance: taskData[1],
-      start_date: taskData[2],
-      end_date: taskData[3],
+      input_task: taskData.tex,
+      task_name: taskData.data.taskName,
+      sub_tasks: taskData.data.subTasks,
+      importance: taskData.imp,
+      start_date: taskData.sta,
+      end_date: taskData.end,
     }]);
 
   if (error) console.error('保存失敗:', error);
 }
 
 function AITaskColl({ onTaskCreated }) {
+  const [schedules, setSchedules] = useState('');
   const [text, setText] = useState('');
   const [importance, setImportance] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -25,7 +27,27 @@ function AITaskColl({ onTaskCreated }) {
   const [taskData, setTaskData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   
+  useEffect(()=>{
+    fetchScheduleData()
+  },[])
 
+  const fetchScheduleData = async ()=>{
+    try{
+      const { data, error } = await supabase
+        .from("tasks")
+        .select("*")
+        .order("start_date",{ascending:true})
+
+      if (error) throw error
+      setSchedules(data)
+    }catch(error) {
+      console.error("fetchでエラーが発生しました",error)
+    }finally{
+      setIsLoading(false)
+    }
+  };
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -51,12 +73,13 @@ function AITaskColl({ onTaskCreated }) {
       // 親コンポーネントに結果を渡す
       onTaskCreated(data);
       const dataSet =
-        [
-          data,
-          importance,
-          startDate,
-          endDate
-        ];
+      {
+        data:data,
+        imp:importance,
+        sta:startDate,
+        end:endDate,
+        tex:text,
+      };
       await saveTaskToSupabase(dataSet);
 
       // 入力欄をクリア
