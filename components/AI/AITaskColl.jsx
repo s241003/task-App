@@ -187,7 +187,8 @@ function AITaskColl({ onTaskCreated }) {
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>
-          <p　style={{ fontsize: "5px" ,margin: '0 auto', padding: '0' }}>タスク</p>
+          <label>
+            タスク
           <input
             type="text"
             value={text}
@@ -208,9 +209,11 @@ function AITaskColl({ onTaskCreated }) {
               fontSize: '16px',
             }}
           />
+            </label>
         </div>
 
         <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
+          <label>重要度
           <input
             type="number"
             value={importance}
@@ -230,6 +233,8 @@ function AITaskColl({ onTaskCreated }) {
               caretColor: '#0f0f0f',
             }}
           />
+            </label>
+          <label>開始日
           <input
             type="date"
             value={startDate}
@@ -247,6 +252,8 @@ function AITaskColl({ onTaskCreated }) {
               caretColor: '#0f0f0f',
             }}
           />
+            </label>
+          <label>期日
           <input
             type="date"
             value={endDate}
@@ -265,6 +272,7 @@ function AITaskColl({ onTaskCreated }) {
             }}
           />
         </div>
+          </label>
 
         <div style={{ display: 'flex', gap: '10px' }}>
           <button
@@ -282,7 +290,7 @@ function AITaskColl({ onTaskCreated }) {
               fontWeight: 'bold',
             }}
           >
-            {isLoading ? '解析中...' : 'AIカモン'}
+            {isLoading ? '解析中...' : 'AI呼び出し'}
           </button>
 
           {(taskData || error) && (
