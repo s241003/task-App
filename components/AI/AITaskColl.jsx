@@ -187,6 +187,7 @@ function AITaskColl({ onTaskCreated }) {
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>
+          <p>タスク</p>
           <input
             type="text"
             value={text}
