@@ -1,201 +1,479 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createClient } from '@supabase/supabase-js';
+export const supabase = createClient(
+  'https://zcbubwuhbkbjoxpneemg.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjYnVid3VoYmtiam94cG5lZW1nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4NTM5NzEsImV4cCI6MjA3NjQyOTk3MX0.1pRZrkCSqD97qRjZBYNM2sd4t1ZFkd-HQP2kUJQMA28'
+);
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+import React, { useState, useEffect } from 'react';
 
-async function callAIRetry(model, prompt, retries = 3) {
-  for (let i = 0; i < retries; i++) {
+async function saveTaskToSupabase(taskData) {
+  const { data, error } = await supabase.from('tasks').insert([
+    {
+      input_text: taskData.tex,
+      task_name: taskData.data.taskName,
+      sub_tasks: taskData.data.subTasks,
+      importance: taskData.imp,
+      start_date: taskData.sta,
+      end_date: taskData.end,
+    },
+  ]);
+
+  if (error) {
+    console.error('保存失敗:', error);
+    throw error;
+  }
+  return data;
+}
+
+function AITaskColl({ onTaskCreated }) {
+  const [schedules, setSchedules] = useState([]);
+  const [text, setText] = useState('');
+  const [importance, setImportance] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [taskData, setTaskData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [needsMoreDetail, setNeedsMoreDetail] = useState(false);
+
+  useEffect(() => {
+    fetchScheduleData();
+  }, []);
+
+  const fetchScheduleData = async () => {
     try {
-      const result = await model.generateContent(prompt);
-      return result;
-    } catch (err) {
-      if (err.status === 503 && i < retries - 1) {
-        console.warn(`503エラー。${i + 1}回目のリトライを待機中...`);
-        await new Promise(res => setTimeout(res, 2000 * (i + 1)));
-        continue;
-      }
-      throw err;
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .order('start_date', { ascending: true });
+
+      if (error) throw error;
+      setSchedules(data);
+    } catch (error) {
+      console.error('fetchでエラーが発生しました', error);
+    } finally {
+      setIsLoading(false);
     }
-  }
-}
+  };
 
-// JSONを安全に抽出する関数
-function extractJSON(text) {
-  // ```json ブロックを探す
-  const jsonBlockMatch = text.match(/```json\n([\s\S]*?)\n```/);
-  if (jsonBlockMatch && jsonBlockMatch[1]) {
-    return jsonBlockMatch[1];
-  }
-  
-  // { で始まり } で終わる部分を探す
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
-    return jsonMatch[0];
-  }
-  
-  return null;
-}
+  const validateInputs = () => {
+    if (!text.trim()) {
+      setError('タスク名を入力してください');
+      return false;
+    }
 
-// バリデーション関数
-function validateTaskData(data) {
-  if (!data || typeof data !== 'object') {
-    return { valid: false, error: '無効なデータ形式です' };
-  }
-  
-  if (!data.taskName || typeof data.taskName !== 'string') {
-    return { valid: false, error: 'taskNameが必要です' };
-  }
-  
-  if (!Array.isArray(data.subTasks)) {
-    return { valid: false, error: 'subTasksは配列である必要があります' };
-  }
-  
-  if (typeof data.Concrete !== 'boolean') {
-    return { valid: false, error: 'Concreteはboolean値である必要があります' };
-  }
-  
-  return { valid: true };
-}
+    if (text.trim().length < 2) {
+      setError('タスク名が短すぎます。もう少し具体的に入力してください');
+      return false;
+    }
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
-  }
+    if (importance && (importance < 1 || importance > 5)) {
+      setError('重要度は1〜5の範囲で設定してください');
+      return false;
+    }
 
-  const { text } = req.body;
-  
-  if (!text || typeof text !== 'string') {
-    return res.status(400).json({ 
-      error: "有効なテキスト入力が必要です" 
-    });
-  }
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      setError('開始日は期日より前に設定してください');
+      return false;
+    }
 
-  // 入力の長さチェック
-  if (text.trim().length < 2) {
-    return res.status(400).json({ 
-      error: "タスク名が短すぎます。もう少し具体的に入力してください" 
-    });
-  }
+    return true;
+  };
 
-  if (text.length > 500) {
-    return res.status(400).json({ 
-      error: "タスク名が長すぎます（500文字以内）" 
-    });
-  }
-
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
-    const prompt = `
-あなたはタスク管理の専門家です。以下のテキストを分析し、JSON形式のみで出力してください。
-
-テキスト: "${text}"
-
-以下の形式で出力してください（説明文やマークダウンは不要、JSONのみ）:
-{
-  "taskName": "タスクの内容",
-  "subTasks": ["サブタスク1", "サブタスク2", "サブタスク3"],
-  "Concrete": true or false,
-  "reason": "Concreteの判定理由（任意）"
-}
-
-ルール:
-1. taskName: 入力されたタスクの内容を簡潔にまとめる
-2. subTasks: そのタスクを達成するために必要な具体的なステップを3〜7個程度の配列にする
-3. Concrete: 
-   - True: 入力が具体的で、明確なサブタスクを生成できる場合
-   - False: 入力が曖昧すぎて、適切なサブタスクを生成できない場合
-     （例: "勉強する"、"頑張る"、"やる"などの抽象的すぎる入力）
-4. reason: Concreteの判定理由を簡潔に（Falseの場合は特に重要）
-
-例1（Concrete=true）:
-入力: "英検2級に合格する"
-出力:
-{
-  "taskName": "英検2級合格",
-  "subTasks": ["リスニング対策", "リーディング対策", "ライティング対策", "過去問演習", "模擬試験受験"],
-  "Concrete": true,
-  "reason": "具体的な目標があり、明確なステップに分解可能"
-}
-
-例2（Concrete=false）:
-入力: "勉強する"
-出力:
-{
-  "taskName": "勉強",
-  "subTasks": [],
-  "Concrete": false,
-  "reason": "何を勉強するのか不明確。具体的な科目や目標を指定してください"
-}
-`.trim();
-
-    const result = await callAIRetry(model, prompt);
-    const response = await result.response;
-    const responseText = response.text();
-
-    // JSONを抽出
-    const jsonString = extractJSON(responseText);
-    
-    if (!jsonString) {
-      console.error("JSON抽出失敗:", responseText);
-      return res.status(500).json({ 
-        error: "AIの応答からJSONを抽出できませんでした" 
-      });
-    }
-
-    // JSONをパース
-    let jsonData;
-    try {
-      jsonData = JSON.parse(jsonString);
-    } catch (parseError) {
-      console.error("JSONパースエラー:", parseError);
-      console.error("パース対象:", jsonString);
-      return res.status(500).json({ 
-        error: "AIの応答を解析できませんでした" 
-      });
-    }
+    // 初期化
+    setError(null);
+    setNeedsMoreDetail(false);
+    setTaskData(null);
 
     // バリデーション
-    const validation = validateTaskData(jsonData);
-    if (!validation.valid) {
-      return res.status(500).json({ 
-        error: `データ検証エラー: ${validation.error}` 
-      });
+    if (!validateInputs()) {
+      return;
     }
 
-    // Concreteがfalseの場合の処理
-    if (jsonData.Concrete === false) {
-      return res.status(200).json({
-        ...jsonData,
-        needsMoreDetail: true,
-        suggestion: jsonData.reason || "もう少し具体的なタスク名を入力してください。例えば、「何を」「いつまでに」「どのように」などを含めると良いでしょう。"
-      });
-    }
+    setIsLoading(true);
 
-    // 成功レスポンス
-    return res.status(200).json({
-      ...jsonData,
-      needsMoreDetail: false
-    });
+    try {
+      // API呼び出し
+      const response = await fetch('/api/generateTask', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
 
-  } catch (error) {
-    console.error("AI呼び出し失敗:", error);
-    
-    // エラーの種類に応じた適切なレスポンス
-    if (error.status === 503) {
-      return res.status(503).json({
-        error: "AIサービスが混雑しています。しばらく待ってから再試行してください。",
-        retryAfter: 5
-      });
+      const data = await response.json();
+
+      // エラーレスポンスの処理
+      if (!response.ok) {
+        throw new Error(data.error || 'API request failed');
+      }
+
+      // Concrete判定の処理
+      if (data.needsMoreDetail || data.Concrete === false) {
+        setNeedsMoreDetail(true);
+        setError(
+          data.suggestion ||
+          data.reason ||
+          'もう少し具体的なタスク名を入力してください。\n例: 「勉強する」→「英検2級に合格する」'
+        );
+        setTaskData(null);
+        return; // ここで処理を終了（保存しない）
+      }
+
+      // 成功時の処理
+      setTaskData(data);
+      console.log('AI Response:', data);
+
+      // データベースに保存
+      const dataSet = {
+        data: data,
+        imp: importance || null,
+        sta: startDate || null,
+        end: endDate || null,
+        tex: text,
+      };
+
+      await saveTaskToSupabase(dataSet);
+
+      // 親コンポーネントに結果を渡す
+      if (onTaskCreated) {
+        onTaskCreated(data);
+      }
+
+      // スケジュールリストを更新
+      await fetchScheduleData();
+
+      // 入力欄をクリア
+      setText('');
+      setImportance('');
+      setStartDate('');
+      setEndDate('');
+
+      // 成功メッセージ（オプション）
+      console.log('タスクが正常に保存されました');
+
+    } catch (error) {
+      console.error('Error:', error);
+      
+      // エラーメッセージの設定
+      if (error.message.includes('503')) {
+        setError('AIサービスが混雑しています。しばらく待ってから再試行してください。');
+      } else if (error.message.includes('429')) {
+        setError('リクエスト制限に達しました。しばらく待ってから再試行してください。');
+      } else {
+        setError(error.message || 'エラーが発生しました。もう一度お試しください。');
+      }
+      setTaskData(null);
+    } finally {
+      setIsLoading(false);
     }
-    
-    if (error.status === 429) {
-      return res.status(429).json({
-        error: "リクエスト制限に達しました。しばらく待ってから再試行してください。"
-      });
-    }
-    
-    return res.status(500).json({
-      error: "タスクの処理中にエラーが発生しました。もう一度お試しください。"
-    });
-  }
+  };
+
+  const handleReset = () => {
+    setText('');
+    setImportance('');
+    setStartDate('');
+    setEndDate('');
+    setTaskData(null);
+    setError(null);
+    setNeedsMoreDetail(false);
+  };
+
+  return (
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '15px' }}>
+          <input
+            type="text"
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
+              if (error) setError(null); // 入力時にエラーをクリア
+            }}
+            placeholder="タスクを入力（具体的に: 例「英検2級に合格する」）"
+            disabled={isLoading}
+            style={{
+              width: '100%',
+              color: '#0f0f0f',
+              background: '#f0f0f0',
+              padding: '12px',
+              borderRadius: '9px',
+              border: error && needsMoreDetail ? '2px solid #f59e0b' : '1px solid #ddd',
+              caretColor: '#0f0f0f',
+              fontSize: '16px',
+            }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
+          <input
+            type="number"
+            value={importance}
+            onChange={(e) => setImportance(e.target.value)}
+            placeholder="重要度 (1~5)"
+            disabled={isLoading}
+            max="5"
+            min="1"
+            style={{
+              flex: '1',
+              minWidth: '120px',
+              color: '#0f0f0f',
+              background: '#f0f0f0',
+              padding: '10px',
+              borderRadius: '9px',
+              border: '1px solid #ddd',
+              caretColor: '#0f0f0f',
+            }}
+          />
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            placeholder="開始日"
+            disabled={isLoading}
+            style={{
+              flex: '1',
+              minWidth: '140px',
+              color: '#0f0f0f',
+              background: '#f0f0f0',
+              padding: '10px',
+              borderRadius: '9px',
+              border: '1px solid #ddd',
+              caretColor: '#0f0f0f',
+            }}
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            placeholder="期日"
+            disabled={isLoading}
+            style={{
+              flex: '1',
+              minWidth: '140px',
+              color: '#0f0f0f',
+              background: '#f0f0f0',
+              padding: '10px',
+              borderRadius: '9px',
+              border: '1px solid #ddd',
+              caretColor: '#0f0f0f',
+            }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            type="submit"
+            disabled={isLoading || !text.trim()}
+            style={{
+              flex: '1',
+              padding: '12px 20px',
+              background: isLoading || !text.trim() ? '#ccc' : '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '9px',
+              cursor: isLoading || !text.trim() ? 'not-allowed' : 'pointer',
+              fontSize: '16px',
+              fontWeight: 'bold',
+            }}
+          >
+            {isLoading ? '解析中...' : 'AIカモン'}
+          </button>
+
+          {(taskData || error) && (
+            <button
+              type="button"
+              onClick={handleReset}
+              style={{
+                padding: '12px 20px',
+                background: '#6b7280',
+                color: 'white',
+                border: 'none',
+                borderRadius: '9px',
+                cursor: 'pointer',
+                fontSize: '16px',
+              }}
+            >
+              リセット
+            </button>
+          )}
+        </div>
+      </form>
+
+      {/* エラーメッセージ表示 */}
+      {error && (
+        <div
+          style={{
+            marginTop: '20px',
+            background: needsMoreDetail ? '#fef3c7' : '#fee2e2',
+            border: needsMoreDetail ? '2px solid #f59e0b' : '2px solid #ef4444',
+            padding: '15px',
+            borderRadius: '8px',
+          }}
+        >
+          <h4 style={{ 
+            margin: '0 0 10px 0', 
+            color: needsMoreDetail ? '#92400e' : '#991b1b',
+            fontSize: '16px'
+          }}>
+            {needsMoreDetail ? 'より具体的な情報が必要です' : 'エラー'}
+          </h4>
+          <p style={{ 
+            margin: '0', 
+            color: needsMoreDetail ? '#78350f' : '#7f1d1d',
+            whiteSpace: 'pre-line',
+            lineHeight: '1.6'
+          }}>
+            {error}
+          </p>
+          {needsMoreDetail && (
+            <div style={{
+              marginTop: '10px',
+              padding: '10px',
+              background: '#fff',
+              borderRadius: '6px',
+              fontSize: '14px',
+              color: '#78350f'
+            }}>
+              <strong>💡 ヒント:</strong>
+              <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
+                <li>「何を」達成したいのか明確にする</li>
+                <li>「いつまでに」という期限を含める</li>
+                <li>具体的な数値や名称を含める</li>
+              </ul>
+              <div style={{ marginTop: '8px' }}>
+                <strong>例:</strong>
+                <br />
+                「勉強する」
+                <br />
+                「英検2級に合格する」
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 成功時の結果表示 */}
+      {taskData && !error && (
+        <div
+          style={{
+            marginTop: '20px',
+            background: '#f0fdf4',
+            border: '2px solid #10b981',
+            padding: '15px',
+            borderRadius: '8px',
+          }}
+        >
+          <h4 style={{ margin: '0 0 15px 0', color: '#065f46', fontSize: '18px' }}>
+            AIによる解析結果
+          </h4>
+          
+          <div style={{ marginBottom: '15px' }}>
+            <strong style={{ color: '#065f46' }}>タスク:</strong>
+            <p style={{ 
+              margin: '5px 0', 
+              fontSize: '16px', 
+              color: '#047857',
+              fontWeight: 'bold'
+            }}>
+              {taskData.taskName}
+            </p>
+          </div>
+
+          <div style={{ marginBottom: '15px' }}>
+            <strong style={{ color: '#065f46' }}>サブタスク一覧:</strong>
+            <ul style={{ 
+              margin: '5px 0', 
+              paddingLeft: '20px',
+              color: '#047857'
+            }}>
+              {taskData.subTasks && taskData.subTasks.map((subTask, index) => (
+                <li key={index} style={{ marginBottom: '5px' }}>
+                  {subTask}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {taskData.reason && (
+            <div style={{ 
+              marginTop: '10px',
+              padding: '10px',
+              background: '#fff',
+              borderRadius: '6px',
+              fontSize: '14px',
+              color: '#065f46',
+              fontStyle: 'italic'
+            }}>
+              <strong>分析理由:</strong> {taskData.reason}
+            </div>
+          )}
+
+          <div style={{ 
+            marginTop: '10px',
+            fontSize: '14px',
+            color: '#047857'
+          }}>
+            <p style={{ margin: '5px 0' }}>
+              <strong>重要度:</strong> {importance || '未設定'}
+            </p>
+            <p style={{ margin: '5px 0' }}>
+              <strong>期間:</strong> {startDate || '未設定'} 〜 {endDate || '未設定'}
+            </p>
+          </div>
+
+          {/* デバッグ用（本番環境では削除推奨） */}
+          <details style={{ marginTop: '15px' }}>
+            <summary style={{ 
+              cursor: 'pointer', 
+              color: '#059669',
+              fontSize: '12px'
+            }}>
+              詳細データを表示
+            </summary>
+            <pre style={{ 
+              background: '#ecfdf5',
+              padding: '10px',
+              borderRadius: '6px',
+              fontSize: '12px',
+              overflow: 'auto',
+              marginTop: '10px'
+            }}>
+              {JSON.stringify(taskData, null, 2)}
+            </pre>
+          </details>
+        </div>
+      )}
+
+      {/* 入力例の表示 */}
+      <div
+        style={{
+          marginTop: '20px',
+          padding: '15px',
+          background: '#f9fafb',
+          borderRadius: '8px',
+          fontSize: '14px',
+          color: '#6b7280',
+        }}
+      >
+        <h4 style={{ margin: '0 0 10px 0', color: '#374151' }}>
+           入力例
+        </h4>
+        <div style={{ lineHeight: '1.8' }}>
+          <p style={{ margin: '5px 0' }}>
+            <strong>良い例:</strong> 「英検2級に合格する」「ReactでTodoアプリを作る」「毎日30分ランニングする」
+          </p>
+          <p style={{ margin: '5px 0' }}>
+            <strong>悪い例:</strong> 「勉強する」「頑張る」「運動する」
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
+
+export default AITaskColl;
