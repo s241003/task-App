@@ -187,8 +187,7 @@ function AITaskColl({ onTaskCreated }) {
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>
-          <div>
-            タスク
+          <div>&nbsp;タスク
           <input
             type="text"
             value={text}
@@ -213,7 +212,7 @@ function AITaskColl({ onTaskCreated }) {
         </div>
 
         <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
-          <div>重要度
+          <div>重要度&nbsp;
           <input
             type="number"
             value={importance}
@@ -235,7 +234,7 @@ function AITaskColl({ onTaskCreated }) {
           />
             </div>
           
-          <div>開始日
+          <div>開始日&nbsp;
           <input
             type="date"
             value={startDate}
@@ -255,7 +254,7 @@ function AITaskColl({ onTaskCreated }) {
           />
             </div>
           
-          <div>期日
+          <div>期日&nbsp;
           <input
             type="date"
             value={endDate}
