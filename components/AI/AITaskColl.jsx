@@ -26,13 +26,21 @@ async function saveTaskToSupabase(taskData) {
 }
 
 function AITaskColl({ onTaskCreated }) {
+
+  //配列
   const [schedules, setSchedules] = useState([]);
+
+  //文字型
   const [text, setText] = useState('');
+  const [subTasks,setSubTasks] = useState('')
   const [importance, setImportance] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  //bool
   const [taskData, setTaskData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadAI, setIsLoadAI] = useState(false);
   const [error, setError] = useState(null);
   const [needsMoreDetail, setNeedsMoreDetail] = useState(false);
 
@@ -56,7 +64,18 @@ function AITaskColl({ onTaskCreated }) {
     }
   };
 
-  const validateInputs = () => {
+
+  {/* AI呼び出し */}
+
+  const AIColl = async (e) => {
+    e.preventDefault();
+
+    // 初期化
+    setError(null);
+    setNeedsMoreDetail(false);
+    setTaskData(null);
+
+    // バリデーション
     if (!text.trim()) {
       setError('タスク名を入力してください');
       return false;
@@ -67,33 +86,7 @@ function AITaskColl({ onTaskCreated }) {
       return false;
     }
 
-    if (importance && (importance < 1 || importance > 5)) {
-      setError('重要度は1〜5の範囲で設定してください');
-      return false;
-    }
-
-    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-      setError('開始日は期日より前に設定してください');
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // 初期化
-    setError(null);
-    setNeedsMoreDetail(false);
-    setTaskData(null);
-
-    // バリデーション
-    if (!validateInputs()) {
-      return;
-    }
-
-    setIsLoading(true);
+    setIsLoadAI(true);
 
     try {
       // API呼び出し
@@ -121,8 +114,55 @@ function AITaskColl({ onTaskCreated }) {
           'もう少し具体的なタスク名を入力してください。\n例: 「勉強する」→「英検2級に合格する」'
         );
         setTaskData(null);
-        return; // ここで処理を終了（保存しない）
+        return; // ここで処理を終了
       }
+
+      // 成功時の処理
+      setTaskData(data);
+      setSubTasks(data.subTasks.join(', '));
+      console.log('AI Response:', data);
+
+      // 成功時ログ
+      console.log('AIタスクが正常に生成されました');
+
+    } catch (error) {
+      console.error('Error:', error);
+      // エラーメッセージの設定
+      if (error.message.includes('503')) {
+        setError('AIサービスが混雑しています。しばらく待ってから再試行してください。');
+      } else if (error.message.includes('429')) {
+        setError('リクエスト制限に達しました。しばらく待ってから再試行してください。');
+      } else {
+        setError(error.message || 'エラーが発生しました。もう一度お試しください。');
+      }
+      setTaskData(null);
+    } finally {
+      setIsLoadAI(false);
+    }
+  };
+
+
+  {/* タスク送信処理 */}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // 初期化
+    setError(null);
+    setNeedsMoreDetail(false);
+    setTaskData(null);
+
+    // バリデーション
+    if (importance && (importance < 1 || importance > 5)) {
+      setError('重要度は1〜5の範囲で設定してください');
+      return false;
+    }
+
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      setError('開始日は期日より前に設定してください');
+      return false;
+    }
+
+    setIsLoading(true);
 
       // 成功時の処理
       setTaskData(data);
@@ -149,6 +189,7 @@ function AITaskColl({ onTaskCreated }) {
 
       // 入力欄をクリア
       setText('');
+      setSubTasks('');
       setImportance('');
       setStartDate('');
       setEndDate('');
@@ -156,25 +197,14 @@ function AITaskColl({ onTaskCreated }) {
       // 成功メッセージ（オプション）
       console.log('タスクが正常に保存されました');
 
-    } catch (error) {
-      console.error('Error:', error);
-      
-      // エラーメッセージの設定
-      if (error.message.includes('503')) {
-        setError('AIサービスが混雑しています。しばらく待ってから再試行してください。');
-      } else if (error.message.includes('429')) {
-        setError('リクエスト制限に達しました。しばらく待ってから再試行してください。');
-      } else {
-        setError(error.message || 'エラーが発生しました。もう一度お試しください。');
-      }
+      // 終了処理
       setTaskData(null);
-    } finally {
       setIsLoading(false);
-    }
   };
 
   const handleReset = () => {
     setText('');
+    setSubTasks('');
     setImportance('');
     setStartDate('');
     setEndDate('');
@@ -187,6 +217,8 @@ function AITaskColl({ onTaskCreated }) {
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>
+
+          {/* タスク入力 */}
           <div>&nbsp;タスク
           <input
             type="text"
@@ -196,7 +228,7 @@ function AITaskColl({ onTaskCreated }) {
               if (error) setError(null); // 入力時にエラーをクリア
             }}
             placeholder="タスクを入力（具体的に: 例「英検2級に合格する」）"
-            disabled={isLoading}
+            disabled={isLoadAI || isLoading}
             style={{
               width: '100%',
               color: '#0f0f0f',
@@ -208,8 +240,52 @@ function AITaskColl({ onTaskCreated }) {
               fontSize: '16px',
             }}
           />
+
+          {/* サブタスク入力 */}
+          <div>
+            <input
+            type="text"
+            value={subTasks}
+            onChange={(e) => {
+              setSubTasks(e.target.value);
+              if (error) setError(null);
+            }}
+            placeholder="タスクを細分化する（例:リスニング,リーディング,ライティング）"
+            disabled={isLoadAI || isLoading}
+            style={{
+              width: '100%',
+              color: '#0f0f0f',
+              background: '#f0f0f0',
+              padding: '12px',
+              borderRadius: '9px',
+              border: error && needsMoreDetail ? '2px solid #f59e0b' : '1px solid #ddd',
+              caretColor: '#0f0f0f',
+              fontSize: '16px',
+            }}
+          />
+          </div>
             </div>
+            {/* AIに送るボタン */}
+            <button
+            onClick={AIColl}
+            type="button"
+            disabled={isLoadAI || isLoading || !text.trim()}
+            style={{
+              flex: '1',
+              padding: '12px 20px',
+              background: isLoadAI || isLoading || !text.trim() ? '#ccc' : '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '9px',
+              cursor: isLoadAI || isLoading || !text.trim() ? 'not-allowed' : 'pointer',
+              fontSize: '16px',
+              fontWeight: 'bold',
+            }}
+          >
+            {isLoadAI || isLoading ? '解析中...' : 'AIに送る'}
+          </button>
         </div>
+      </form>
 
         <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
           <div>重要度&nbsp;
@@ -233,7 +309,7 @@ function AITaskColl({ onTaskCreated }) {
             }}
           />
             </div>
-          
+
           <div>開始日&nbsp;
           <input
             type="date"
@@ -277,23 +353,6 @@ function AITaskColl({ onTaskCreated }) {
           
 
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button
-            type="submit"
-            disabled={isLoading || !text.trim()}
-            style={{
-              flex: '1',
-              padding: '12px 20px',
-              background: isLoading || !text.trim() ? '#ccc' : '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '9px',
-              cursor: isLoading || !text.trim() ? 'not-allowed' : 'pointer',
-              fontSize: '16px',
-              fontWeight: 'bold',
-            }}
-          >
-            {isLoading ? '解析中...' : 'AI呼び出し'}
-          </button>
 
           {(taskData || error) && (
             <button
@@ -313,7 +372,6 @@ function AITaskColl({ onTaskCreated }) {
             </button>
           )}
         </div>
-      </form>
 
       {/* エラーメッセージ表示 */}
       {error && (
@@ -424,7 +482,7 @@ function AITaskColl({ onTaskCreated }) {
             </div>
           )}
 
-          <div style={{ 
+          <div style={{
             marginTop: '10px',
             fontSize: '14px',
             color: '#047857'
