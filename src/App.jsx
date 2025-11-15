@@ -41,23 +41,6 @@ const App = () => {
     }
   };
 
-  // 手動でタスクを追加する処理
-  const handleAddTask = (e) => {
-    e.preventDefault();
-    if (!taskInput.trim()) return;
-
-    setTasks((prevTasks) => {
-      const newTasks = { ...prevTasks };
-      if (!newTasks[selectedDate]) {
-        newTasks[selectedDate] = [];
-      }
-      newTasks[selectedDate].push(taskInput);
-      return newTasks;
-    });
-
-    setTaskInput('');
-  };
-
   const renderCalendar = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -102,7 +85,7 @@ const App = () => {
 
   return (
     <div className="app-container">
-      <h1>📅 シンプルタスクカレンダー</h1>
+      <h1>シンプルタスクカレンダー</h1>
 
       {/* カレンダー本体 */}
       <div className="calendar-container">
@@ -123,16 +106,6 @@ const App = () => {
         <AITaskInput onTaskCreated={handleAddTaskFromAI} />
 
         <h3 style={{ marginTop: '2rem' }}>{selectedDate} のタスク</h3>
-
-        <form onSubmit={handleAddTask} className="task-form">
-          <input
-            type="text"
-            value={taskInput}
-            onChange={(e) => setTaskInput(e.target.value)}
-            placeholder="新しいタスクを手動入力"
-          />
-          <button type="submit">追加</button>
-        </form>
 
         <ul className="task-list">
           {tasks[selectedDate] && tasks[selectedDate].length > 0 ? (

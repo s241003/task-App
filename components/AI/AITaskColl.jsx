@@ -119,7 +119,7 @@ function AITaskColl({ onTaskCreated }) {
 
       // 成功時の処理
       setTaskData(data);
-      setSubTasks(data.subTasks.join(', '));
+      setSubTasks(data.subTasks.join(' '));
       console.log('AI Response:', data);
 
       // 成功時ログ
@@ -230,7 +230,7 @@ function AITaskColl({ onTaskCreated }) {
             placeholder="タスクを入力（具体的に: 例「英検2級に合格する」）"
             disabled={isLoadAI || isLoading}
             style={{
-              width: '100%',
+              width: '40%',
               color: '#0f0f0f',
               background: '#f0f0f0',
               padding: '12px',
@@ -241,31 +241,7 @@ function AITaskColl({ onTaskCreated }) {
             }}
           />
 
-          {/* サブタスク入力 */}
-          <div>
-            <input
-            type="text"
-            value={subTasks}
-            onChange={(e) => {
-              setSubTasks(e.target.value);
-              if (error) setError(null);
-            }}
-            placeholder="タスクを細分化する（例:リスニング,リーディング,ライティング）"
-            disabled={isLoadAI || isLoading}
-            style={{
-              width: '100%',
-              color: '#0f0f0f',
-              background: '#f0f0f0',
-              padding: '12px',
-              borderRadius: '9px',
-              border: error && needsMoreDetail ? '2px solid #f59e0b' : '1px solid #ddd',
-              caretColor: '#0f0f0f',
-              fontSize: '16px',
-            }}
-          />
-          </div>
-            </div>
-            {/* AIに送るボタン */}
+          {/* AIに送るボタン */}
             <button
             onClick={AIColl}
             type="button"
@@ -284,8 +260,32 @@ function AITaskColl({ onTaskCreated }) {
           >
             {isLoadAI || isLoading ? '解析中...' : 'AIに送る'}
           </button>
+          </div>
+
+          {/* サブタスク入力 */}
+          <div>
+            <input
+            type="text"
+            value={subTasks}
+            onChange={(e) => {
+              setSubTasks(e.target.value);
+              if (error) setError(null);
+            }}
+            placeholder="タスクを細分化する（スペースで区切ってください）"
+            disabled={isLoadAI || isLoading}
+            style={{
+              width: '100%',
+              color: '#0f0f0f',
+              background: '#f0f0f0',
+              padding: '12px',
+              borderRadius: '9px',
+              border: error && needsMoreDetail ? '2px solid #f59e0b' : '1px solid #ddd',
+              caretColor: '#0f0f0f',
+              fontSize: '16px',
+            }}
+          />
+          </div>
         </div>
-      </form>
 
         <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
           <div>重要度&nbsp;
@@ -350,7 +350,7 @@ function AITaskColl({ onTaskCreated }) {
           />
           </div>
         </div>
-          
+      </form>
 
         <div style={{ display: 'flex', gap: '10px' }}>
 
