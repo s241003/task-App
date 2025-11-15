@@ -213,10 +213,112 @@ function AITaskColl({ onTaskCreated }) {
     setNeedsMoreDetail(false);
   };
 
-  return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', marginBottom: '15px'}}>
-      <form onSubmit={handleSubmit}>
+  // 追加: 共通スタイルをまとめる（UI整理のみ、機能変更なし）
+  const styles = {
+    container: {
+      maxWidth: '800px',
+      margin: '0 auto',
+      padding: '20px',
+      marginBottom: '15px',
+      fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial'
+    },
+    row: { display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' },
+    input: {
+      width: '40%',
+      color: '#0f0f0f',
+      background: '#f0f0f0',
+      padding: '12px',
+      borderRadius: '9px',
+      border: '1px solid #ddd',
+      caretColor: '#0f0f0f',
+      fontSize: '16px',
+    },
+    fullInput: {
+      width: '100%',
+      color: '#0f0f0f',
+      background: '#f0f0f0',
+      padding: '12px',
+      borderRadius: '9px',
+      border: '1px solid #ddd',
+      caretColor: '#0f0f0f',
+      fontSize: '16px',
+    },
+    aiButton: (disabled) => ({
+      marginLeft: '10px',
+      flex: '1',
+      padding: '12px 20px',
+      background: disabled ? '#ccc' : '#3b82f6',
+      color: 'white',
+      border: 'none',
+      borderRadius: '9px',
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      fontSize: '16px',
+      fontWeight: 'bold',
+    }),
+    select: {
+      flex: '1',
+      minWidth: '120px',
+      color: '#0f0f0f',
+      background: '#f0f0f0',
+      padding: '10px',
+      borderRadius: '9px',
+      border: '1px solid #ddd',
+      caretColor: '#0f0f0f',
+    },
+    dateInput: {
+      flex: '1',
+      minWidth: '140px',
+      color: '#0f0f0f',
+      background: '#f0f0f0',
+      padding: '10px',
+      borderRadius: '9px',
+      border: '1px solid #ddd',
+      caretColor: '#0f0f0f',
+    },
+    resetButton: {
+      padding: '12px 20px',
+      background: '#6b7280',
+      color: 'white',
+      border: 'none',
+      borderRadius: '9px',
+      cursor: 'pointer',
+      fontSize: '16px',
+    },
+    alertBase: {
+      marginTop: '20px',
+      padding: '15px',
+      borderRadius: '8px',
+    },
+    alertError: {
+      background: '#fee2e2',
+      border: '2px solid #ef4444',
+      color: '#7f1d1d',
+    },
+    alertWarn: {
+      background: '#fef3c7',
+      border: '2px solid #f59e0b',
+      color: '#78350f',
+    },
+    successBox: {
+      marginTop: '20px',
+      background: '#f0fdf4',
+      border: '2px solid #10b981',
+      padding: '15px',
+      borderRadius: '8px',
+    },
+    debugPre: {
+      background: '#ecfdf5',
+      padding: '10px',
+      borderRadius: '6px',
+      fontSize: '12px',
+      overflow: 'auto',
+      marginTop: '10px'
+    }
+  };
 
+  return (
+    <div style={styles.container}>
+      <form onSubmit={handleSubmit}>
         {/* タスク入力 */}
         <label htmlFor="task">タスク
           <input
@@ -229,16 +331,11 @@ function AITaskColl({ onTaskCreated }) {
             }}
             placeholder="タスクを入力（具体的に: 例「英検2級に合格する」）"
             disabled={isLoadAI || isLoading}
-            style={{
-              width: '40%',
-              color: '#0f0f0f',
-              background: '#f0f0f0',
-              padding: '12px',
-              borderRadius: '9px',
-              border: error && needsMoreDetail ? '2px solid #f59e0b' : '1px solid #ddd',
-              caretColor: '#0f0f0f',
-              fontSize: '16px',
-            }}
+            style={
+              error && needsMoreDetail
+                ? { ...styles.input, border: '2px solid #f59e0b' }
+                : styles.input
+            }
           />
         </label>
 
@@ -247,25 +344,10 @@ function AITaskColl({ onTaskCreated }) {
           onClick={AIColl}
           type="button"
           disabled={isLoadAI || isLoading || !text.trim()}
-          style={{
-            marginLeft: '10px',
-            flex: '1',
-            padding: '12px 20px',
-            background: isLoadAI || isLoading || !text.trim() ? '#ccc' : '#3b82f6',
-            color: 'white',
-            border: 'none',
-            borderRadius: '9px',
-            cursor: isLoadAI || isLoading || !text.trim() ? 'not-allowed' : 'pointer',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            '&:hover': {
-              backgroundColor: isLoadAI || isLoading || !text.trim() ? '#ccc' : '#2563eb',
-            },
-          }}
+          style={styles.aiButton(isLoadAI || isLoading || !text.trim())}
         >
           {isLoadAI || isLoading ? '解析中...' : 'AIに送る'}
         </button>
-
 
         {/* サブタスク入力 */}
         <div>
@@ -280,16 +362,7 @@ function AITaskColl({ onTaskCreated }) {
               }}
               placeholder="タスクを細分化する（スペースで区切ってください）"
               disabled={isLoadAI || isLoading}
-              style={{
-                width: '100%',
-                color: '#0f0f0f',
-                background: '#f0f0f0',
-                padding: '12px',
-                borderRadius: '9px',
-                border: error && needsMoreDetail ? '2px solid #f59e0b' : '1px solid #ddd',
-                caretColor: '#0f0f0f',
-                fontSize: '16px',
-              }}
+              style={ error && needsMoreDetail ? { ...styles.fullInput, border: '2px solid #f59e0b' } : styles.fullInput }
             />
           </label>
         </div>
@@ -304,16 +377,7 @@ function AITaskColl({ onTaskCreated }) {
                     setImportance(e.target.value)
                   }
                   disabled={isLoading}
-                  style={{
-                    flex: '1',
-                    minWidth: '120px',
-                    color: '#0f0f0f',
-                    background: '#f0f0f0',
-                    padding: '10px',
-                    borderRadius: '9px',
-                    border: '1px solid #ddd',
-                    caretColor: '#0f0f0f',
-                  }}
+                  style={styles.select}
                 >
                   <option value="1">🟦 　低　 </option>
                   <option value="2">🟩 やや低 </option>
@@ -326,25 +390,18 @@ function AITaskColl({ onTaskCreated }) {
 
 
             {/* 期間 */}
-          <div htmlFor="turm">
+          <div>
             <label htmlFor="turm">期間
               <input
+                id="turm"
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 placeholder="開始日"
                 disabled={isLoading}
-                style={{
-                  flex: '1',
-                  minWidth: '140px',
-                  color: '#0f0f0f',
-                  background: '#f0f0f0',
-                  padding: '10px',
-                  borderRadius: '9px',
-                  border: '1px solid #ddd',
-                  caretColor: '#0f0f0f',
-                }}
+                style={styles.dateInput}
               />
+
               &emsp;～&emsp;
 
               <input
@@ -353,16 +410,7 @@ function AITaskColl({ onTaskCreated }) {
                 onChange={(e) => setEndDate(e.target.value)}
                 placeholder="期日"
                 disabled={isLoading}
-                style={{
-                  flex: '1',
-                  minWidth: '140px',
-                  color: '#0f0f0f',
-                  background: '#f0f0f0',
-                  padding: '10px',
-                  borderRadius: '9px',
-                  border: '1px solid #ddd',
-                  caretColor: '#0f0f0f',
-                }}
+                style={styles.dateInput}
               />
             </label>
           </div>
@@ -378,15 +426,7 @@ function AITaskColl({ onTaskCreated }) {
             <button
               type="button"
               onClick={handleReset}
-              style={{
-                padding: '12px 20px',
-                background: '#6b7280',
-                color: 'white',
-                border: 'none',
-                borderRadius: '9px',
-                cursor: 'pointer',
-                fontSize: '16px',
-              }}
+              style={styles.resetButton}
             >
               リセット
             </button>
@@ -396,13 +436,11 @@ function AITaskColl({ onTaskCreated }) {
       {/* エラーメッセージ表示 */}
       {error && (
         <div
-          style={{
-            marginTop: '20px',
-            background: needsMoreDetail ? '#fef3c7' : '#fee2e2',
-            border: needsMoreDetail ? '2px solid #f59e0b' : '2px solid #ef4444',
-            padding: '15px',
-            borderRadius: '8px',
-          }}
+          style={
+            needsMoreDetail
+              ? { ...styles.alertBase, ...styles.alertWarn }
+              : { ...styles.alertBase, ...styles.alertError }
+          }
         >
           <h4 style={{ 
             margin: '0 0 10px 0', 
@@ -448,15 +486,7 @@ function AITaskColl({ onTaskCreated }) {
 
       {/* 成功時の結果表示 */}
       {taskData && !error && (
-        <div
-          style={{
-            marginTop: '20px',
-            background: '#f0fdf4',
-            border: '2px solid #10b981',
-            padding: '15px',
-            borderRadius: '8px',
-          }}
-        >
+        <div style={styles.successBox}>
           <h4 style={{ margin: '0 0 15px 0', color: '#065f46', fontSize: '18px' }}>
           　AIによる解析結果
           </h4>
@@ -524,14 +554,7 @@ function AITaskColl({ onTaskCreated }) {
             }}>
               詳細データを表示
             </summary>
-            <pre style={{ 
-              background: '#ecfdf5',
-              padding: '10px',
-              borderRadius: '6px',
-              fontSize: '12px',
-              overflow: 'auto',
-              marginTop: '10px'
-            }}>
+            <pre style={styles.debugPre}>
               {JSON.stringify(taskData, null, 2)}
             </pre>
           </details>
