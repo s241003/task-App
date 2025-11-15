@@ -222,57 +222,83 @@ function AITaskColl({ onTaskCreated }) {
       marginBottom: '15px',
       fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial'
     },
+    // 追加: フォーム全体をグリッド化して整列
+    formGrid: {
+      display: 'grid',
+      gridTemplateColumns: '1fr',
+      gap: '12px',
+      alignItems: 'start',
+    },
+    // 追加: 各入力グループのスタイル
+    formGroup: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '6px',
+    },
+    labelStyle: {
+      fontSize: '14px',
+      color: '#374151',
+      fontWeight: '600',
+    },
     row: { display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' },
     input: {
-      width: '40%',
+      width: '100%', // タスク入力を幅いっぱいにして、AIボタンは右に寄せるので内部調整
       color: '#0f0f0f',
-      background: '#f0f0f0',
+      background: '#f8fafc',
       padding: '12px',
       borderRadius: '9px',
-      border: '1px solid #ddd',
+      border: '1px solid #e6edf3',
       caretColor: '#0f0f0f',
       fontSize: '16px',
     },
     fullInput: {
       width: '100%',
       color: '#0f0f0f',
-      background: '#f0f0f0',
+      background: '#f8fafc',
       padding: '12px',
       borderRadius: '9px',
-      border: '1px solid #ddd',
+      border: '1px solid #e6edf3',
       caretColor: '#0f0f0f',
       fontSize: '16px',
     },
+    // AIボタンは右寄せの小さめボタンに調整
     aiButton: (disabled) => ({
       marginLeft: '10px',
-      flex: '1',
-      padding: '12px 20px',
-      background: disabled ? '#ccc' : '#3b82f6',
+      padding: '10px 16px',
+      background: disabled ? '#e5e7eb' : '#2563eb',
       color: 'white',
       border: 'none',
       borderRadius: '9px',
       cursor: disabled ? 'not-allowed' : 'pointer',
-      fontSize: '16px',
-      fontWeight: 'bold',
+      fontSize: '14px',
+      fontWeight: '700',
+      alignSelf: 'center'
     }),
+    // 入力群を横並びにする行
+    actionRow: {
+      display: 'flex',
+      gap: '10px',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    },
     select: {
       flex: '1',
       minWidth: '120px',
       color: '#0f0f0f',
-      background: '#f0f0f0',
+      background: '#f8fafc',
       padding: '10px',
       borderRadius: '9px',
-      border: '1px solid #ddd',
+      border: '1px solid #e6edf3',
       caretColor: '#0f0f0f',
     },
     dateInput: {
       flex: '1',
       minWidth: '140px',
       color: '#0f0f0f',
-      background: '#f0f0f0',
+      background: '#f8fafc',
       padding: '10px',
       borderRadius: '9px',
-      border: '1px solid #ddd',
+      border: '1px solid #e6edf3',
       caretColor: '#0f0f0f',
     },
     resetButton: {
@@ -318,40 +344,43 @@ function AITaskColl({ onTaskCreated }) {
 
   return (
     <div style={styles.container}>
-      <form onSubmit={handleSubmit}>
-        {/* タスク入力 */}
-        <label htmlFor="task">タスク
-          <input
-            isLoading="task"
-            type="text"
-            value={text}
-            onChange={(e) => {
-              setText(e.target.value);
-              if (error) setError(null); // 入力時にエラーをクリア
-            }}
-            placeholder="タスクを入力（具体的に: 例「英検2級に合格する」）"
-            disabled={isLoadAI || isLoading}
-            style={
-              error && needsMoreDetail
-                ? { ...styles.input, border: '2px solid #f59e0b' }
-                : styles.input
-            }
-          />
-        </label>
+      <form onSubmit={handleSubmit} style={{ display: 'block' }}>
+        <div style={styles.formGrid}>
+          {/* タスク入力グループ（ラベル上） */}
+          <div style={styles.formGroup}>
+            <label style={styles.labelStyle} htmlFor="task">タスク</label>
+            <div style={styles.actionRow}>
+              <input
+                isLoading="task"
+                type="text"
+                id="task"
+                value={text}
+                onChange={(e) => {
+                  setText(e.target.value);
+                  if (error) setError(null); // 入力時にエラーをクリア
+                }}
+                placeholder="具体的に：例「英検2級に合格する」"
+                disabled={isLoadAI || isLoading}
+                style={
+                  error && needsMoreDetail
+                    ? { ...styles.input, border: '2px solid #f59e0b', flex: 1 }
+                    : { ...styles.input, flex: 1 }
+                }
+              />
+              <button
+                onClick={AIColl}
+                type="button"
+                disabled={isLoadAI || isLoading || !text.trim()}
+                style={styles.aiButton(isLoadAI || isLoading || !text.trim())}
+              >
+                {isLoadAI || isLoading ? '解析中…' : 'AIに送る'}
+              </button>
+            </div>
+          </div>
 
-        {/* AIに送るボタン */}
-        <button
-          onClick={AIColl}
-          type="button"
-          disabled={isLoadAI || isLoading || !text.trim()}
-          style={styles.aiButton(isLoadAI || isLoading || !text.trim())}
-        >
-          {isLoadAI || isLoading ? '解析中...' : 'AIに送る'}
-        </button>
-
-        {/* サブタスク入力 */}
-        <div>
-          <label htmlFor="subTask">サブタスク
+          {/* サブタスク */}
+          <div style={styles.formGroup}>
+            <label style={styles.labelStyle} htmlFor="subTask">サブタスク</label>
             <input
               id="subTask"
               type="text"
@@ -360,59 +389,55 @@ function AITaskColl({ onTaskCreated }) {
                 setSubTasks(e.target.value);
                 if (error) setError(null);
               }}
-              placeholder="タスクを細分化する（スペースで区切ってください）"
+              placeholder="スペースで区切って入力（例: 調査 準備 実施）"
               disabled={isLoadAI || isLoading}
               style={ error && needsMoreDetail ? { ...styles.fullInput, border: '2px solid #f59e0b' } : styles.fullInput }
             />
-          </label>
-        </div>
+          </div>
 
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
-          <label htmlFor="importance">重要度&nbsp;
-            <div>
-                <select
-                  id="importance"
-                  value={importance}
-                  onChange={(e) =>
-                    setImportance(e.target.value)
-                  }
+          {/* 重要度・期間を横並びに */}
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ ...styles.formGroup, flex: '0 0 180px' }}>
+              <label style={styles.labelStyle} htmlFor="importance">重要度</label>
+              <select
+                id="importance"
+                value={importance}
+                onChange={(e) => setImportance(e.target.value)}
+                disabled={isLoading}
+                style={styles.select}
+              >
+                <option value="">未選択</option>
+                <option value="1">🟦 低</option>
+                <option value="2">🟩 やや低</option>
+                <option value="3">🟨 中</option>
+                <option value="4">🟧 やや高</option>
+                <option value="5">🟥 高</option>
+              </select>
+            </div>
+
+            <div style={{ ...styles.formGroup, flex: 1 }}>
+              <label style={styles.labelStyle} htmlFor="turm">期間</label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  id="turm"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  placeholder="開始日"
                   disabled={isLoading}
-                  style={styles.select}
-                >
-                  <option value="1">🟦 　低　 </option>
-                  <option value="2">🟩 やや低 </option>
-                  <option value="3">🟨 　中　 </option>
-                  <option value="4">🟧 やや高 </option>
-                  <option value="5">🟥 　高 </option>
-                </select>
+                  style={styles.dateInput}
+                />
+                <span style={{ alignSelf: 'center', color: '#6b7280' }}>〜</span>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  placeholder="期日"
+                  disabled={isLoading}
+                  style={styles.dateInput}
+                />
               </div>
-          </label>
-
-
-            {/* 期間 */}
-          <div>
-            <label htmlFor="turm">期間
-              <input
-                id="turm"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                placeholder="開始日"
-                disabled={isLoading}
-                style={styles.dateInput}
-              />
-
-              &emsp;～&emsp;
-
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                placeholder="期日"
-                disabled={isLoading}
-                style={styles.dateInput}
-              />
-            </label>
+            </div>
           </div>
         </div>
       </form>
@@ -420,7 +445,7 @@ function AITaskColl({ onTaskCreated }) {
 
 
         {/* 以下 AI結果ウィンドウ */}
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
 
           {(taskData || error) && (
             <button
