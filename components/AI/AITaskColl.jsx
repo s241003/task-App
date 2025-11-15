@@ -259,7 +259,7 @@ function AITaskColl({ onTaskCreated }) {
             fontSize: '16px',
             fontWeight: 'bold',
             '&:hover': {
-              backgroundColor: grey[200],
+              backgroundColor: isLoadAI || isLoading || !text.trim() ? '#ccc' : '#2563eb',
             },
           }}
         >
