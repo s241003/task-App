@@ -214,13 +214,13 @@ function AITaskColl({ onTaskCreated }) {
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', marginBottom: '15px'}}>
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
 
-          {/* タスク入力 */}
-          <div>&nbsp;タスク
+        {/* タスク入力 */}
+        <label htmlFor="task">タスク
           <input
+            isLoading="task"
             type="text"
             value={text}
             onChange={(e) => {
@@ -240,118 +240,138 @@ function AITaskColl({ onTaskCreated }) {
               fontSize: '16px',
             }}
           />
+        </label>
 
-          {/* AIに送るボタン */}
-            <button
-            onClick={AIColl}
-            type="button"
-            disabled={isLoadAI || isLoading || !text.trim()}
-            style={{
-              flex: '1',
-              padding: '12px 20px',
-              background: isLoadAI || isLoading || !text.trim() ? '#ccc' : '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '9px',
-              cursor: isLoadAI || isLoading || !text.trim() ? 'not-allowed' : 'pointer',
-              fontSize: '16px',
-              fontWeight: 'bold',
-            }}
-          >
-            {isLoadAI || isLoading ? '解析中...' : 'AIに送る'}
-          </button>
-          </div>
+        {/* AIに送るボタン */}
+        <button
+          onClick={AIColl}
+          type="button"
+          disabled={isLoadAI || isLoading || !text.trim()}
+          style={{
+            marginLeft: '10px',
+            flex: '1',
+            padding: '12px 20px',
+            background: isLoadAI || isLoading || !text.trim() ? '#ccc' : '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '9px',
+            cursor: isLoadAI || isLoading || !text.trim() ? 'not-allowed' : 'pointer',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            '&:hover': {
+              backgroundColor: grey[200],
+            },
+          }}
+        >
+          {isLoadAI || isLoading ? '解析中...' : 'AIに送る'}
+        </button>
 
-          {/* サブタスク入力 */}
-          <div>
+
+        {/* サブタスク入力 */}
+        <div>
+          <label htmlFor="subTask">サブタスク
             <input
-            type="text"
-            value={subTasks}
-            onChange={(e) => {
-              setSubTasks(e.target.value);
-              if (error) setError(null);
-            }}
-            placeholder="タスクを細分化する（スペースで区切ってください）"
-            disabled={isLoadAI || isLoading}
-            style={{
-              width: '100%',
-              color: '#0f0f0f',
-              background: '#f0f0f0',
-              padding: '12px',
-              borderRadius: '9px',
-              border: error && needsMoreDetail ? '2px solid #f59e0b' : '1px solid #ddd',
-              caretColor: '#0f0f0f',
-              fontSize: '16px',
-            }}
-          />
-          </div>
+              id="subTask"
+              type="text"
+              value={subTasks}
+              onChange={(e) => {
+                setSubTasks(e.target.value);
+                if (error) setError(null);
+              }}
+              placeholder="タスクを細分化する（スペースで区切ってください）"
+              disabled={isLoadAI || isLoading}
+              style={{
+                width: '100%',
+                color: '#0f0f0f',
+                background: '#f0f0f0',
+                padding: '12px',
+                borderRadius: '9px',
+                border: error && needsMoreDetail ? '2px solid #f59e0b' : '1px solid #ddd',
+                caretColor: '#0f0f0f',
+                fontSize: '16px',
+              }}
+            />
+          </label>
         </div>
 
         <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
-          <div>重要度&nbsp;
-          <input
-            type="number"
-            value={importance}
-            onChange={(e) => setImportance(e.target.value)}
-            placeholder="重要度 (1~5)"
-            disabled={isLoading}
-            max="5"
-            min="1"
-            style={{
-              flex: '1',
-              minWidth: '120px',
-              color: '#0f0f0f',
-              background: '#f0f0f0',
-              padding: '10px',
-              borderRadius: '9px',
-              border: '1px solid #ddd',
-              caretColor: '#0f0f0f',
-            }}
-          />
-            </div>
+          <label htmlFor="importance">重要度&nbsp;
+            <div>
+                <select
+                  id="importance"
+                  value={importance}
+                  onChange={(e) =>
+                    setImportance(e.target.value)
+                  }
+                  disabled={isLoading}
+                  style={{
+                    flex: '1',
+                    minWidth: '120px',
+                    color: '#0f0f0f',
+                    background: '#f0f0f0',
+                    padding: '10px',
+                    borderRadius: '9px',
+                    border: '1px solid #ddd',
+                    caretColor: '#0f0f0f',
+                  }}
+                >
+                  <option value="1">🟦 　低　 </option>
+                  <option value="2">🟩 やや低 </option>
+                  <option value="3">🟨 　中　 </option>
+                  <option value="4">🟧 やや高 </option>
+                  <option value="5">🟥 　高 </option>
+                </select>
+              </div>
+          </label>
 
-          <div>開始日&nbsp;
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            placeholder="開始日"
-            disabled={isLoading}
-            style={{
-              flex: '1',
-              minWidth: '140px',
-              color: '#0f0f0f',
-              background: '#f0f0f0',
-              padding: '10px',
-              borderRadius: '9px',
-              border: '1px solid #ddd',
-              caretColor: '#0f0f0f',
-            }}
-          />
-            </div>
-          
-          <div>期日&nbsp;
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            placeholder="期日"
-            disabled={isLoading}
-            style={{
-              flex: '1',
-              minWidth: '140px',
-              color: '#0f0f0f',
-              background: '#f0f0f0',
-              padding: '10px',
-              borderRadius: '9px',
-              border: '1px solid #ddd',
-              caretColor: '#0f0f0f',
-            }}
-          />
+
+            {/* 期間 */}
+          <div htmlFor="turm">
+            <label htmlFor="turm">期間
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                placeholder="開始日"
+                disabled={isLoading}
+                style={{
+                  flex: '1',
+                  minWidth: '140px',
+                  color: '#0f0f0f',
+                  background: '#f0f0f0',
+                  padding: '10px',
+                  borderRadius: '9px',
+                  border: '1px solid #ddd',
+                  caretColor: '#0f0f0f',
+                }}
+              />
+              &emsp;～&emsp;
+
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                placeholder="期日"
+                disabled={isLoading}
+                style={{
+                  flex: '1',
+                  minWidth: '140px',
+                  color: '#0f0f0f',
+                  background: '#f0f0f0',
+                  padding: '10px',
+                  borderRadius: '9px',
+                  border: '1px solid #ddd',
+                  caretColor: '#0f0f0f',
+                }}
+              />
+            </label>
           </div>
         </div>
       </form>
+        {/* 以上 タスク生成ウィンドウ */}
 
+
+        {/* 以下 AI結果ウィンドウ */}
         <div style={{ display: 'flex', gap: '10px' }}>
 
           {(taskData || error) && (
