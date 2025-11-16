@@ -462,7 +462,7 @@ function AITaskColl({ onTaskCreated }) {
            <button
               type="submit"
               disabled={isLoadAI || isLoading || !text.trim() || !importance.trim() || !subTasks.trim() || !startDate.trim() || !endDate.trim()}
-              style={styles.submitButton(disabled)}
+              style={styles.submitButton(isLoadAI || isLoading || !text.trim() || !importance.trim() || !subTasks.trim() || !startDate.trim() || !endDate.trim())}
             >
               タスクを作成
             </button>
