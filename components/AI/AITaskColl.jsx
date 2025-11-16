@@ -171,7 +171,7 @@ function AITaskColl({ onTaskCreated }) {
 
       // 親コンポーネントに結果を渡す
       if (onTaskCreated) {
-        onTaskCreated(dataset);
+        onTaskCreated(dataSet);
       }
 
       // スケジュールリストを更新
