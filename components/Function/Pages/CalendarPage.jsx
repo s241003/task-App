@@ -1,6 +1,6 @@
 import { useState } from "react";
 import '../../../src/App.css';
-import AITaskColl from '../components/AI/AITaskColl';
+import AITaskColl from '../../components/AI/AITaskColl';
 import { formatDate,formatDateDisplay } from '../../../src/App';
 
 function CalendarPage({tasks})
@@ -409,7 +409,7 @@ function CalendarPage({tasks})
         </div>
 
         <div className="task-container" style={styles.taskContainer}>
-          <AITaskInput onTaskCreated={handleAddTaskFromAI} />
+          <AITaskColl onTaskCreated={handleAddTaskFromAI} />
 
           {/* タスク一覧（重要度順） */}
           <div className="task-list-section">
