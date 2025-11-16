@@ -9,8 +9,27 @@ function CalendarPage({tasks, setTasks})
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [taskInput, setTaskInput] = useState('');
 
-  const key = selectedDate ? formatDate(selectedDate) : null
-  let selectedTasks = key && tasks[key] ? tasks[key] : []
+  const key = selectedDate ? formatDate(selectedDate) : null;
+  // 生データ（文字列またはオブジェクト）が入る可能性があるため正規化する
+  const selectedTasksRaw = key && tasks[key] ? tasks[key] : [];
+  let selectedTasks = selectedTasksRaw.map((t) => {
+    if (typeof t === 'string') return { task: t, imp: 0 };
+    // t がオブジェクトの場合、task フィールドが文字列でない可能性に対応
+    const rawTask = t.task;
+    const safeTask =
+      typeof rawTask === 'string'
+        ? rawTask
+        : // try common nested fields or fallback to JSON
+          (rawTask && (rawTask.text || rawTask.title)) || JSON.stringify(rawTask || '');
+    return {
+      task: safeTask || '',
+      imp: typeof t.imp === 'number' ? t.imp : 0,
+      sta: t.sta,
+      end: t.end,
+      // preserve other fields if needed
+      ...t,
+    };
+  });
 
   // ★ 重要度が高い順にソート
   selectedTasks = [...selectedTasks].sort((a, b) => (b.imp || 0) - (a.imp || 0))
@@ -185,6 +204,7 @@ function CalendarPage({tasks, setTasks})
       const dateString = formatDate(date);
       // selectedDate は Date 型に統一 -> 比較はフォーマットした文字列同士で行う
       const isSelected = dateString === formatDate(selectedDate);
+      // カレンダー表示用は文字列／オブジェクト両方を許容する（表示時に正規化しない）
       const dayTasks = tasks[dateString] || [];
       const hasTask = dayTasks.length > 0;
 
@@ -220,11 +240,19 @@ function CalendarPage({tasks, setTasks})
           )}
 
           <div style={styles.dayTasks}>
-            {dayTasks.slice(0, 3).map((t, idx) => (
-              <div key={idx} style={styles.taskBadge} title={t}>
-                {t}
-              </div>
-            ))}
+            {dayTasks.slice(0, 3).map((t, idx) => {
+              // 日セルのタスク表示でもオブジェクトを直接描画しないよう安全に文字列化
+              const raw = typeof t === 'string' ? t : t.task;
+              const text =
+                typeof raw === 'string'
+                  ? raw
+                  : (raw && (raw.text || raw.title)) || JSON.stringify(raw || '');
+              return (
+                <div key={idx} style={styles.taskBadge} title={text}>
+                  {text}
+                </div>
+              );
+            })}
 
             {dayTasks.length > 3 && (
               <div style={styles.moreBadge}>＋{dayTasks.length - 3} 件</div>
@@ -433,12 +461,14 @@ function CalendarPage({tasks, setTasks})
                     {/* ← 左端に色バー */}
                     <div
                       className="priority-bar"
-                      style={{ backgroundColor: getPriorityColor(task.priority) }}
+                      // priority は task.priority ではなく task.imp を参照する（正規化時に imp をセット）
+                      style={{ backgroundColor: getPriorityColor(task.imp) }}
                     ></div>
 
                     {/* タスク内容 */}
                     <div className="task-content">
-                      <strong>{task.task}</strong>
+                      {/* task.task は正規化済みで文字列保証 */}
+                      <strong>{String(task.task)}</strong>
                       <div className="task-meta">
                         {task.sta && task.end && (
                           <span> {task.sta}〜{task.end}</span>
