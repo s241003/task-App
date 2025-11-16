@@ -1,414 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import './App.css';
-import AITaskInput from '../components/AI/AITaskColl';
+import NavigationBar from '../components/Function/NavigationBar';
+import CalendarPage from '../components/Function/Pages/CalendarPage';
 
-const formatDate = (date) => {
+export const formatDate = (date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 
+export const formatDateDisplay = (date) => {
+  if (!date) return "日付未選択";
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  return `${year}年${month}月${day}日`;
+};
+
+
 const App = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
-  const [tasks, setTasks] = useState({});
-  const [taskInput, setTaskInput] = useState('');
+  const [currentPage, setCurrentPage] = useState(() => localStorage.getItem('lastPage') || 'calendar')
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem('tasks')
+    return saved ? JSON.parse(saved) : {}
+  })
 
-  // --- 祝日関連ユーティリティ: 年単位で祝日マップを生成（振替・国民の休日を含む） ---
-  const pad = (v) => String(v).padStart(2, '0');
-  const toKey = (date) => {
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-  };
-
-  const getNthWeekdayOfMonth = (year, month, weekday, nth) => {
-    // month: 0-11, weekday: 0(Sun)-6(Sat)
-    const first = new Date(year, month, 1);
-    const firstWeekday = first.getDay();
-    const diff = (7 + weekday - firstWeekday) % 7;
-    return 1 + diff + (nth - 1) * 7;
-  };
-
-  const vernalEquinoxDay = (year) => {
-    return Math.floor(20.8431 + 0.242194 * (year - 2000) - Math.floor((year - 2000) / 4));
-  };
-
-  const autumnalEquinoxDay = (year) => {
-    return Math.floor(23.2488 + 0.242194 * (year - 2000) - Math.floor((year - 2000) / 4));
-  };
-
-  const getHolidaysForYear = (year) => {
-    const map = {}; // key: 'YYYY-MM-DD' -> name
-
-    // 固定日（主なもの）
-    const fixed = {
-      '1-1': "元日",
-      '2-11': "建国記念の日",
-      '2-23': "天皇誕生日",
-      '4-29': "昭和の日",
-      '5-3': "憲法記念日",
-      '5-4': "みどりの日",
-      '5-5': "こどもの日",
-      '11-3': "文化の日",
-      '11-23': "勤労感謝の日"
-    };
-
-    for (const k in fixed) {
-      const [m, d] = k.split('-').map(Number);
-      const dt = new Date(year, m - 1, d);
-      map[toKey(dt)] = fixed[k];
-    }
-
-    // ハッピーマンデー等（第n月曜）
-    const add = (m, dayOfMonth, name) => { map[toKey(new Date(year, m - 1, dayOfMonth))] = name; };
-    add(1, getNthWeekdayOfMonth(year, 0, 1, 2), "成人の日"); // 1月第2月曜
-    add(7, getNthWeekdayOfMonth(year, 6, 1, 3), "海の日"); // 7月第3月曜
-    add(9, getNthWeekdayOfMonth(year, 8, 1, 3), "敬老の日"); // 9月第3月曜
-    add(10, getNthWeekdayOfMonth(year, 9, 1, 2), "スポーツの日"); // 10月第2月曜
-
-    // 春分・秋分
-    map[toKey(new Date(year, 2, vernalEquinoxDay(year)))] = "春分の日";
-    map[toKey(new Date(year, 8, autumnalEquinoxDay(year)))] = "秋分の日";
-
-    // 山の日
-    map[toKey(new Date(year, 7, 11))] = "山の日";
-
-    // --- 振替休日 --- 
-    // 元の祝日が日曜の場合、その次の平日を振替休日にする（既に祝日の場合はさらに次の日へ）
-    const keys = Object.keys(map).sort();
-    keys.forEach((k) => {
-      const parts = k.split('-').map(Number);
-      const dt = new Date(parts[0], parts[1] - 1, parts[2]);
-      if (dt.getDay() === 0) {
-        // 次の日から探す
-        let next = new Date(dt);
-        next.setDate(next.getDate() + 1);
-        // ループで次の平日でかつ祝日ではない日を見つける
-        while (map[toKey(next)]) {
-          next.setDate(next.getDate() + 1);
+  {/* _init_ supabase読み込み */}
+  useEffect(() => {
+      const fetchTasks = async () => {
+        try {
+          const { data, error } = await supabase.from('tasks').select('*')
+          if (error) throw error
+          const loadedTasks = {}
+          data.forEach((row) => {
+            const task = {
+              task: row.task_name,
+              sub: row.sub_tasks,
+              imp: row.importance,
+              sta: row.start_date,
+              end: row.end_date,
+              state: row.state,
+            }
+            const key = formatDate(new Date(task.sta))
+            if (!loadedTasks[key]) loadedTasks[key] = []
+            loadedTasks[key].push(task)
+          })
+          setTasks(loadedTasks)
+          localStorage.setItem('tasks', JSON.stringify(loadedTasks))
+        } catch (err) {
+          console.warn('Supabase読み込み失敗:', err.message)
         }
-        map[toKey(next)] = "振替休日";
       }
-    });
+      fetchTasks()
+    }, [])
 
-    // --- 国民の休日 --- 
-    // 2つの祝日に挟まれた平日を国民の休日にする
-    // 年内の日を走査
-    const start = new Date(year, 0, 1);
-    const end = new Date(year, 11, 31);
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      const key = toKey(d);
-      if (map[key]) continue;
-      const prev = new Date(d); prev.setDate(d.getDate() - 1);
-      const next = new Date(d); next.setDate(d.getDate() + 1);
-      if (map[toKey(prev)] && map[toKey(next)]) {
-        map[key] = "国民の休日";
-      }
+
+  {/* ナビゲーションバー切り換え */}
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'tasks':
+        return <p>タスク</p>
+      case 'task-detail':
+        return <p>タスク詳細</p>
+      case 'calendar':
+        return <CalendarPage tasks={tasks} />
+      case 'groupwork':
+        return <p>グループワーク</p>
+      case 'settings':
+        return <p>設定</p>
+      default:
+        return <CalendarPage />
     }
-
-    return map;
-  };
-
-  const isJapaneseHoliday = (date) => {
-    const y = date.getFullYear();
-    const holidays = getHolidaysForYear(y);
-    return holidays[toKey(date)] || null;
-  };
-
-  // --- 既存: AI追加処理 ---
-  const handleAddTaskFromAI = (data) => {
-    const targetDate = data.dueDate || selectedDate;
-    const taskText = data.taskName;
-
-    if (!taskText) return;
-
-    setTasks((prevTasks) => {
-      const newTasks = { ...prevTasks };
-      if (!newTasks[targetDate]) {
-        newTasks[targetDate] = [];
-      }
-      newTasks[targetDate].push(taskText);
-
-      if (data.subTasks && data.subTasks.length > 0) {
-        data.subTasks.forEach((sub) => newTasks[targetDate].push(`- ${sub}`));
-      }
-      return newTasks;
-    });
-
-    if (data.dueDate) {
-      setSelectedDate(data.dueDate);
-    }
-  };
-
-  // --- カレンダー描画（週末と祝日で色付け） ---
-  const renderCalendar = () => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const firstDayOfMonth = new Date(year, month, 1);
-    const lastDayOfMonth = new Date(year, month + 1, 0);
-
-    const daysInMonth = [];
-
-    // 月の初日まで空白を埋める
-    for (let i = 0; i < firstDayOfMonth.getDay(); i++) {
-      // 空セルは見た目を合わせて表示（枠線／丸みを保持）
-      daysInMonth.push(
-        <div key={`empty-${i}`} style={{ ...styles.day, ...styles.emptyDay }} />
-      );
-    }
-
-    // 日付を生成
-    for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
-      const date = new Date(year, month, day);
-      const dateString = formatDate(date);
-      const isSelected = dateString === selectedDate;
-      const dayTasks = tasks[dateString] || [];
-      const hasTask = dayTasks.length > 0;
-
-      const weekday = date.getDay(); // 0:Sun ... 6:Sat
-      const holidayName = isJapaneseHoliday(date);
-      const isHoliday = Boolean(holidayName);
-      // 日付色
-      let numberColor = '#0f172a';
-      if (isHoliday || weekday === 0) numberColor = '#dc2626'; // 赤
-      else if (weekday === 6) numberColor = '#2563eb'; // 青
-
-      daysInMonth.push(
-        <div
-          key={day}
-          style={{
-            ...styles.day,
-            ...(isSelected ? styles.selected : {}),
-            ...(hasTask ? styles.hasTaskAccent : {})
-          }}
-          onClick={() => setSelectedDate(dateString)}
-          title={holidayName ? holidayName : undefined}
-        >
-          <div style={{ ...styles.dayNumber, color: numberColor }}>
-            <span>{day}</span>
-          </div>
-
-          {/* 祝日名を小ラベルで表示（ある場合） */}
-          {isHoliday && (
-            <div style={{ fontSize: '12px', color: '#dc2626', marginBottom: '6px' }}>
-              {holidayName}
-            </div>
-          )}
-
-          <div style={styles.dayTasks}>
-            {dayTasks.slice(0, 3).map((t, idx) => (
-              <div key={idx} style={styles.taskBadge} title={t}>
-                {t}
-              </div>
-            ))}
-
-            {dayTasks.length > 3 && (
-              <div style={styles.moreBadge}>＋{dayTasks.length - 3} 件</div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    return daysInMonth;
-  };
-
-  // --- 既存: 月移動処理 ---
-  const goToPreviousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  };
-
-  const goToNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-  };
-
-  const styles = {
-    calendarContainer: {
-      borderRadius: '12px',
-      overflow: 'hidden',
-      border: '1px solid #e5e7eb',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.06)',
-      marginTop: '1rem',
-    },
-    header: {
-      background: '#f9fafb',
-      padding: '12px 16px',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      borderBottom: '1px solid #e5e7eb',
-    },
-    weekRow: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(7, 1fr)',
-      background: '#f3f4f6',
-      padding: '10px 0',
-      fontWeight: '500',
-      color: '#374151',
-    },
-    grid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(7, 1fr)',
-      gap: '10px',
-      padding: '12px',
-    },
-    // 日セル（共通の枠・丸み・影で区切りを明確化）
-    day: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-      padding: '10px',
-      borderRadius: '12px',
-      cursor: 'pointer',
-      position: 'relative',
-      transition: 'background 0.15s, transform 0.08s',
-      minHeight: '96px',
-      boxSizing: 'border-box',
-      background: '#ffffff',
-      border: '1px solid #e6edf3',
-      boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
-    },
-    // 空セルを日セルと同等の寸法で表示（境界は薄く保つ）
-    emptyDay: {
-      background: 'transparent',
-      borderStyle: 'dashed',
-      borderColor: 'transparent',
-      boxShadow: 'none',
-    },
-    dayNumber: {
-      fontSize: '16px',
-      fontWeight: '600',
-      lineHeight: '1.2',
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'flex-start',
-      alignItems: 'center'
-    },
-    dayTasks: {
-      marginTop: '8px',
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '6px',
-    },
-    taskBadge: {
-      background: '#ecfdf5',
-      color: '#065f46',
-      padding: '6px 10px',
-      borderRadius: '999px',
-      fontSize: '12px',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      maxWidth: '100%'
-    },
-    moreBadge: {
-      fontSize: '12px',
-      color: '#6b7280',
-      textAlign: 'center',
-    },
-    selected: {
-      background: '#eef2ff',
-      border: '1px solid #c7d2fe',
-      boxShadow: '0 6px 12px rgba(37,99,235,0.06)',
-    },
-    hasTaskAccent: {
-      boxShadow: 'inset 0 0 0 2px rgba(16,185,129,0.06)',
-    },
-    // 追加: カレンダー全体のスタイル
-    calendarWrapper: {
-      maxWidth: '900px',
-      margin: '0 auto',
-      padding: '0 16px',
-    },
-    // 追加: タスク入力部分のスタイル
-    taskContainer: {
-      marginTop: '1rem',
-      padding: '16px',
-      borderRadius: '8px',
-      background: '#fff',
-      border: '1px solid #e5e7eb',
-      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    },
-    taskList: {
-      listStyleType: 'none',
-      padding: 0,
-      margin: '0.5rem 0 0 0',
-    },
-    taskItem: {
-      padding: '8px 0',
-      borderBottom: '1px solid #e5e7eb',
-    },
-    taskInputWrapper: {
-      display: 'flex',
-      gap: '8px',
-      marginBottom: '12px',
-    },
-    taskInput: {
-      flex: 1,
-      padding: '10px',
-      borderRadius: '8px',
-      border: '1px solid #e5e7eb',
-      fontSize: '16px',
-      color: '#111827',
-    },
-    addButton: {
-      padding: '10px 16px',
-      background: '#2563eb',
-      color: 'white',
-      border: 'none',
-      borderRadius: '8px',
-      cursor: 'pointer',
-      fontSize: '16px',
-      fontWeight: '500',
-      transition: 'background 0.2s',
-    },
-    addButtonDisabled: {
-      background: '#e5e7eb',
-      color: '#9ca3af',
-      cursor: 'not-allowed',
-    },
-  };
+  }
 
   return (
     <div className="app-container">
-      <h1>シンプルタスクカレンダー</h1>
-
-      <div className="calendar-container" style={styles.calendarContainer}>
-        <div className="calendar-header" style={styles.header}>
-          <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}>&lt;</button>
-          <h2>{`${currentDate.getFullYear()}年 ${currentDate.getMonth() + 1}月`}</h2>
-          <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}>&gt;</button>
-        </div>
-
-        <div className="calendar-weekdays" style={styles.weekRow}>
-          <div style={{color:'#dc2626'}}>日</div>
-          <div>月</div>
-          <div>火</div>
-          <div>水</div>
-          <div>木</div>
-          <div>金</div>
-          <div style={{color:'#2563eb'}}>土</div>
-        </div>
-
-        <div className="calendar-grid" style={styles.grid}>{renderCalendar()}</div>
-      </div>
-
-      <div className="task-container" style={styles.taskContainer}>
-        <AITaskInput onTaskCreated={handleAddTaskFromAI} />
-
-        <h3 style={{ marginTop: '2rem' }}>{selectedDate} のタスク</h3>
-
-        <ul className="task-list" style={styles.taskList}>
-          {tasks[selectedDate] && tasks[selectedDate].length > 0 ? (
-            tasks[selectedDate].map((task, index) => <li key={index} style={styles.taskItem}>{task}</li>)
-          ) : (
-            <p>この日のタスクはありません。</p>
-          )}
-        </ul>
-      </div>
+      {renderPage()}
+      <NavigationBar currentPage={currentPage} onPageChange={setCurrentPage} />
     </div>
   );
+
 };
 
 export default App;
