@@ -1,6 +1,6 @@
 import { useState } from "react";
 import '../../../src/App.css';
-import AITaskInput from '../components/AI/AITaskColl';
+import AITaskColl from '../components/AI/AITaskColl';
 import { formatDate,formatDateDisplay } from '../../../src/App';
 
 function CalendarPage({tasks})
