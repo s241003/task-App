@@ -3,10 +3,10 @@ import '../../../src/App.css';
 import AITaskColl from "../../AI/AITaskColl";
 import { formatDate,formatDateDisplay } from '../../../src/App';
 
-function CalendarPage({tasks})
+function CalendarPage({tasks, setTasks})
 {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [taskInput, setTaskInput] = useState('');
 
   const key = selectedDate ? formatDate(selectedDate) : null
@@ -131,26 +131,34 @@ function CalendarPage({tasks})
 
   // --- 既存: AI追加処理 ---
   const handleAddTaskFromAI = (data) => {
-    const targetDate = data.dueDate || selectedDate;
+    // targetDate を Date に正規化
+    const targetDate = data.dueDate
+      ? (data.dueDate instanceof Date ? data.dueDate : new Date(data.dueDate))
+      : selectedDate;
     const taskText = data.taskName;
 
     if (!taskText) return;
 
-    setTasks((prevTasks) => {
-      const newTasks = { ...prevTasks };
-      if (!newTasks[targetDate]) {
-        newTasks[targetDate] = [];
-      }
-      newTasks[targetDate].push(taskText);
+    const targetKey = formatDate(targetDate);
 
-      if (data.subTasks && data.subTasks.length > 0) {
-        data.subTasks.forEach((sub) => newTasks[targetDate].push(`- ${sub}`));
-      }
-      return newTasks;
-    });
+    // 親から setTasks が渡されていれば呼ぶ（なければ変更しない）
+    if (typeof setTasks === 'function') {
+      setTasks((prevTasks) => {
+        const newTasks = { ...prevTasks };
+        if (!newTasks[targetKey]) {
+          newTasks[targetKey] = [];
+        }
+        newTasks[targetKey].push(taskText);
+
+        if (data.subTasks && data.subTasks.length > 0) {
+          data.subTasks.forEach((sub) => newTasks[targetKey].push(`- ${sub}`));
+        }
+        return newTasks;
+      });
+    }
 
     if (data.dueDate) {
-      setSelectedDate(data.dueDate);
+      setSelectedDate(targetDate);
     }
   };
 
@@ -175,7 +183,8 @@ function CalendarPage({tasks})
     for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
       const date = new Date(year, month, day);
       const dateString = formatDate(date);
-      const isSelected = dateString === selectedDate;
+      // selectedDate は Date 型に統一 -> 比較はフォーマットした文字列同士で行う
+      const isSelected = dateString === formatDate(selectedDate);
       const dayTasks = tasks[dateString] || [];
       const hasTask = dayTasks.length > 0;
 
@@ -195,7 +204,8 @@ function CalendarPage({tasks})
             ...(isSelected ? styles.selected : {}),
             ...(hasTask ? styles.hasTaskAccent : {})
           }}
-          onClick={() => setSelectedDate(dateString)}
+          // selectedDate を Date 型で保持するため、クリックでは Date を渡す
+          onClick={() => setSelectedDate(date)}
           title={holidayName ? holidayName : undefined}
         >
           <div style={{ ...styles.dayNumber, color: numberColor }}>
@@ -413,7 +423,7 @@ function CalendarPage({tasks})
 
           {/* タスク一覧（重要度順） */}
           <div className="task-list-section">
-            <h3 style={{ marginTop: '2rem' }}> {selectedDate} のタスク</h3>
+            <h3 style={{ marginTop: '2rem' }}> {formatDate(selectedDate)} のタスク</h3>
             {selectedTasks.length === 0 ? (
               <p>タスクはありません</p>
             ) : (
