@@ -15,7 +15,12 @@ const App = () => {
   const [tasks, setTasks] = useState({});
   const [taskInput, setTaskInput] = useState('');
 
-  // --- 追加: 日本の祝日判定ヘルパー（主な祝日をカバー、春分/秋分は近似式） ---
+  // --- 祝日関連ユーティリティ: 年単位で祝日マップを生成（振替・国民の休日を含む） ---
+  const pad = (v) => String(v).padStart(2, '0');
+  const toKey = (date) => {
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  };
+
   const getNthWeekdayOfMonth = (year, month, weekday, nth) => {
     // month: 0-11, weekday: 0(Sun)-6(Sat)
     const first = new Date(year, month, 1);
@@ -32,12 +37,10 @@ const App = () => {
     return Math.floor(23.2488 + 0.242194 * (year - 2000) - Math.floor((year - 2000) / 4));
   };
 
-  const isJapaneseHoliday = (date) => {
-    const y = date.getFullYear();
-    const m = date.getMonth() + 1; // 1-12
-    const d = date.getDate();
+  const getHolidaysForYear = (year) => {
+    const map = {}; // key: 'YYYY-MM-DD' -> name
 
-    // 固定日
+    // 固定日（主なもの）
     const fixed = {
       '1-1': "元日",
       '2-11': "建国記念の日",
@@ -49,28 +52,67 @@ const App = () => {
       '11-3': "文化の日",
       '11-23': "勤労感謝の日"
     };
-    const key = `${m}-${d}`;
-    if (fixed[key]) return fixed[key];
 
-    // ハッピーマンデー（第n月曜）
-    // 成人の日: 1月第2月曜
-    if (m === 1 && d === getNthWeekdayOfMonth(y, 0, 1, 2)) return "成人の日";
-    // 海の日: 7月第3月曜
-    if (m === 7 && d === getNthWeekdayOfMonth(y, 6, 1, 3)) return "海の日";
-    // 敬老の日: 9月第3月曜
-    if (m === 9 && d === getNthWeekdayOfMonth(y, 8, 1, 3)) return "敬老の日";
-    // 体育の日（スポーツの日）: 10月第2月曜
-    if (m === 10 && d === getNthWeekdayOfMonth(y, 9, 1, 2)) return "スポーツの日";
+    for (const k in fixed) {
+      const [m, d] = k.split('-').map(Number);
+      const dt = new Date(year, m - 1, d);
+      map[toKey(dt)] = fixed[k];
+    }
 
-    // 春分・秋分（近似）
-    if (m === 3 && d === vernalEquinoxDay(y)) return "春分の日";
-    if (m === 9 && d === autumnalEquinoxDay(y)) return "秋分の日";
+    // ハッピーマンデー等（第n月曜）
+    const add = (m, dayOfMonth, name) => { map[toKey(new Date(year, m - 1, dayOfMonth))] = name; };
+    add(1, getNthWeekdayOfMonth(year, 0, 1, 2), "成人の日"); // 1月第2月曜
+    add(7, getNthWeekdayOfMonth(year, 6, 1, 3), "海の日"); // 7月第3月曜
+    add(9, getNthWeekdayOfMonth(year, 8, 1, 3), "敬老の日"); // 9月第3月曜
+    add(10, getNthWeekdayOfMonth(year, 9, 1, 2), "スポーツの日"); // 10月第2月曜
 
-    // 山の日: 8月11日（稀に移動だが固定で扱う）
-    if (m === 8 && d === 11) return "山の日";
+    // 春分・秋分
+    map[toKey(new Date(year, 2, vernalEquinoxDay(year)))] = "春分の日";
+    map[toKey(new Date(year, 8, autumnalEquinoxDay(year)))] = "秋分の日";
 
-    // その他（移動祝日は簡易対応）
-    return null;
+    // 山の日
+    map[toKey(new Date(year, 7, 11))] = "山の日";
+
+    // --- 振替休日 --- 
+    // 元の祝日が日曜の場合、その次の平日を振替休日にする（既に祝日の場合はさらに次の日へ）
+    const keys = Object.keys(map).sort();
+    keys.forEach((k) => {
+      const parts = k.split('-').map(Number);
+      const dt = new Date(parts[0], parts[1] - 1, parts[2]);
+      if (dt.getDay() === 0) {
+        // 次の日から探す
+        let next = new Date(dt);
+        next.setDate(next.getDate() + 1);
+        // ループで次の平日でかつ祝日ではない日を見つける
+        while (map[toKey(next)]) {
+          next.setDate(next.getDate() + 1);
+        }
+        map[toKey(next)] = "振替休日";
+      }
+    });
+
+    // --- 国民の休日 --- 
+    // 2つの祝日に挟まれた平日を国民の休日にする
+    // 年内の日を走査
+    const start = new Date(year, 0, 1);
+    const end = new Date(year, 11, 31);
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const key = toKey(d);
+      if (map[key]) continue;
+      const prev = new Date(d); prev.setDate(d.getDate() - 1);
+      const next = new Date(d); next.setDate(d.getDate() + 1);
+      if (map[toKey(prev)] && map[toKey(next)]) {
+        map[key] = "国民の休日";
+      }
+    }
+
+    return map;
+  };
+
+  const isJapaneseHoliday = (date) => {
+    const y = date.getFullYear();
+    const holidays = getHolidaysForYear(y);
+    return holidays[toKey(date)] || null;
   };
 
   // --- 既存: AI追加処理 ---
@@ -109,8 +151,9 @@ const App = () => {
 
     // 月の初日まで空白を埋める
     for (let i = 0; i < firstDayOfMonth.getDay(); i++) {
+      // 空セルは見た目を合わせて表示（枠線／丸みを保持）
       daysInMonth.push(
-        <div key={`empty-${i}`} style={styles.empty} />
+        <div key={`empty-${i}`} style={{ ...styles.day, ...styles.emptyDay }} />
       );
     }
 
@@ -184,7 +227,7 @@ const App = () => {
       borderRadius: '12px',
       overflow: 'hidden',
       border: '1px solid #e5e7eb',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.06)',
       marginTop: '1rem',
     },
     header: {
@@ -206,55 +249,71 @@ const App = () => {
     grid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(7, 1fr)',
-      gap: '8px',
-      padding: '10px',
+      gap: '10px',
+      padding: '12px',
     },
+    // 日セル（共通の枠・丸み・影で区切りを明確化）
     day: {
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
-      padding: '8px',
-      borderRadius: '8px',
+      alignItems: 'flex-start',
+      padding: '10px',
+      borderRadius: '12px',
       cursor: 'pointer',
       position: 'relative',
-      transition: 'background 0.2s',
+      transition: 'background 0.15s, transform 0.08s',
+      minHeight: '96px',
+      boxSizing: 'border-box',
+      background: '#ffffff',
+      border: '1px solid #e6edf3',
+      boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+    },
+    // 空セルを日セルと同等の寸法で表示（境界は薄く保つ）
+    emptyDay: {
+      background: 'transparent',
+      borderStyle: 'dashed',
+      borderColor: 'transparent',
+      boxShadow: 'none',
     },
     dayNumber: {
       fontSize: '16px',
       fontWeight: '600',
       lineHeight: '1.2',
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'flex-start',
+      alignItems: 'center'
     },
     dayTasks: {
-      marginTop: '4px',
+      marginTop: '8px',
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
-      gap: '4px',
+      gap: '6px',
     },
     taskBadge: {
-      background: '#2563eb',
-      color: 'white',
+      background: '#ecfdf5',
+      color: '#065f46',
       padding: '6px 10px',
-      borderRadius: '12px',
+      borderRadius: '999px',
       fontSize: '12px',
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
+      maxWidth: '100%'
     },
     moreBadge: {
       fontSize: '12px',
       color: '#6b7280',
       textAlign: 'center',
     },
-    empty: {
-      height: '80px',
-    },
     selected: {
-      background: '#2563eb',
-      color: 'white',
+      background: '#eef2ff',
+      border: '1px solid #c7d2fe',
+      boxShadow: '0 6px 12px rgba(37,99,235,0.06)',
     },
     hasTaskAccent: {
-      border: '2px solid #4ade80',
+      boxShadow: 'inset 0 0 0 2px rgba(16,185,129,0.06)',
     },
     // 追加: カレンダー全体のスタイル
     calendarWrapper: {
