@@ -7,7 +7,6 @@ function CalendarPage({tasks})
 {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
-  const [tasks, setTasks] = useState({});
   const [taskInput, setTaskInput] = useState('');
 
   const key = selectedDate ? formatDate(selectedDate) : null
