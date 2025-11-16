@@ -152,11 +152,6 @@ function AITaskColl({ onTaskCreated }) {
     setTaskData(null);
 
     // バリデーション
-    if (importance && (importance < 1 || importance > 5)) {
-      setError('重要度は1〜5の範囲で設定してください');
-      return false;
-    }
-
     if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
       setError('開始日は期日より前に設定してください');
       return false;
@@ -214,6 +209,13 @@ function AITaskColl({ onTaskCreated }) {
   };
 
   // 追加: 共通スタイルをまとめる（UI整理のみ、機能変更なし）
+  const AMBER = {
+    light: '#ffedd5', // 背景や薄い強調
+    base: '#f59e0b',  // メインアンバー
+    deep: '#92400e',  // 見出しや強調文字
+    dark: '#7c2d12'   // ボタンの影など
+  };
+
   const styles = {
     container: {
       maxWidth: '800px',
@@ -261,11 +263,11 @@ function AITaskColl({ onTaskCreated }) {
       caretColor: '#0f0f0f',
       fontSize: '16px',
     },
-    // AIボタンは右寄せの小さめボタンに調整
+    // AIボタンは右寄せの小さめボタンに調整（琥珀色）
     aiButton: (disabled) => ({
       marginLeft: '10px',
       padding: '10px 16px',
-      background: disabled ? '#e5e7eb' : '#2563eb',
+      background: disabled ? '#fde9d0' : AMBER.base,
       color: 'white',
       border: 'none',
       borderRadius: '9px',
@@ -274,7 +276,6 @@ function AITaskColl({ onTaskCreated }) {
       fontWeight: '700',
       alignSelf: 'center'
     }),
-    // 入力群を横並びにする行
     actionRow: {
       display: 'flex',
       gap: '10px',
@@ -303,13 +304,22 @@ function AITaskColl({ onTaskCreated }) {
     },
     resetButton: {
       padding: '12px 20px',
-      background: '#6b7280',
+      background: AMBER.deep,
       color: 'white',
       border: 'none',
       borderRadius: '9px',
       cursor: 'pointer',
       fontSize: '16px',
     },
+    submitButton: (disabled) => ({
+      padding: '12px 20px',
+      background: AMBER.base,
+      color: 'white',
+      border: 'none',
+      borderRadius: '9px',
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      fontSize: '16px',
+    }),
     alertBase: {
       marginTop: '20px',
       padding: '15px',
@@ -321,19 +331,19 @@ function AITaskColl({ onTaskCreated }) {
       color: '#7f1d1d',
     },
     alertWarn: {
-      background: '#fef3c7',
-      border: '2px solid #f59e0b',
-      color: '#78350f',
+      background: AMBER.light,
+      border: `2px solid ${AMBER.base}`,
+      color: AMBER.deep,
     },
     successBox: {
       marginTop: '20px',
-      background: '#f0fdf4',
-      border: '2px solid #10b981',
+      background: '#fff7ed',
+      border: `2px solid ${AMBER.base}`,
       padding: '15px',
       borderRadius: '8px',
     },
     debugPre: {
-      background: '#ecfdf5',
+      background: '#fff7ed',
       padding: '10px',
       borderRadius: '6px',
       fontSize: '12px',
@@ -346,10 +356,13 @@ function AITaskColl({ onTaskCreated }) {
     <div style={styles.container}>
       <form onSubmit={handleSubmit} style={{ display: 'block' }}>
         <div style={styles.formGrid}>
+
           {/* タスク入力グループ（ラベル上） */}
           <div style={styles.formGroup}>
             <label style={styles.labelStyle} htmlFor="task">タスク</label>
             <div style={styles.actionRow}>
+
+              {/* タスク入力 */}
               <input
                 isLoading="task"
                 type="text"
@@ -367,6 +380,8 @@ function AITaskColl({ onTaskCreated }) {
                     : { ...styles.input, flex: 1 }
                 }
               />
+
+              {/* Aiボタン */}
               <button
                 onClick={AIColl}
                 type="button"
@@ -378,9 +393,10 @@ function AITaskColl({ onTaskCreated }) {
             </div>
           </div>
 
-          {/* サブタスク */}
           <div style={styles.formGroup}>
             <label style={styles.labelStyle} htmlFor="subTask">サブタスク</label>
+
+            {/* サブタスク */}
             <input
               id="subTask"
               type="text"
@@ -395,10 +411,12 @@ function AITaskColl({ onTaskCreated }) {
             />
           </div>
 
-          {/* 重要度・期間を横並びに */}
+
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ ...styles.formGroup, flex: '0 0 180px' }}>
               <label style={styles.labelStyle} htmlFor="importance">重要度</label>
+
+              {/* 重要度 */}
               <select
                 id="importance"
                 value={importance}
@@ -417,6 +435,7 @@ function AITaskColl({ onTaskCreated }) {
 
             <div style={{ ...styles.formGroup, flex: 1 }}>
               <label style={styles.labelStyle} htmlFor="turm">期間</label>
+              {/* 期間 */}
               <div style={{ display: 'flex', gap: '8px' }}>
                 <input
                   id="turm"
@@ -438,6 +457,15 @@ function AITaskColl({ onTaskCreated }) {
                 />
               </div>
             </div>
+
+            {/* タスク送信ボタン */}
+           <button
+              type="submit"
+              disabled={isLoadAI || isLoading || !text.trim() || !importance.trim() || !subTasks.trim() || !startDate.trim() || !endDate.trim()}
+              style={styles.submitButton(disabled)}
+            >
+              タスクを作成
+            </button>
           </div>
         </div>
       </form>
@@ -467,15 +495,15 @@ function AITaskColl({ onTaskCreated }) {
               : { ...styles.alertBase, ...styles.alertError }
           }
         >
-          <h4 style={{ 
-            margin: '0 0 10px 0', 
+          <h4 style={{
+            margin: '0 0 10px 0',
             color: needsMoreDetail ? '#92400e' : '#991b1b',
             fontSize: '16px'
           }}>
             {needsMoreDetail ? 'より具体的な情報が必要です' : 'エラー'}
           </h4>
-          <p style={{ 
-            margin: '0', 
+          <p style={{
+            margin: '0',
             color: needsMoreDetail ? '#78350f' : '#7f1d1d',
             whiteSpace: 'pre-line',
             lineHeight: '1.6'
@@ -512,16 +540,16 @@ function AITaskColl({ onTaskCreated }) {
       {/* 成功時の結果表示 */}
       {taskData && !error && (
         <div style={styles.successBox}>
-          <h4 style={{ margin: '0 0 15px 0', color: '#065f46', fontSize: '18px' }}>
+          <h4 style={{ margin: '0 0 15px 0', color: AMBER.deep, fontSize: '18px' }}>
           　AIによる解析結果
           </h4>
           
           <div style={{ marginBottom: '15px' }}>
-            <strong style={{ color: '#065f46' }}>タスク:</strong>
+            <strong style={{ color: AMBER.deep }}>タスク:</strong>
             <p style={{ 
               margin: '5px 0', 
               fontSize: '16px', 
-              color: '#047857',
+              color: AMBER.base,
               fontWeight: 'bold'
             }}>
               {taskData.taskName}
@@ -529,11 +557,11 @@ function AITaskColl({ onTaskCreated }) {
           </div>
 
           <div style={{ marginBottom: '15px' }}>
-            <strong style={{ color: '#065f46' }}>サブタスク一覧:</strong>
+            <strong style={{ color: AMBER.deep }}>サブタスク一覧:</strong>
             <ul style={{ 
               margin: '5px 0', 
               paddingLeft: '20px',
-              color: '#047857'
+              color: AMBER.base
             }}>
               {taskData.subTasks && taskData.subTasks.map((subTask, index) => (
                 <li key={index} style={{ marginBottom: '5px' }}>
@@ -550,7 +578,7 @@ function AITaskColl({ onTaskCreated }) {
               background: '#fff',
               borderRadius: '6px',
               fontSize: '14px',
-              color: '#065f46',
+              color: AMBER.deep,
               fontStyle: 'italic'
             }}>
               <strong>分析理由:</strong> {taskData.reason}
@@ -560,7 +588,7 @@ function AITaskColl({ onTaskCreated }) {
           <div style={{
             marginTop: '10px',
             fontSize: '14px',
-            color: '#047857'
+            color: AMBER.deep
           }}>
             <p style={{ margin: '5px 0' }}>
               <strong>重要度:</strong> {importance || '未設定'}
@@ -574,17 +602,17 @@ function AITaskColl({ onTaskCreated }) {
           <details style={{ marginTop: '15px' }}>
             <summary style={{ 
               cursor: 'pointer', 
-              color: '#059669',
+              color: AMBER.deep,
               fontSize: '12px'
             }}>
-              詳細データを表示
-            </summary>
-            <pre style={styles.debugPre}>
-              {JSON.stringify(taskData, null, 2)}
-            </pre>
-          </details>
-        </div>
-      )}
+               詳細データを表示
+             </summary>
+             <pre style={styles.debugPre}>
+               {JSON.stringify(taskData, null, 2)}
+             </pre>
+           </details>
+         </div>
+       )}
 
       {/* 入力例の表示 */}
       <div
