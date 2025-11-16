@@ -6,12 +6,12 @@ export const supabase = createClient(
 
 import React, { useState, useEffect } from 'react';
 
+{/* supabase保存 */}
 async function saveTaskToSupabase(taskData) {
   const { data, error } = await supabase.from('tasks').insert([
     {
-      input_text: taskData.tex,
-      task_name: taskData.data.taskName,
-      sub_tasks: taskData.data.subTasks,
+      task_name: taskData.tas,
+      sub_tasks: taskData.sub,
       importance: taskData.imp,
       start_date: taskData.sta,
       end_date: taskData.end,
@@ -111,7 +111,7 @@ function AITaskColl({ onTaskCreated }) {
         setError(
           data.suggestion ||
           data.reason ||
-          'もう少し具体的なタスク名を入力してください。\n例: 「勉強する」→「英検2級に合格する」'
+          'もう少しタスクを具体的にしてください。\n例: 「勉強する」→「英検2級に合格する」'
         );
         setTaskData(null);
         return; // ここで処理を終了
@@ -149,7 +149,6 @@ function AITaskColl({ onTaskCreated }) {
     // 初期化
     setError(null);
     setNeedsMoreDetail(false);
-    setTaskData(null);
 
     // バリデーション
     if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
@@ -159,24 +158,20 @@ function AITaskColl({ onTaskCreated }) {
 
     setIsLoading(true);
 
-      // 成功時の処理
-      setTaskData(data);
-      console.log('AI Response:', data);
-
       // データベースに保存
       const dataSet = {
-        data: data,
+        tas: text||null,
+        sub: subTasks.split(' ')||null,
         imp: importance || null,
         sta: startDate || null,
         end: endDate || null,
-        tex: text,
       };
 
       await saveTaskToSupabase(dataSet);
 
       // 親コンポーネントに結果を渡す
       if (onTaskCreated) {
-        onTaskCreated(data);
+        onTaskCreated(dataset);
       }
 
       // スケジュールリストを更新
@@ -313,7 +308,7 @@ function AITaskColl({ onTaskCreated }) {
     },
     submitButton: (disabled) => ({
       padding: '12px 20px',
-      background: AMBER.base,
+      background: disabled ? '#fde9d0' : AMBER.base,
       color: 'white',
       border: 'none',
       borderRadius: '9px',
