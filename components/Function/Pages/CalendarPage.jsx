@@ -1,5 +1,5 @@
 import { useState } from "react";
-import './App.css';
+import '../../../src/App.css';
 import AITaskInput from '../components/AI/AITaskColl';
 import { formatDate,formatDateDisplay } from '../../../src/App';
 
