@@ -756,10 +756,10 @@ function CalendarPage({ tasks, setTasks }) {
     },
     grid: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(7, 1fr)',
+      gridTemplateColumns: 'repeat(7, 1fr)', // ← 柔軟に変更
+      gridAutoRows: '120px',
       gap: '10px',
       padding: '12px',
-      justifyContent: 'center',
     },
     day: {
       display: 'flex',
@@ -771,7 +771,7 @@ function CalendarPage({ tasks, setTasks }) {
       position: 'relative',
       transition: 'background 0.15s, transform 0.08s',
       width: '100%',
-      aspectRatio: '1 / 1', // ← 正方形を維持
+      minHeight: '120px',
       overflow: 'hidden',
       boxSizing: 'border-box',
       background: '#ffffff',
@@ -783,8 +783,7 @@ function CalendarPage({ tasks, setTasks }) {
       border: 'none',
       boxShadow: 'none',
       cursor: 'default',
-      width: '100%',
-      aspectRatio: '1 / 1', // ← 空白セルも正方形
+      width: '100%', // ← 修正
     },
     dayNumber: {
       fontSize: '16px',
