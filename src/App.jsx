@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from "../components/AI/AITaskColl";
-import { BrowserRouter as Router, Route, Routes, Link, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import './App.css';
 import NavigationBar from '../components/Function/NavigationBar';
 import LoginPage from '../components/Function/Pages/LoginPage';
@@ -22,8 +22,12 @@ export const formatDateDisplay = (date) => {
   return `${year}年${month}月${day}日`;
 };
 
+export const NotFound = (setIsNotFound) =>{
+  useEffect(() =>{
+    setIsNotFound(true);
+  return()=>setIsNotFound(false);
+  },[setIsNotFound])
 
-export const NotFound = () =>{
   return(
     <div>
       <h1>404: NOT FOUND</h1>
@@ -37,6 +41,7 @@ const App = () => {
     const saved = localStorage.getItem('tasks')
     return saved ? JSON.parse(saved) : {}
   })
+  const [isNotFound, setIsNotFound] = useState(false);
 
   {/* _init_ supabase読み込み */}
   useEffect(() => {
@@ -67,13 +72,6 @@ const App = () => {
       fetchTasks()
     }, [])
 
-
-    const location = useLocation();
-    const currentPage = location.pathname;
-    const validPaths = ["/", "/tasks", "/calendar", "/groupwork"];
-
-    const isNotFound = !validPaths.includes(currentPath);
-
   return (
 
     // ルーティング
@@ -84,7 +82,7 @@ const App = () => {
           <Route path="/tasks" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
         {(isNotFound) ? <NavigationBar />: null}
       </Router>
