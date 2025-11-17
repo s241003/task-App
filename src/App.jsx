@@ -25,7 +25,7 @@ export const formatDateDisplay = (date) => {
 export const NotFound = () =>{
   return(
     <div>
-      <h1>404 NOT FOUND</h1>
+      <h1>404: NOT FOUND</h1>
       <div>お探しのページが見つかりませんでした。<br/><Link to="calendar">ホームへ</Link></div>
     </div>
   )
@@ -76,7 +76,7 @@ const App = () => {
           <Route path="/tasks" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
-          <Route element={NotFound} />
+          <Route path={`/*`} element={NotFound} />
         </Routes>
         <NavigationBar />
       </Router>
