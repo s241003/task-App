@@ -834,7 +834,7 @@ function CalendarPage({ tasks, setTasks }) {
 
   return (
     <div className="page-content" style={{ width: '100%', padding: '0 10px', boxSizing: 'border-box' }}>
-      <h1>シンプルタスクカレンダー</h1>
+      <h1>カレンダー</h1>
       <div className="calendar-container" style={styles.calendarContainer}>
         <div className="calendar-header" style={styles.header}>
           <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}>&lt;</button>
