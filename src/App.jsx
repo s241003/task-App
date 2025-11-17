@@ -76,7 +76,7 @@ const App = () => {
           <Route path="/tasks" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
-          <Route path="/*" element={NotFound} />
+          <Route path="/*" element={<NotFound />} />
         </Routes>
         <NavigationBar />
       </Router>
