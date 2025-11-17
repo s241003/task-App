@@ -4,10 +4,10 @@ function TaskDetailPage({ task, onBack }) {
   return (
     <div className="page-content">
       <button className="back-btn" onClick={onBack}>← 戻る</button>
-      
+
       <div className="task-detail-container">
         <h1 className="task-title">{task.title}</h1>
-        
+
         <div className="task-info-section">
           <div className="info-item">
             <span className="info-label">📅 期間:</span>
@@ -15,7 +15,7 @@ function TaskDetailPage({ task, onBack }) {
               {task.startDate} 〜 {task.endDate}
             </span>
           </div>
-          
+
           {task.estimatedTime && (
             <div className="info-item">
               <span className="info-label">⏱ 予想時間:</span>
