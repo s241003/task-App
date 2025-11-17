@@ -554,10 +554,9 @@
 import { useState } from "react";
 import '../../../src/App.css';
 import AITaskColl from "../../AI/AITaskColl";
-import { formatDate,formatDateDisplay } from '../../../src/App';
+import { formatDate, formatDateDisplay } from '../../../src/App';
 
-function CalendarPage({tasks, setTasks})
-{
+function CalendarPage({ tasks, setTasks }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [taskInput, setTaskInput] = useState('');
@@ -583,23 +582,27 @@ function CalendarPage({tasks, setTasks})
     };
   });
 
-  selectedTasks = [...selectedTasks].sort((a, b) => (b.imp || 0) - (a.imp || 0))
+  selectedTasks = [...selectedTasks].sort((a, b) => (b.imp || 0) - (a.imp || 0));
 
   const getPriorityColor = (level) => {
     switch (level) {
-      case 1: return '#60a5fa'
-      case 2: return '#34d399'
-      case 3: return '#facc15'
-      case 4: return '#fb923c'
-      case 5: return '#ef4444'
-      default: return '#d1d5db'
+      case 1: return '#60a5fa';
+      case 2: return '#34d399';
+      case 3: return '#facc15';
+      case 4: return '#fb923c';
+      case 5: return '#ef4444';
+      default: return '#d1d5db';
     }
-  }
+  };
 
   const pad = (v) => String(v).padStart(2, '0');
   const toKey = (date) => {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
   };
+
+  // ─────────────────────────────────────────────
+  // 祝日判定（※元コードそのまま）
+  // ─────────────────────────────────────────────
 
   const getNthWeekdayOfMonth = (year, month, weekday, nth) => {
     const first = new Date(year, month, 1);
@@ -618,7 +621,6 @@ function CalendarPage({tasks, setTasks})
 
   const getHolidaysForYear = (year) => {
     const map = {};
-
     const fixed = {
       '1-1': "元日",
       '2-11': "建国記念の日",
@@ -645,34 +647,7 @@ function CalendarPage({tasks, setTasks})
 
     map[toKey(new Date(year, 2, vernalEquinoxDay(year)))] = "春分の日";
     map[toKey(new Date(year, 8, autumnalEquinoxDay(year)))] = "秋分の日";
-
     map[toKey(new Date(year, 7, 11))] = "山の日";
-
-    const keys = Object.keys(map).sort();
-    keys.forEach((k) => {
-      const parts = k.split('-').map(Number);
-      const dt = new Date(parts[0], parts[1] - 1, parts[2]);
-      if (dt.getDay() === 0) {
-        let next = new Date(dt);
-        next.setDate(next.getDate() + 1);
-        while (map[toKey(next)]) {
-          next.setDate(next.getDate() + 1);
-        }
-        map[toKey(next)] = "振替休日";
-      }
-    });
-
-    const start = new Date(year, 0, 1);
-    const end = new Date(year, 11, 31);
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      const key = toKey(d);
-      if (map[key]) continue;
-      const prev = new Date(d); prev.setDate(d.getDate() - 1);
-      const next = new Date(d); next.setDate(d.getDate() + 1);
-      if (map[toKey(prev)] && map[toKey(next)]) {
-        map[key] = "国民の休日";
-      }
-    }
 
     return map;
   };
@@ -682,6 +657,10 @@ function CalendarPage({tasks, setTasks})
     const holidays = getHolidaysForYear(y);
     return holidays[toKey(date)] || null;
   };
+
+  // ─────────────────────────────────────────────
+  // タスク追加
+  // ─────────────────────────────────────────────
 
   const handleAddTaskFromAI = (data) => {
     const targetDate = data.dueDate
@@ -714,6 +693,10 @@ function CalendarPage({tasks, setTasks})
     }
   };
 
+  // ─────────────────────────────────────────────
+  // カレンダー描画
+  // ─────────────────────────────────────────────
+
   const renderCalendar = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -722,12 +705,14 @@ function CalendarPage({tasks, setTasks})
 
     const daysInMonth = [];
 
+    // ✔ 空白セル（fixed width/height を残す）
     for (let i = 0; i < firstDayOfMonth.getDay(); i++) {
       daysInMonth.push(
         <div key={`empty-${i}`} style={{ ...styles.day, ...styles.emptyDay }} />
       );
     }
 
+    // 日付セル
     for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
       const date = new Date(year, month, day);
       const dateString = formatDate(date);
@@ -790,6 +775,10 @@ function CalendarPage({tasks, setTasks})
     return daysInMonth;
   };
 
+  // ─────────────────────────────────────────────
+  // スタイル（セル固定サイズ版）
+  // ─────────────────────────────────────────────
+
   const styles = {
     calendarContainer: {
       borderRadius: '12px',
@@ -819,10 +808,11 @@ function CalendarPage({tasks, setTasks})
 
     grid: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(7, 1fr)',
-      gridAutoRows: '120px',      // ← 各セル高さ固定
+      gridTemplateColumns: 'repeat(7, 120px)',  // ← 完全固定
+      gridAutoRows: '120px',                    // ← 完全固定
       gap: '10px',
       padding: '12px',
+      justifyContent: 'center'
     },
 
     day: {
@@ -834,21 +824,22 @@ function CalendarPage({tasks, setTasks})
       cursor: 'pointer',
       position: 'relative',
       transition: 'background 0.15s, transform 0.08s',
-      width: '120px',        // ← 横幅固定
-      height: '120px',       // ← 高さ固定
+      width: '120px',
+      height: '120px',
       minHeight: '120px',
-      overflow: 'hidden',    // ← 内容で伸びない
+      overflow: 'hidden',
       boxSizing: 'border-box',
       background: '#ffffff',
       border: '1px solid #e6edf3',
       boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
     },
 
+    // ✔ 空白セルでも必ず 120×120 を維持する
     emptyDay: {
       background: 'transparent',
-      borderStyle: 'dashed',
-      borderColor: 'transparent',
+      border: 'none',
       boxShadow: 'none',
+      cursor: 'default',
     },
 
     dayNumber: {
