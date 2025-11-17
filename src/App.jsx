@@ -22,10 +22,10 @@ export const formatDateDisplay = (date) => {
   return `${year}年${month}月${day}日`;
 };
 
-export const NotFound = (setIsNotFound) =>{
-  useEffect(() =>{
+export const NotFound = ({ setIsNotFound }) =>{
+  useEffect(() => {
     setIsNotFound(true);
-  return()=>setIsNotFound(false);
+    return () => setIsNotFound(false);
   },[setIsNotFound])
 
   return(
