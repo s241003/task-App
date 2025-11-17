@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from "../components/AI/AITaskColl";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import './App.css';
 import NavigationBar from '../components/Function/NavigationBar';
 import LoginPage from '../components/Function/Pages/LoginPage';
@@ -22,6 +22,14 @@ export const formatDateDisplay = (date) => {
   return `${year}年${month}月${day}日`;
 };
 
+export const NotFound = () =>{
+  return(
+    <div>
+      <h1>404 NOT FOUND</h1>
+      <div>お探しのページが見つかりませんでした。<br/><Link to="calendar">ホームへ</Link></div>
+    </div>
+  )
+}
 
 const App = () => {
   const [tasks, setTasks] = useState(() => {
@@ -60,6 +68,7 @@ const App = () => {
 
   return (
 
+    // ルーティング
     <div className="app-container">
       <Router>
         <Routes>
@@ -67,7 +76,7 @@ const App = () => {
           <Route path="/tasks"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
           <Route path="/calendar"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
           <Route path="/groupwork"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
-          {/* <Route path="*" element={<NotFound />} /> */}
+          <Route>{NotFound}</Route>
         </Routes>
         <NavigationBar />
       </Router>
