@@ -6,7 +6,7 @@ function TaskPanel({ selectedDate, tasks, onAddTask }) {
   const handleAddClick = () => {
     const text = taskInput.trim()
     if (!text) return
-    
+
     onAddTask(text)
     setTaskInput('')
   }
