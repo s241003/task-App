@@ -9,7 +9,8 @@ function CalendarPage({
   onPrevMonth,
   onNextMonth,
   onSelectDate
-}) {
+}) 
+{
   const key = selectedDate ? formatDateKey(selectedDate) : null
   const selectedTasks = key && tasks[key] ? tasks[key] : []
 
@@ -47,8 +48,10 @@ function CalendarPage({
           <ul>
             {selectedTasks.map((task, index) => (
               <li key={index}>
+                <button className="titlebutton"　onClick={() => onTaskClick(task)}> 
                 <strong>{task.title}</strong><br />
                 {task.estimatedTime && <small>予想時間: {task.estimatedTime}分</small>}<br />
+                  </button>
                 {task.duration && <small>期間: {task.duration}</small>}
               </li>
             ))}
