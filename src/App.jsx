@@ -84,7 +84,7 @@ const App = () => {
           <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
-        {(isNotFound) ? <NavigationBar />: null}
+        {(!isNotFound) ? <NavigationBar />: null}
       </Router>
     </div>
   );
