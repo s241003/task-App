@@ -894,4 +894,3 @@ function CalendarPage({ tasks, setTasks }) {
 }
 
 export default CalendarPage;
-
