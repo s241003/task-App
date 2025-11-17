@@ -72,11 +72,11 @@ const App = () => {
     <div className="app-container">
       <Router>
         <Routes>
-          <Route exact path="/"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
-          <Route path="/tasks"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
-          <Route path="/calendar"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
-          <Route path="/groupwork"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
-          <Route>{NotFound}</Route>
+          <Route path="/" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
+          <Route path="/tasks" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
+          <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
+          <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
+          <Route element={NotFound} />
         </Routes>
         <NavigationBar />
       </Router>

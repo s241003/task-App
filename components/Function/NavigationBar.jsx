@@ -20,7 +20,7 @@ function NavigationBar({ currentPage, onPageChange }) {
             onClick={() => onPageChange?.(page.id)}
             >
               {page.label}
-            </NavLink>
+          </NavLink>
         ))}
       </nav>
 
