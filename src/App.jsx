@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from "../components/AI/AITaskColl";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import './App.css';
 import NavigationBar from '../components/Function/NavigationBar';
 import LoginPage from '../components/Function/Pages/LoginPage';
@@ -62,13 +62,13 @@ const App = () => {
 
     <div className="app-container">
       <Router>
-        <Switch>
+        <Routes>
           <Route exact path="/"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
           <Route path="/tasks"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
           <Route path="/calendar"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
           <Route path="/groupwork"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
           {/* <Route path="*" element={<NotFound />} /> */}
-        </Switch>
+        </Routes>
         <NavigationBar />
       </Router>
     </div>
