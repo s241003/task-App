@@ -224,7 +224,6 @@ function CalendarPage({tasks, setTasks})
             ...(isSelected ? styles.selected : {}),
             ...(hasTask ? styles.hasTaskAccent : {})
           }}
-          // selectedDate を Date 型で保持するため、クリックでは Date を渡す
           onClick={() => setSelectedDate(date)}
           title={holidayName ? holidayName : undefined}
         >
@@ -318,7 +317,7 @@ function CalendarPage({tasks, setTasks})
       boxSizing: 'border-box',
       background: '#ffffff',
       border: '1px solid #e6edf3',
-      boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+      boxShadow: '0 1px 2px rgba(15,23,42,0.04)', 
     },
     // 空セルを日セルと同等の寸法で表示（境界は薄く保つ）
     emptyDay: {
@@ -424,7 +423,7 @@ function CalendarPage({tasks, setTasks})
 
   return (
     <div className="page-content">
-      <h1>シンプルタスクカレンダー</h1>
+      <h1>カレンダー</h1>
 
         <div className="calendar-container" style={styles.calendarContainer}>
           <div className="calendar-header" style={styles.header}>

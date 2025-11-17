@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from "../components/AI/AITaskColl";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import './App.css';
 import NavigationBar from '../components/Function/NavigationBar';
+import LoginPage from '../components/Function/Pages/LoginPage';
 import CalendarPage from '../components/Function/Pages/CalendarPage';
 
 export const formatDate = (date) => {
@@ -22,7 +24,6 @@ export const formatDateDisplay = (date) => {
 
 
 const App = () => {
-  const [currentPage, setCurrentPage] = useState(() => localStorage.getItem('lastPage') || 'calendar')
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem('tasks')
     return saved ? JSON.parse(saved) : {}
@@ -57,29 +58,19 @@ const App = () => {
       fetchTasks()
     }, [])
 
-
-  {/* ナビゲーションバー切り換え */}
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'tasks':
-        return <p>タスク</p>
-      case 'task-detail':
-        return <p>タスク詳細</p>
-      case 'calendar':
-        return <CalendarPage tasks={tasks} />
-      case 'groupwork':
-        return <p>グループワーク</p>
-      case 'settings':
-        return <p>設定</p>
-      default:
-        return <CalendarPage />
-    }
-  }
-
   return (
+
     <div className="app-container">
-      {renderPage()}
-      <NavigationBar currentPage={currentPage} onPageChange={setCurrentPage} />
+      <Router>
+        <Switch>
+          <Route exact path="/"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
+          <Route path="/tasks"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
+          <Route path="/calendar"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
+          <Route path="/groupwork"><CalendarPage tasks={tasks} setTasks={setTasks} /></Route>
+          {/* <Route path="*" element={<NotFound />} /> */}
+        </Switch>
+        <NavigationBar />
+      </Router>
     </div>
   );
 

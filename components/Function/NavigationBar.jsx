@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 function NavigationBar({ currentPage, onPageChange }) {
   const pages = [
     { id: 'tasks', label: 'タスク' },
@@ -10,18 +12,20 @@ function NavigationBar({ currentPage, onPageChange }) {
     <div className="nav-container">
       <nav className="navigation-bar">
         {pages.map(page => (
-          <button
+          <NavLink
             key={page.id}
-            className={`nav-button ${currentPage === page.id ? 'active' : ''}`}
-            onClick={() => onPageChange(page.id)}
-          >
-            {page.label}
-          </button>
+            to={`/${page.id}`}
+            activeClassName="active"
+            className="nav-button"
+            onClick={() => onPageChange?.(page.id)}
+            >
+              {page.label}
+            </NavLink>
         ))}
       </nav>
 
       <style jsx>{`
-        /* ナビゲーション全体を中央に配置 */
+
         .nav-container {
           width: 100%;
           display: flex;
@@ -66,7 +70,7 @@ function NavigationBar({ currentPage, onPageChange }) {
           color: #111827;
         }
 
-        .nav-button.active {
+        .active {
           color: #3b82f6;
           border-top: 3px solid #3b82f6;
           background: #f9fafb;
