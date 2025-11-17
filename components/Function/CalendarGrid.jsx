@@ -18,16 +18,28 @@ function CalendarGrid({ currentMonth, selectedDate, onSelectDate }) {
     const isToday = cellDate.toDateString() === today.toDateString()
     const isSelected = selectedDate && cellDate.toDateString() === selectedDate.toDateString()
 
+    const dayOfWeek = cellDate.getDay()
+    const bgColor =
+      dayOfWeek === 0
+        ? '#ffe5e5' // 日曜：薄い赤
+        : dayOfWeek === 6
+        ? '#e5f0ff' // 土曜：薄い青
+        : 'white' // 平日
+
     cells.push(
       <td
         key={day}
         className={isSelected ? 'selected' : ''}
-        style={isToday ? { border: '2px solid red' } : {}}
+        style={{
+          backgroundColor: bgColor,
+          border: isToday ? '2px solid red' : '1px solid #ccc', // ✅ 外枠を常に表示
+        }}
         onClick={() => onSelectDate(cellDate)}
       >
         {day}
       </td>
     )
+
   }
 
   const rows = []
@@ -43,13 +55,13 @@ function CalendarGrid({ currentMonth, selectedDate, onSelectDate }) {
     <table id="calendar">
       <thead>
         <tr>
-          <th>日</th>
+          <th　style={{ color: 'red' }}>日</th>
           <th>月</th>
           <th>火</th>
           <th>水</th>
           <th>木</th>
           <th>金</th>
-          <th>土</th>
+          <th style={{ color: 'blue' }}>土</th>
         </tr>
       </thead>
       <tbody id="calendarBody">
