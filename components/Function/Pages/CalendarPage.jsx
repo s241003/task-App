@@ -736,7 +736,9 @@ function CalendarPage({ tasks, setTasks }) {
       border: '1px solid #e5e7eb',
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.06)',
       marginTop: '1rem',
+      width: '100%',      // ← 画面いっぱい
       maxWidth: '100%',
+      boxSizing: 'border-box',
     },
     header: {
       background: '#f9fafb',
@@ -759,7 +761,9 @@ function CalendarPage({ tasks, setTasks }) {
       gridTemplateColumns: 'repeat(7, 1fr)',
       gap: '10px',
       padding: '12px',
-      justifyContent: 'center',
+      justifyContent: 'stretch', // ←列を画面いっぱいに広げる
+      width: '100%',
+      boxSizing: 'border-box',
     },
     day: {
       display: 'flex',
@@ -771,7 +775,7 @@ function CalendarPage({ tasks, setTasks }) {
       position: 'relative',
       transition: 'background 0.15s, transform 0.08s',
       width: '100%',
-      aspectRatio: '1 / 1', // ← 正方形を維持
+      aspectRatio: '1 / 1', // 正方形
       overflow: 'hidden',
       boxSizing: 'border-box',
       background: '#ffffff',
@@ -784,7 +788,7 @@ function CalendarPage({ tasks, setTasks }) {
       boxShadow: 'none',
       cursor: 'default',
       width: '100%',
-      aspectRatio: '1 / 1', // ← 空白セルも正方形
+      aspectRatio: '1 / 1',
     },
     dayNumber: {
       fontSize: '16px',
@@ -829,7 +833,7 @@ function CalendarPage({ tasks, setTasks }) {
   };
 
   return (
-    <div className="page-content">
+    <div className="page-content" style={{ width: '100%', padding: '0 10px', boxSizing: 'border-box' }}>
       <h1>シンプルタスクカレンダー</h1>
       <div className="calendar-container" style={styles.calendarContainer}>
         <div className="calendar-header" style={styles.header}>
@@ -890,3 +894,4 @@ function CalendarPage({ tasks, setTasks }) {
 }
 
 export default CalendarPage;
+
