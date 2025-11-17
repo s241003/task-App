@@ -41,78 +41,120 @@ body {
 }
 
 .navigation-bar {
+  transform: scale(1); /* ブラウザ拡大でもスケーリング影響を受けにくくする */
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;/* 追加 */
+  height: 8%;              /* ← 高さを固定 */
   transform: none;     /*translateX(-50%);*/
   max-width: none; /*600px;*/
   width: 100%;
   display: flex;
   justify-content: space-around;
   align-items: center;/*追加*/
-  background-color: white;
+  background-color: #fff;
   border-top: 1px solid #ddd;
-  padding: 10px 0;
+  padding: 0;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000; /*追加*/
+  box-sizing: border-box;
+  aspect-ratio: 5 / 1;
 }
 
 .nav-button {
   flex: 1;
   text-align: center;
-  padding: 10px 0;
+  margin-top: 10px;  /* ← 数値を調整して下にずらす */
+  padding: 1px 0;
   border: none;
   background: none;
   cursor: pointer;
   font-size: 0px;
   color: #666;
   transition: all 0.3s;
+  text-align: center;
 }
 
+.nav-button:focus {
+  outline: none;
+}
+
+.nav-button img {
+  transform: scale(1.1);
+  width: 40px;
+  height: 40px;
+  display: block;
+  margin: 0 auto;
+  margin-top: 5px;  /* ← 数値を調整して下にずらす */
+}
+
+.nav-button.active img {
+  transform: scale(1.1);
+}
+
+.nav-button span {
+  bottom:0;                /* 親要素の下に配置 */
+  display: block;           /* サイズを指定できるようにする */
+  width: 100%;              /* 横幅を指定（px や % でもOK） */
+  height: 100%;
+  text-align: center;       /* 文字を中央揃え */
+  opacity: 0;                /* ← 透明にする */
+  font-size: 12px;
+  color: #000000;
+  margin-top: 1%;                 /* アイコンとの隙間 */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  background-color: #ffffff;
+  aspect-ratio: 18 / 1;
+}
+
+.nav-button:hover span {
+  opacity: 1;
+  transform: translateY(0);  /* ← 元の位置に戻る */
+}
 
 /* デフォルト（非アクティブ）の画像 */
 .nav-button.calendar {
   background: url('../public/icon/calendar_black.png') no-repeat center;
-  background-size: 24px 24px;
+  background-size: 14% 14%;
 }
 .nav-button.chat {
   background: url('../public/icon/chat_black.png') no-repeat center;
-  background-size: 24px 24px;
+  background-size: 14% 14%;
 }
 .nav-button.groupwork {
   background: url('../public/icon/groupwork_black.png') no-repeat center;
-  background-size: 24px 24px;
+  background-size: 14% 14%;
 }
 .nav-button.setting {
   background: url('../public/icon/setting_black.png') no-repeat center;
-  background-size: 24px 24px;
+  background-size: 14% 14%;
 }
 .nav-button.task {
   background: url('../public/icon/task_black.png') no-repeat center;
-  background-size: 24px 24px;
+  background-size: 14% 14%;
 }
 
 /* アクティブ時 */
 .nav-button.active.calendar {
   background: url('../public/icon/calendar_blue.png') no-repeat center;
-  background-size: 24px 24px;
+  background-size: 14% 14%;
 }
 .nav-button.active.chat {
   background: url('../public/icon/chat_blue.png') no-repeat center;
-  background-size: 24px 24px;
+  background-size: 14% 14%;
 }
 .nav-button.active.groupwork {
   background: url('../public/icon/groupwork_blue.png') no-repeat center;
-  background-size: 24px 24px;
+  background-size: 14% 14%;
 }
 .nav-button.active.setting {
   background: url('../public/icon/setting_blue.png') no-repeat center;
-  background-size: 24px 24px;
+  background-size: 14% 14%;
 }
 .nav-button.active.task {
   background: url('../public/icon/task_blue.png') no-repeat center;
-  background-size: 24px 24px;
+  background-size: 14% 14%;
 }
 
 .nav-button:hover {
@@ -161,21 +203,27 @@ td.selected {
   align-items: center;
   margin: 20px 0;
   padding: 10px;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   border-radius: 5px;
 }
 
 #monthLabel {
+  color: black;
   font-size: 18px;
   font-weight: bold;
+}
+
+#calendar td.selected {
+  background-color: #ffeb3b !important;
 }
 
 input {
   width: 100%;
   padding: 10px;
   margin: 10px 0;
-  border: 1px solid #ddd;
+  border: 1px solid #ffffff;
   border-radius: 5px;
+  color: black;
   font-size: 14px;
   box-sizing: border-box;
 }
@@ -192,9 +240,9 @@ button {
   transition: background-color 0.2s;
 }
 
-button:hover {
-  background-color: #0056b3;
-}
+/* button:hover {
+  background-color: #ffffff;
+} */
 
 button:disabled {
   background-color: #ccc;
@@ -204,6 +252,7 @@ button:disabled {
 .selected-date, .selected-date-info {
   padding: 10px;
   margin: 10px 0;
+  color: black;
   background-color: #e7f3ff;
   border-left: 4px solid #007bff;
   border-radius: 3px;
@@ -233,6 +282,34 @@ button:disabled {
   background-color: #f8f9fa;
   border-left: 3px solid #28a745;
   border-radius: 3px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+.modal-content {
+  position: relative; /* ← これを追加して close-btn の位置を基準にする */
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .empty-message {
@@ -311,6 +388,7 @@ button:disabled {
   border-radius: 12px;
   width: 90%;
   max-width: 400px;
+
 }
 
 .task-form-content input,
