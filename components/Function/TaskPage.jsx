@@ -105,8 +105,10 @@ function TaskPage({ selectedDate, tasks, onAddTask, onTaskClick }) {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2>新しいタスクを追加</h2>
+            {/* ここを追加 */}
+            <button className="close-btn" onClick={resetForm}>×</button>
 
+            <h2>新しいタスクを追加</h2>
             <input
               type="text"
               placeholder="タスク名"
