@@ -348,6 +348,7 @@ function AITaskColl({ onTaskCreated }) {
   };
 
   return (
+
     <div style={styles.container}>
       <form onSubmit={handleSubmit} style={{ display: 'block' }}>
         <div style={styles.formGrid}>

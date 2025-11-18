@@ -1,4 +1,6 @@
 import { NavLink } from "react-router-dom";
+import { RiChatAiLine } from "react-icons/ri";
+import AITaskColl from "../AI/AITaskColl";
 
 function NavigationBar({ currentPage, onPageChange }) {
   const pages = [
@@ -22,6 +24,7 @@ function NavigationBar({ currentPage, onPageChange }) {
               {page.label}
           </NavLink>
         ))}
+        <RiChatAiLine onClick={<AITaskColl />}/>
       </nav>
 
       <style jsx>{`
