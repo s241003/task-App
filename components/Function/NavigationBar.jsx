@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { IconContext } from 'react-icons'
 import { RiChatAiLine } from "react-icons/ri";
 import AITaskColl from "../AI/AITaskColl";
 
 function NavigationBar({ currentPage, onPageChange }) {
+  const [showAI, setShowAI] = useState(false);
   const pages = [
     { id: 'tasks', label: 'タスク' },
     { id: 'calendar', label: 'カレンダー' },
@@ -24,8 +27,15 @@ function NavigationBar({ currentPage, onPageChange }) {
               {page.label}
           </NavLink>
         ))}
-        <RiChatAiLine onClick={<AITaskColl />}/>
+        <IconContext.Provider value={{ color: "#78350f", size: "28px" }}>
+          <RiChatAiLine 
+            onClick={() => setShowAI(true)}
+            style={{ cursor: 'pointer' }}
+          />
+        </IconContext.Provider>
       </nav>
+
+      {showAI && <AITaskColl onClose={() => setShowAI(false)} />}
 
       <style jsx>{`
 
