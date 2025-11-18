@@ -561,7 +561,7 @@ function CalendarPage({ tasks, setTasks }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [taskInput, setTaskInput] = useState("");
 
-  // カレンダーの日付配列を生成
+  // カレンダー日付生成
   const getCalendarDays = (date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -570,7 +570,7 @@ function CalendarPage({ tasks, setTasks }) {
 
     const days = [];
 
-    // 月初の空セル
+    // 月初の空白
     for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
 
     // 日付
@@ -580,31 +580,38 @@ function CalendarPage({ tasks, setTasks }) {
     return days;
   };
 
-  // 前月／次月ボタン
   const handlePrevMonth = () =>
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  const handleNextMonth = () =>
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+    );
 
-  // タスク追加
+  const handleNextMonth = () =>
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+    );
+
   const addTask = () => {
     if (!taskInput) return;
     const key = formatDate(selectedDate);
-    const newTask = { task: taskInput, imp: 0, sta: null, end: null, sub: [] };
-    setTasks({
-      ...tasks,
-      [key]: [...(tasks[key] || []), newTask],
-    });
+    const newTask = { task: taskInput }; // 必ずオブジェクト化
+    setTasks({ ...tasks, [key]: [...(tasks[key] || []), newTask] });
     setTaskInput("");
   };
 
   const days = getCalendarDays(currentDate);
 
-  // タスク文字列化関数
-  const renderTaskText = (t) => {
-    if (typeof t === "string") return t;
-    if (typeof t.task === "string") return t.task;
-    return JSON.stringify(t);
+  // カレンダー内タスクを文字列化して表示
+  const renderTasks = (day) => {
+    const dayTasks = tasks[formatDate(day)] || [];
+    return dayTasks.map((t, idx) => (
+      <div key={idx} className="task-item">
+        {typeof t === "string"
+          ? t
+          : typeof t.task === "string"
+          ? t.task
+          : JSON.stringify(t)}
+      </div>
+    ));
   };
 
   return (
@@ -631,30 +638,28 @@ function CalendarPage({ tasks, setTasks }) {
             </tr>
           </thead>
           <tbody>
-            {Array.from({ length: Math.ceil(days.length / 7) }).map((_, rowIndex) => (
-              <tr key={rowIndex}>
-                {days.slice(rowIndex * 7, rowIndex * 7 + 7).map((day, i) => (
-                  <td
-                    key={i}
-                    className={day ? "calendar-day" : "empty-day"}
-                    onClick={() => day && setSelectedDate(day)}
-                  >
-                    {day && (
-                      <>
-                        <div className="day-number">{day.getDate()}</div>
-                        <div className="task-list">
-                          {(tasks[formatDate(day)] || []).map((t, idx) => (
-                            <div key={idx} className="task-item">
-                              {renderTaskText(t)}
-                            </div>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {Array.from({ length: Math.ceil(days.length / 7) }).map(
+              (_, rowIndex) => (
+                <tr key={rowIndex}>
+                  {days
+                    .slice(rowIndex * 7, rowIndex * 7 + 7)
+                    .map((day, i) => (
+                      <td
+                        key={i}
+                        className={day ? "calendar-day" : "empty-day"}
+                        onClick={() => day && setSelectedDate(day)}
+                      >
+                        {day && (
+                          <>
+                            <div className="day-number">{day.getDate()}</div>
+                            <div className="task-list">{renderTasks(day)}</div>
+                          </>
+                        )}
+                      </td>
+                    ))}
+                </tr>
+              )
+            )}
           </tbody>
         </table>
       </div>
@@ -671,16 +676,19 @@ function CalendarPage({ tasks, setTasks }) {
 
       <AITaskColl
         onTaskCreated={(data) => {
-          // AI追加も安全にオブジェクト化
           const targetDate = data.dueDate
             ? new Date(data.dueDate)
             : selectedDate;
           const key = formatDate(targetDate);
-          const newTask = { task: data.taskName || "", imp: 0, sta: null, end: null, sub: data.subTasks || [] };
-          setTasks({
-            ...tasks,
-            [key]: [...(tasks[key] || []), newTask],
-          });
+          const newTask = {
+            task: data.taskName || "",
+            imp: data.imp || 0,
+            sta: data.sta || null,
+            end: data.end || null,
+            sub: data.sub || [],
+            state: data.state || null,
+          };
+          setTasks({ ...tasks, [key]: [...(tasks[key] || []), newTask] });
           setSelectedDate(targetDate);
         }}
       />
