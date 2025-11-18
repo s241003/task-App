@@ -561,31 +561,20 @@ function CalendarPage({ tasks, setTasks }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [taskInput, setTaskInput] = useState('');
 
-  /* ---------------------------
-     タスク一覧（正規化＋ソート）
-  ---------------------------- */
   const key = selectedDate ? formatDate(selectedDate) : null;
-
   const selectedTasksRaw = key && tasks[key] ? tasks[key] : [];
-
   let selectedTasks = selectedTasksRaw.map((t) => {
     if (typeof t === 'string') return { task: t, imp: 0 };
-
     const rawTask = t.task;
-    const safeTask =
-      typeof rawTask === 'string'
-        ? rawTask
-        : (rawTask && (rawTask.text || rawTask.title)) || JSON.stringify(rawTask || '');
-
+    const safeTask = typeof rawTask === 'string' ? rawTask : (rawTask && (rawTask.text || rawTask.title)) || JSON.stringify(rawTask || '');
     return {
-      task: safeTask,
+      task: safeTask || '',
       imp: typeof t.imp === 'number' ? t.imp : 0,
       sta: t.sta,
       end: t.end,
       ...t,
     };
   });
-
   selectedTasks = [...selectedTasks].sort((a, b) => (b.imp || 0) - (a.imp || 0));
 
   const getPriorityColor = (level) => {
@@ -599,13 +588,12 @@ function CalendarPage({ tasks, setTasks }) {
     }
   };
 
-
-  /* ---------------------------
-      祝日ロジック（省略せず全収録）
-  ---------------------------- */
   const pad = (v) => String(v).padStart(2, '0');
-  const toKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const toKey = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
+  // ─────────────────────────────────────────────
+  // 祝日判定
+  // ─────────────────────────────────────────────
   const getNthWeekdayOfMonth = (year, month, weekday, nth) => {
     const first = new Date(year, month, 1);
     const firstWeekday = first.getDay();
@@ -613,15 +601,11 @@ function CalendarPage({ tasks, setTasks }) {
     return 1 + diff + (nth - 1) * 7;
   };
 
-  const vernalEquinoxDay = (year) =>
-    Math.floor(20.8431 + 0.242194 * (year - 2000) - Math.floor((year - 2000) / 4));
-
-  const autumnalEquinoxDay = (year) =>
-    Math.floor(23.2488 + 0.242194 * (year - 2000) - Math.floor((year - 2000) / 4));
+  const vernalEquinoxDay = (year) => Math.floor(20.8431 + 0.242194 * (year - 2000) - Math.floor((year - 2000) / 4));
+  const autumnalEquinoxDay = (year) => Math.floor(23.2488 + 0.242194 * (year - 2000) - Math.floor((year - 2000) / 4));
 
   const getHolidaysForYear = (year) => {
     const map = {};
-
     const fixed = {
       '1-1': "元日",
       '2-11': "建国記念の日",
@@ -633,49 +617,21 @@ function CalendarPage({ tasks, setTasks }) {
       '11-3': "文化の日",
       '11-23': "勤労感謝の日"
     };
-
     for (const k in fixed) {
       const [m, d] = k.split('-').map(Number);
       const dt = new Date(year, m - 1, d);
       map[toKey(dt)] = fixed[k];
     }
-
-    const add = (m, dayOfMonth, name) =>
+    const add = (m, dayOfMonth, name) => {
       map[toKey(new Date(year, m - 1, dayOfMonth))] = name;
-
+    };
     add(1, getNthWeekdayOfMonth(year, 0, 1, 2), "成人の日");
     add(7, getNthWeekdayOfMonth(year, 6, 1, 3), "海の日");
     add(9, getNthWeekdayOfMonth(year, 8, 1, 3), "敬老の日");
     add(10, getNthWeekdayOfMonth(year, 9, 1, 2), "スポーツの日");
-
     map[toKey(new Date(year, 2, vernalEquinoxDay(year)))] = "春分の日";
     map[toKey(new Date(year, 8, autumnalEquinoxDay(year)))] = "秋分の日";
-
     map[toKey(new Date(year, 7, 11))] = "山の日";
-
-    const keys = Object.keys(map).sort();
-
-    keys.forEach((k) => {
-      const [yy, mm, dd] = k.split('-').map(Number);
-      const dt = new Date(yy, mm - 1, dd);
-      if (dt.getDay() === 0) {
-        let next = new Date(dt);
-        next.setDate(next.getDate() + 1);
-        while (map[toKey(next)]) next.setDate(next.getDate() + 1);
-        map[toKey(next)] = "振替休日";
-      }
-    });
-
-    const start = new Date(year, 0, 1);
-    const end = new Date(year, 11, 31);
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      const key = toKey(d);
-      if (map[key]) continue;
-      const prev = new Date(d); prev.setDate(d.getDate() - 1);
-      const next = new Date(d); next.setDate(d.getDate() + 1);
-      if (map[toKey(prev)] && map[toKey(next)]) map[key] = "国民の休日";
-    }
-
     return map;
   };
 
@@ -685,118 +641,207 @@ function CalendarPage({ tasks, setTasks }) {
     return holidays[toKey(date)] || null;
   };
 
-
-  /* ---------------------------
-      AI追加処理
-  ---------------------------- */
+  // ─────────────────────────────────────────────
+  // タスク追加
+  // ─────────────────────────────────────────────
   const handleAddTaskFromAI = (data) => {
-    const targetDate =
-      data.dueDate
-        ? (data.dueDate instanceof Date ? data.dueDate : new Date(data.dueDate))
-        : selectedDate;
-
+    const targetDate = data.dueDate ? (data.dueDate instanceof Date ? data.dueDate : new Date(data.dueDate)) : selectedDate;
     const taskText = data.taskName;
     if (!taskText) return;
-
     const targetKey = formatDate(targetDate);
-
-    setTasks((prev) => {
-      const updated = { ...prev };
-      if (!updated[targetKey]) updated[targetKey] = [];
-
-      updated[targetKey].push(taskText);
-
-      if (data.subTasks) {
-        data.subTasks.forEach((s) => updated[targetKey].push(`- ${s}`));
-      }
-
-      return updated;
-    });
-
+    if (typeof setTasks === 'function') {
+      setTasks((prevTasks) => {
+        const newTasks = { ...prevTasks };
+        if (!newTasks[targetKey]) newTasks[targetKey] = [];
+        newTasks[targetKey].push(taskText);
+        if (data.subTasks && data.subTasks.length > 0) {
+          data.subTasks.forEach((sub) => newTasks[targetKey].push(`- ${sub}`));
+        }
+        return newTasks;
+      });
+    }
     if (data.dueDate) setSelectedDate(targetDate);
   };
 
-
-  /* ---------------------------
-      カレンダー描画
-  ---------------------------- */
+  // ─────────────────────────────────────────────
+  // カレンダー描画
+  // ─────────────────────────────────────────────
   const renderCalendar = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    const first = new Date(year, month, 1);
-    const last = new Date(year, month + 1, 0);
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    const daysInMonth = [];
 
-    const days = [];
-
-    for (let i = 0; i < first.getDay(); i++) {
-      days.push(<div key={`empty-${i}`} className="calendar-day empty" />);
+    // 空白セル
+    for (let i = 0; i < firstDayOfMonth.getDay(); i++) {
+      daysInMonth.push(<div key={`empty-${i}`} style={{ ...styles.day, ...styles.emptyDay }} />);
     }
 
-    for (let day = 1; day <= last.getDate(); day++) {
+    for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
       const date = new Date(year, month, day);
-      const dateStr = formatDate(date);
-      const isSelected = dateStr === formatDate(selectedDate);
-      const dayTasks = tasks[dateStr] || [];
+      const dateString = formatDate(date);
+      const isSelected = dateString === formatDate(selectedDate);
+      const dayTasks = tasks[dateString] || [];
       const hasTask = dayTasks.length > 0;
-
       const weekday = date.getDay();
       const holidayName = isJapaneseHoliday(date);
       const isHoliday = Boolean(holidayName);
+      let numberColor = '#0f172a';
+      if (isHoliday || weekday === 0) numberColor = '#dc2626';
+      else if (weekday === 6) numberColor = '#2563eb';
 
-      let color = '#0f172a';
-      if (isHoliday || weekday === 0) color = '#dc2626';
-      else if (weekday === 6) color = '#2563eb';
-
-      days.push(
+      daysInMonth.push(
         <div
           key={day}
-          className={`calendar-day ${isSelected ? 'selected' : ''} ${hasTask ? 'has-task' : ''}`}
+          style={{ ...styles.day, ...(isSelected ? styles.selected : {}), ...(hasTask ? styles.hasTaskAccent : {}) }}
           onClick={() => setSelectedDate(date)}
-          title={holidayName || undefined}
+          title={holidayName ? holidayName : undefined}
         >
-          <div style={{ color }}>{day}</div>
-
+          <div style={{ ...styles.dayNumber, color: numberColor }}>
+            <span>{day}</span>
+          </div>
           {isHoliday && (
-            <div style={{ fontSize: '12px', color: '#dc2626' }}>{holidayName}</div>
+            <div style={{ fontSize: '12px', color: '#dc2626', marginBottom: '6px' }}>
+              {holidayName}
+            </div>
           )}
-
-          <div>
-            {dayTasks.slice(0, 3).map((t, i) => {
-              const text = typeof t === 'string'
-                ? t
-                : (t.task || JSON.stringify(t.task || ''));
+          <div style={styles.dayTasks}>
+            {dayTasks.slice(0, 3).map((t, idx) => {
+              const raw = typeof t === 'string' ? t : t.task;
+              const text = typeof raw === 'string' ? raw : (raw && (raw.text || raw.title)) || JSON.stringify(raw || '');
               return (
-                <div key={i} className="task-badge">
+                <div key={idx} style={styles.taskBadge} title={text}>
                   {text}
                 </div>
               );
             })}
-
             {dayTasks.length > 3 && (
-              <div className="more-badge">＋{dayTasks.length - 3} 件</div>
+              <div style={styles.moreBadge}>＋{dayTasks.length - 3} 件</div>
             )}
           </div>
         </div>
       );
     }
-
-    return days;
+    return daysInMonth;
   };
 
+  // ─────────────────────────────────────────────
+  // スタイル
+  // ─────────────────────────────────────────────
+  const styles = {
+    calendarContainer: {
+      borderRadius: '12px',
+      overflow: 'hidden',
+      border: '1px solid #e5e7eb',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.06)',
+      marginTop: '1rem',
+      width: '100%',      // ← 画面いっぱい
+      maxWidth: '100%',
+      boxSizing: 'border-box',
+    },
+    header: {
+      background: '#f9fafb',
+      padding: '12px 16px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderBottom: '1px solid #e5e7eb',
+    },
+    weekRow: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(7, 1fr)',
+      background: '#f3f4f6',
+      padding: '10px 0',
+      fontWeight: '500',
+      color: '#374151',
+    },
+    grid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(7, 1fr)',
+      gap: '10px',
+      padding: '12px',
+      justifyContent: 'stretch', // ←列を画面いっぱいに広げる
+      width: '100%',
+      boxSizing: 'border-box',
+    },
+    day: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      padding: '10px',
+      borderRadius: '12px',
+      cursor: 'pointer',
+      position: 'relative',
+      transition: 'background 0.15s, transform 0.08s',
+      width: '100%',
+      aspectRatio: '1 / 1', // 正方形
+      overflow: 'hidden',
+      boxSizing: 'border-box',
+      background: '#ffffff',
+      border: '1px solid #e6edf3',
+      boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+    },
+    emptyDay: {
+      background: 'transparent',
+      border: 'none',
+      boxShadow: 'none',
+      cursor: 'default',
+      width: '100%',
+      aspectRatio: '1 / 1',
+    },
+    dayNumber: {
+      fontSize: '16px',
+      fontWeight: '600',
+      lineHeight: '1.2',
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'flex-start',
+      alignItems: 'center'
+    },
+    dayTasks: {
+      marginTop: '6px',
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '4px',
+    },
+    taskBadge: {
+      background: '#ecfdf5',
+      color: '#065f46',
+      padding: '4px 8px',
+      borderRadius: '999px',
+      fontSize: '11px',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      maxWidth: '100%'
+    },
+    moreBadge: {
+      fontSize: '12px',
+      color: '#6b7280',
+      textAlign: 'center',
+    },
+    selected: {
+      background: '#eef2ff',
+      border: '1px solid #c7d2fe',
+      boxShadow: '0 6px 12px rgba(37,99,235,0.06)',
+    },
+    hasTaskAccent: {
+      boxShadow: 'inset 0 0 0 2px rgba(16,185,129,0.06)',
+    },
+  };
 
   return (
-    <div className="page-content">
+    <div className="page-content" style={{ width: '100%', padding: '0 10px', boxSizing: 'border-box' }}>
       <h1>シンプルタスクカレンダー</h1>
-
-      {/* カレンダー */}
-      <div className="calendar-container">
-        <div className="calendar-header">
+      <div className="calendar-container" style={styles.calendarContainer}>
+        <div className="calendar-header" style={styles.header}>
           <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}>&lt;</button>
-          <h2>{currentDate.getFullYear()}年 {currentDate.getMonth() + 1}月</h2>
+          <h2>{`${currentDate.getFullYear()}年 ${currentDate.getMonth() + 1}月`}</h2>
           <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}>&gt;</button>
         </div>
-
-        <div className="calendar-weekdays">
+        <div className="calendar-weekdays" style={styles.weekRow}>
           <div style={{ color: '#dc2626' }}>日</div>
           <div>月</div>
           <div>火</div>
@@ -805,34 +850,27 @@ function CalendarPage({ tasks, setTasks }) {
           <div>金</div>
           <div style={{ color: '#2563eb' }}>土</div>
         </div>
-
-        <div className="calendar-grid">
+        <div className="calendar-grid" style={styles.grid}>
           {renderCalendar()}
         </div>
       </div>
 
-      {/* タスク一覧 */}
       <div className="task-container">
         <AITaskColl onTaskCreated={handleAddTaskFromAI} />
-
         <div className="task-list-section">
-          <h3>{formatDate(selectedDate)} のタスク</h3>
-
+          <h3 style={{ marginTop: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
           {selectedTasks.length === 0 ? (
             <p>タスクはありません</p>
           ) : (
             <ul className="task-list">
-              {selectedTasks.map((task, i) => (
-                <li key={i} className="task-item">
+              {selectedTasks.map((task, index) => (
+                <li key={index} className="task-item">
                   <div className="priority-bar" style={{ backgroundColor: getPriorityColor(task.imp) }}></div>
-
                   <div className="task-content">
                     <strong>{String(task.task)}</strong>
                     <div className="task-meta">
-                      {task.sta && task.end && (
-                        <span>{task.sta}〜{task.end}</span>
-                      )}
-                      <span>重要度: {task.imp}</span>
+                      {task.sta && task.end && (<span>{task.sta}〜{task.end}</span>)}
+                      <span>重要度: {task.imp || 0}</span>
                     </div>
                   </div>
                 </li>
@@ -842,48 +880,18 @@ function CalendarPage({ tasks, setTasks }) {
         </div>
       </div>
 
-      {/* 内部 CSS（あなたの環境に合わせて最適化済） */}
       <style jsx>{`
-        .task-item {
-          position: relative;
-          display: flex;
-          border: 1px solid #e5e7eb;
-          border-radius: 6px;
-          background: #fff;
-          overflow: hidden;
-        }
-        .priority-bar {
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: 8px;
-        }
-        .task-content {
-          padding: 8px 12px;
-        }
-        .task-meta {
-          color: #6b7280;
-          font-size: 0.8rem;
-          margin-top: 4px;
-          display: flex;
-          gap: 8px;
-        }
-        .task-badge {
-          background: #ecfdf5;
-          padding: 2px 6px;
-          border-radius: 12px;
-          font-size: 10px;
-          margin-top: 2px;
-        }
-        .more-badge {
-          font-size: 10px;
-          color: #6b7280;
-          margin-top: 2px;
-        }
+        .task-list-section { margin-top: 20px; }
+        .task-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+        .task-item { position: relative; display: flex; align-items: stretch; border: 1.5px solid #e5e7eb; border-radius: 6px; background: white; transition: all 0.2s; overflow: hidden; }
+        .priority-bar { position: absolute; left: -1.5px; top: -1.5px; bottom: -1.5px; width: 8px; border-radius: 6px 0 0 6px; }
+        .task-item:hover { border-color: #3b82f6; background: #f9fafb; transform: translateY(-1px); }
+        .task-content { display: flex; flex-direction: column; padding: 6px 10px; color: #111; font-size: 0.9rem; }
+        .task-meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.8rem; color: #6b7280; }
       `}</style>
     </div>
   );
 }
 
 export default CalendarPage;
+
