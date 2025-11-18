@@ -641,27 +641,6 @@ function CalendarPage({ tasks, setTasks }) {
     return holidays[toKey(date)] || null;
   };
 
-  // ─────────────────────────────────────────────
-  // タスク追加
-  // ─────────────────────────────────────────────
-  const handleAddTaskFromAI = (data) => {
-    const targetDate = data.dueDate ? (data.dueDate instanceof Date ? data.dueDate : new Date(data.dueDate)) : selectedDate;
-    const taskText = data.taskName;
-    if (!taskText) return;
-    const targetKey = formatDate(targetDate);
-    if (typeof setTasks === 'function') {
-      setTasks((prevTasks) => {
-        const newTasks = { ...prevTasks };
-        if (!newTasks[targetKey]) newTasks[targetKey] = [];
-        newTasks[targetKey].push(taskText);
-        if (data.subTasks && data.subTasks.length > 0) {
-          data.subTasks.forEach((sub) => newTasks[targetKey].push(`- ${sub}`));
-        }
-        return newTasks;
-      });
-    }
-    if (data.dueDate) setSelectedDate(targetDate);
-  };
 
   // ─────────────────────────────────────────────
   // カレンダー描画
@@ -856,7 +835,6 @@ function CalendarPage({ tasks, setTasks }) {
       </div>
 
       <div className="task-container">
-        <AITaskColl onTaskCreated={handleAddTaskFromAI} />
         <div className="task-list-section">
           <h3 style={{ marginTop: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
           {selectedTasks.length === 0 ? (

@@ -306,6 +306,25 @@ function AITaskColl({ onTaskCreated }) {
       cursor: 'pointer',
       fontSize: '16px',
     },
+    closeButton: {
+      position: 'absolute',
+      top: '12px',
+      right: '12px',
+      width: '36px',
+      height: '36px',
+      borderRadius: '8px',
+      border: 'none',
+      background: '#ffffff',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+      cursor: 'pointer',
+      fontSize: '18px',
+      fontWeight: '700',
+      color: '#374151',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      textDecoration: 'none' // NavLink 用に追加
+    },
     submitButton: (disabled) => ({
       padding: '12px 20px',
       background: disabled ? '#fde9d0' : AMBER.base,
@@ -352,6 +371,18 @@ function AITaskColl({ onTaskCreated }) {
     <div style={styles.container}>
       <form onSubmit={handleSubmit} style={{ display: 'block' }}>
         <div style={styles.formGrid}>
+          {onClose ? (
+        <button
+          type="button"
+          aria-label="閉じる"
+          onClick={onClose}
+          style={styles.closeButton}
+        >
+          ×
+        </button>
+          ):(
+          <NavLink to="/calendar" style={ styles.closeButton }>x</NavLink>
+          )}
 
           {/* タスク入力グループ（ラベル上） */}
           <div style={styles.formGroup}>

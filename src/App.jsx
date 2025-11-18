@@ -1,6 +1,6 @@
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { supabase } from "../components/AI/AITaskColl";
+import AITaskColl, { supabase } from "../components/AI/AITaskColl";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import './App.css';
 import NavigationBar from '../components/Function/NavigationBar';
@@ -43,6 +43,26 @@ const App = () => {
   })
   const [isNotFound, setIsNotFound] = useState(false);
 
+  {/* タスク追加関数 */}
+  const handleAddTaskFromAI = (data) => {
+    const targetDate = data.dueDate ? (data.dueDate instanceof Date ? data.dueDate : new Date(data.dueDate)) : selectedDate;
+    const taskText = data.taskName;
+    if (!taskText) return;
+    const targetKey = formatDate(targetDate);
+    if (typeof setTasks === 'function') {
+      setTasks((prevTasks) => {
+        const newTasks = { ...prevTasks };
+        if (!newTasks[targetKey]) newTasks[targetKey] = [];
+        newTasks[targetKey].push(taskText);
+        if (data.subTasks && data.subTasks.length > 0) {
+          data.subTasks.forEach((sub) => newTasks[targetKey].push(`- ${sub}`));
+        }
+        return newTasks;
+      });
+    }
+    if (data.dueDate) setSelectedDate(targetDate);
+};
+
   {/* _init_ supabase読み込み */}
   useEffect(() => {
       const fetchTasks = async () => {
@@ -81,6 +101,7 @@ const App = () => {
           <Route path="/" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/tasks" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
+          <Route path="/addTask" element={<AITaskColl onTaskCreated={handleAddTaskFromAI} />} />
           <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
