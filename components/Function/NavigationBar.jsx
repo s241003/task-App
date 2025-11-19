@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { IconContext } from 'react-icons'
 import { RiChatAiLine } from "react-icons/ri";
-import AITaskColl from "../AI/AITaskColl";
+import AIChat from "../AI/AIChat";
 
 function NavigationBar({ currentPage, onPageChange }) {
   const [showAI, setShowAI] = useState(false);
@@ -35,7 +35,7 @@ function NavigationBar({ currentPage, onPageChange }) {
         </IconContext.Provider>
       </nav>
 
-      {showAI && <AITaskColl onClose={() => setShowAI(false)} />}
+      {showAI && <AIChat onClose={() => setShowAI(false)} />}
 
       <style jsx>{`
 

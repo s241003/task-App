@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
-async function callAIRetry(model, prompt, retries = 3) {
+export async function callAIRetry(model, prompt, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
       const result = await model.generateContent(prompt);
@@ -179,7 +179,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("AI呼び出し失敗:", error);
-    
+
     // エラーの種類に応じた適切なレスポンス
     if (error.status === 503) {
       return res.status(503).json({
@@ -187,13 +187,13 @@ export default async function handler(req, res) {
         retryAfter: 5
       });
     }
-    
+
     if (error.status === 429) {
       return res.status(429).json({
         error: "リクエスト制限に達しました。しばらく待ってから再試行してください。"
       });
     }
-    
+
     return res.status(500).json({
       error: "タスクの処理中にエラーが発生しました。もう一度お試しください。"
     });

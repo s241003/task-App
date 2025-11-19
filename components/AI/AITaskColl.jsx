@@ -212,11 +212,31 @@ function AITaskColl({ onTaskCreated }) {
   };
 
   const styles = {
-    container: {
+    overlay: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000,
+      fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial'
+    },
+    modal: {
       maxWidth: '800px',
-      margin: '0 auto',
+      width: '90%',
+      maxHeight: '90vh',
+      overflowY: 'auto',
+      backgroundColor: 'white',
+      borderRadius: '12px',
       padding: '20px',
-      marginBottom: '15px',
+      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+      position: 'relative'
+    },
+    container: {
       fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial'
     },
     // 追加: フォーム全体をグリッド化して整列
@@ -367,22 +387,10 @@ function AITaskColl({ onTaskCreated }) {
   };
 
   return (
-
-    <div style={styles.container}>
-      <form onSubmit={handleSubmit} style={{ display: 'block' }}>
-        <div style={styles.formGrid}>
-          {onClose ? (
-        <button
-          type="button"
-          aria-label="閉じる"
-          onClick={onClose}
-          style={styles.closeButton}
-        >
-          ×
-        </button>
-          ):(
-          <NavLink to="/calendar" style={ styles.closeButton }>x</NavLink>
-          )}
+    <div style={styles.overlay}>
+      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <form onSubmit={handleSubmit} style={{ display: 'block' }}>
+          <div style={styles.formGrid}>
 
           {/* タスク入力グループ（ラベル上） */}
           <div style={styles.formGroup}>
@@ -663,6 +671,7 @@ function AITaskColl({ onTaskCreated }) {
             <strong>悪い例:</strong> 「勉強する」「頑張る」「運動する」
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

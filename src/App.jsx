@@ -4,7 +4,6 @@ import AITaskColl, { supabase } from "../components/AI/AITaskColl";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import './App.css';
 import NavigationBar from '../components/Function/NavigationBar';
-import LoginPage from '../components/Function/Pages/LoginPage';
 import CalendarPage from '../components/Function/Pages/CalendarPage';
 
 export const formatDate = (date) => {
