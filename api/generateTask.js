@@ -1,8 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+const genAI = new GoogleGenerativeAI("AIzaSyAFKBLrIdGKIILK3deHeZnKo9ZvzQHKKrE");
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-
-export async function callAIRetry(model, prompt, retries = 3) {
+async function callAIRetry(model, prompt, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
       const result = await model.generateContent(prompt);

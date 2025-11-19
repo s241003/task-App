@@ -834,7 +834,7 @@ function CalendarPage({ tasks, setTasks }) {
 
   return (
     <div className="page-content" style={{ width: '100%', padding: '0 10px', boxSizing: 'border-box' }}>
-      <h1>シンプルタスクカレンダー</h1>
+      <h1>カレンダー</h1>
       <div className="calendar-container" style={styles.calendarContainer}>
         <div className="calendar-header" style={styles.header}>
           <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}>&lt;</button>
@@ -856,7 +856,7 @@ function CalendarPage({ tasks, setTasks }) {
       </div>
 
       <div className="task-container">
-        <AITaskColl onTaskCreated={handleAddTaskFromAI} />
+        {/*<AITaskColl onTaskCreated={handleAddTaskFromAI} />*/}
         <div className="task-list-section">
           <h3 style={{ marginTop: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
           {selectedTasks.length === 0 ? (

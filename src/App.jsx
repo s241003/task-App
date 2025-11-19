@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import './App.css';
 import NavigationBar from '../components/Function/NavigationBar';
 import CalendarPage from '../components/Function/Pages/CalendarPage';
+import AIChat from '../components/AI/AIChat';
 
 export const formatDate = (date) => {
   const year = date.getFullYear();
@@ -101,6 +102,7 @@ const App = () => {
           <Route path="/tasks" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/addTask" element={<AITaskColl onTaskCreated={handleAddTaskFromAI} />} />
+          <Route path="/aiChat" element={<AIChat />} />
           <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>

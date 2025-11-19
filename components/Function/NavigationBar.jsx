@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { IconContext } from 'react-icons'
 import { RiChatAiLine } from "react-icons/ri";
 import AIChat from "../AI/AIChat";
@@ -12,6 +12,7 @@ function NavigationBar({ currentPage, onPageChange }) {
     { id: 'groupwork', label: 'グループワーク' },
     { id: 'settings', label: '設定' }
   ]
+  const navigate = useNavigate();
 
   return (
     <div className="nav-container">
@@ -28,14 +29,13 @@ function NavigationBar({ currentPage, onPageChange }) {
           </NavLink>
         ))}
         <IconContext.Provider value={{ color: "#78350f", size: "28px" }}>
-          <RiChatAiLine 
-            onClick={() => setShowAI(true)}
+          <RiChatAiLine
+            onClick={() => navigate('/aiChat')}
             style={{ cursor: 'pointer' }}
           />
         </IconContext.Provider>
       </nav>
 
-      {showAI && <AIChat onClose={() => setShowAI(false)} />}
 
       <style jsx>{`
 
