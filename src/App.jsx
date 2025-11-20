@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import AITaskColl, { supabase } from "../components/AI/AITaskColl";
 import { Router, Route, Routes, Link, useNavigate } from "react-router-dom";
 import './App.css';
+import "bootstrap/dist/css/bootstrap.css";
 import NavigationBar from '../components/Function/NavigationBar';
 import CalendarPage from '../components/Function/Pages/CalendarPage';
 import AIChat from '../components/AI/AIChat';
@@ -42,7 +43,7 @@ const App = () => {
     const saved = localStorage.getItem('tasks')
     return saved ? JSON.parse(saved) : {}
   })
-  const [isNotFound, setIsNotFound] = useState(false);
+    const [isNotFound, setIsNotFound] = useState(false);
 
   {/* タスク追加関数 */}
   const handleAddTaskFromAI = (data) => {
@@ -103,7 +104,7 @@ const App = () => {
           <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClicked={() => navigate("/")} />} />
           <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/addTask" element={<AITaskColl onTaskCreated={handleAddTaskFromAI} />} />
-          <Route path="/aiChat" element={<AIChat />} />
+          <Route path="/aichat" element={<AIChat />} />
           <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
