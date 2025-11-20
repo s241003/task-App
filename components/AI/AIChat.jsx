@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Container, Card, CardHeader, CardBody,
   ListGroup, ListGroupItem, Input, Button, InputGroup, Spinner
@@ -17,11 +17,11 @@ export default function AIChat() {
     setLoading(true);
 
     try {
-      const res = await fetch("./AIChat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMsg.content, history: messages }),
-      });
+      const res = await fetch("/api/generateTask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: userMsg.content }), // ← text に変更
+    });
       const data = await res.json();
       const aiMsg = { role: "model", content: data.reply };
       setMessages(m => [...m, aiMsg]);
