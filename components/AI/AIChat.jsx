@@ -17,7 +17,7 @@ export default function AIChat() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/AIChat", {
+      const res = await fetch("./AIChat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsg.content, history: messages }),

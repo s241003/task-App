@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import AITaskColl, { supabase } from "../components/AI/AITaskColl";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { Router, Route, Routes, Link, useNavigate } from "react-router-dom";
 import './App.css';
 import NavigationBar from '../components/Function/NavigationBar';
 import CalendarPage from '../components/Function/Pages/CalendarPage';
 import AIChat from '../components/AI/AIChat';
+import TaskPage from '../components/Function/Pages/TaskPage';
 
 export const formatDate = (date) => {
   const year = date.getFullYear();
@@ -91,15 +92,15 @@ const App = () => {
       }
       fetchTasks()
     }, [])
+    const navigate = useNavigate();
 
   return (
 
     // ルーティング
     <div className="app-container">
-      <Router>
         <Routes>
           <Route path="/" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
-          <Route path="/tasks" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
+          <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClicked={() => navigate("/")} />} />
           <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="/addTask" element={<AITaskColl onTaskCreated={handleAddTaskFromAI} />} />
           <Route path="/aiChat" element={<AIChat />} />
@@ -107,7 +108,6 @@ const App = () => {
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
         {(!isNotFound) ? <NavigationBar />: null}
-      </Router>
     </div>
   );
 
