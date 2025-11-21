@@ -41,7 +41,7 @@ export default function AIChat() {
 ただし、ユーザーからの質問に答える際には、必ず以下のルールを守ってください。
 
 1. 回答はユーザが使っている言語で行ってください。
-2. ユーザーの質問に対して正確かつ簡潔に答えてください。冗長になることがないように注意してください。
+2. ユーザーの質問に対して正確かつ簡潔に、でも温かみをもって答えてください。冗長になることがないように注意してください。
 3. 不明な点がある場合は、正直に「わかりません」と答えてください。
 
 ユーザー: "${input}"
@@ -53,7 +53,7 @@ export default function AIChat() {
       const aiMsg = { role: "model", content: responseText };
       setMessages(m => [...m, aiMsg]);
     } catch (err) {
-      setMessages(m => [...m, { role: "model", content: "サーバーが頭を掻いているよ" }]);
+      setMessages(m => [...m, { role: "model", content: "すいません、エラーです" }]);
     } finally {
       setLoading(false);
     }
