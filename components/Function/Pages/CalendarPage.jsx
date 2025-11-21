@@ -713,7 +713,7 @@ function CalendarPage({ tasks, setTasks }) {
               const raw = typeof t === 'string' ? t : t.task;
               const text = typeof raw === 'string' ? raw : (raw && (raw.text || raw.title)) || JSON.stringify(raw || '');
               return (
-                <div key={idx} style={styles.taskBadge} title={text}>
+                <div key={idx} style={styles.taskBadge,backgroundColor: getPriorityColor(t.imp)} title={text}>
                   {text}
                 </div>
               );
