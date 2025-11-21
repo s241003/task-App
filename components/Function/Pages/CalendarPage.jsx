@@ -808,7 +808,7 @@ function CalendarPage({ tasks, setTasks }) {
       flexDirection: 'column',
       gap: '4px',
     },
-    taskBadge(imp): {
+    taskBadge: (imp) => ({
       backgroundColor: getPriorityColor(imp),
       color: '#065f46',
       padding: '4px 8px',
@@ -818,7 +818,7 @@ function CalendarPage({ tasks, setTasks }) {
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       maxWidth: '100%'
-    },
+    }),
     moreBadge: {
       fontSize: '12px',
       color: '#6b7280',
