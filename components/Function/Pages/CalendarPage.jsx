@@ -713,7 +713,7 @@ function CalendarPage({ tasks, setTasks }) {
               const raw = typeof t === 'string' ? t : t.task;
               const text = typeof raw === 'string' ? raw : (raw && (raw.text || raw.title)) || JSON.stringify(raw || '');
               return (
-                <div key={idx} style={styles.taskBadge,backgroundColor: getPriorityColor(t.imp)} title={text}>
+                <div key={idx} style={styles.taskBadge(t.imp)} title={text}>
                   {text}
                 </div>
               );
@@ -808,8 +808,8 @@ function CalendarPage({ tasks, setTasks }) {
       flexDirection: 'column',
       gap: '4px',
     },
-    taskBadge: {
-      background: '#ecfdf5',
+    taskBadge(imp): {
+      bbackgroundColor: getPriorityColor(imp),
       color: '#065f46',
       padding: '4px 8px',
       borderRadius: '999px',
