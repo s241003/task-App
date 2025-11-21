@@ -727,6 +727,7 @@ function CalendarPage({ tasks, setTasks }) {
     }
     return daysInMonth;
   };
+  const navigate = useNavigate();
 
   // ─────────────────────────────────────────────
   // スタイル
@@ -859,7 +860,7 @@ function CalendarPage({ tasks, setTasks }) {
       </div>
 
       <div className="task-container">
-        <Button onClick={ ()=> useNavigate("/addtask")} >タスク作成</Button>
+        <Button  onClick={ ()=> navigate("/addtask")} >タスク作成</Button>
         <div className="task-list-section">
           <h3 style={{ marginTop: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
           {selectedTasks.length === 0 ? (
