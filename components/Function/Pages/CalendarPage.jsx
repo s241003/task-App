@@ -809,7 +809,7 @@ function CalendarPage({ tasks, setTasks }) {
       gap: '4px',
     },
     taskBadge(imp): {
-      bbackgroundColor: getPriorityColor(imp),
+      backgroundColor: getPriorityColor(imp),
       color: '#065f46',
       padding: '4px 8px',
       borderRadius: '999px',
