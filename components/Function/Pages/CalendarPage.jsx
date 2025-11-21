@@ -821,7 +821,7 @@ function CalendarPage({ tasks, setTasks }) {
     }),
     moreBadge: {
       fontSize: '12px',
-      color: '#6b7280',
+      color: '#f5f5f5',
       textAlign: 'center',
     },
     selected: {
