@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
- export const genAI = new GoogleGenerativeAI("AIzaSyAFKBLrIdGKIILK3deHeZnKo9ZvzQHKKrE");
+ export const genAI = new GoogleGenerativeAI("AIzaSyARetT4-H2vZWOXFIFjPtXASgi5PNPvh5M");
 
 async function callAIRetry(model, prompt, retries = 3) {
   for (let i = 0; i < retries; i++) {
