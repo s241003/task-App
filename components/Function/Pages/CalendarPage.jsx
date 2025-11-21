@@ -555,6 +555,8 @@ import { useState } from "react";
 import '../../../src/App.css';
 import AITaskColl from "../../AI/AITaskColl";
 import { formatDate, formatDateDisplay } from '../../../src/App';
+import { Button } from "reactstrap";
+import { useNavigate } from "react-router-dom";
 
 function CalendarPage({ tasks, setTasks }) {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -856,7 +858,7 @@ function CalendarPage({ tasks, setTasks }) {
       </div>
 
       <div className="task-container">
-        <AITaskColl onTaskCreated={handleAddTaskFromAI} />
+        <Button onClick={ ()=> useNavigate("/addtask")} >タスク作成</Button>
         <div className="task-list-section">
           <h3 style={{ marginTop: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
           {selectedTasks.length === 0 ? (
