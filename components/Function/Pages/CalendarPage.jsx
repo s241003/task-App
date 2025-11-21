@@ -814,7 +814,7 @@ function CalendarPage({ tasks, setTasks }) {
       color: '#ffffff',
       padding: '4px 8px',
       borderRadius: '999px',
-      fontSize: '2rem',
+      fontSize: '12px',
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
