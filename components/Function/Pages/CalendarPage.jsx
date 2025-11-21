@@ -854,10 +854,9 @@ function CalendarPage({ tasks, setTasks }) {
           {renderCalendar()}
         </div>
       </div>
-            <AITaskColl />
 
       <div className="task-container">
-        {/*<AITaskColl onTaskCreated={handleAddTaskFromAI} />*/}
+        <AITaskColl onTaskCreated={handleAddTaskFromAI} />
         <div className="task-list-section">
           <h3 style={{ marginTop: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
           {selectedTasks.length === 0 ? (
@@ -866,7 +865,7 @@ function CalendarPage({ tasks, setTasks }) {
             <ul className="task-list">
               {selectedTasks.map((task, index) => (
                 <li key={index} className="task-item">
-                  <div className="priority-bar" style={{ backgroundColor: getPriorityColor(task.imp) }}></div>
+                  <div className="priority-bar" style={{ backgroundColor: getPriorityColor(task.imp) }} />
                   <div className="task-content">
                     <strong>{String(task.task)}</strong>
                     <div className="task-meta">
