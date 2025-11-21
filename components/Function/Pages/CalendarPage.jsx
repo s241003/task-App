@@ -854,6 +854,7 @@ function CalendarPage({ tasks, setTasks }) {
           {renderCalendar()}
         </div>
       </div>
+            <AITaskColl />
 
       <div className="task-container">
         {/*<AITaskColl onTaskCreated={handleAddTaskFromAI} />*/}
