@@ -1,8 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient(
-  import.meta.env.SUPABASE_URL, // process.env.SUPABASE_URL
-  import.meta.env.SUPABASE_API_KEY // process.env.SUPABASE_API_KEY
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_GOOGLE_API_KEY
 );
+
+  // import.meta.env.SUPABASE_URL
+  // import.meta.env.SUPABASE_API_KEY
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
