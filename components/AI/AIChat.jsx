@@ -1,9 +1,12 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useState } from "react";
 import {
   Container, Card, CardHeader, CardBody,
   ListGroup, ListGroupItem, Input, Button, InputGroup, Spinner
 } from "reactstrap";
-import { genAI } from "../../api/generateTask";
+
+
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
 
 async function callAIRetry(model, prompt, retries = 3) {
   for (let i = 0; i < retries; i++) {
