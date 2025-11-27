@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
- export const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
+export const genAI = new GoogleGenerativeAI(process.env.VITE_GOOGLE_API_KEY);
 //  import.meta.env.VITE_GOOGLE_API_KEY
 async function callAIRetry(model, prompt, retries = 3) {
   for (let i = 0; i < retries; i++) {
