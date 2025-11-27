@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient(
-  "https://zcbubwuhbkbjoxpneemg.supabase.co", // process.env.SUPABASE_URL
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjYnVid3VoYmtiam94cG5lZW1nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4NTM5NzEsImV4cCI6MjA3NjQyOTk3MX0.1pRZrkCSqD97qRjZBYNM2sd4t1ZFkd-HQP2kUJQMA28" // process.env.SUPABASE_API_KEY
+  import.meta.env.SUPABASE_URL, // process.env.SUPABASE_URL
+  import.meta.env.SUPABASE_API_KEY // process.env.SUPABASE_API_KEY
 );
 
 import React, { useState, useEffect, useCallback } from 'react';
