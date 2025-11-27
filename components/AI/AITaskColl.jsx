@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_GOOGLE_API_KEY
+  import.meta.env.VITE_SUPABASE_API_KEY
 );
 
   // import.meta.env.SUPABASE_URL
