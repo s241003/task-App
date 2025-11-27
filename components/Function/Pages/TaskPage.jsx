@@ -24,7 +24,7 @@ function TaskPage({ tasks, onTaskClick }) {
   return (
     <>
       <div className="page-content">
-        <h1>タスク管理</h1>
+        <h1 className="text-red-500">タスク管理</h1>
 
         <button className="add-task-btn" onClick={handleAddClick}>
           ＋ タスクを追加

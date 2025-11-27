@@ -4,7 +4,9 @@ export const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjYnVid3VoYmtiam94cG5lZW1nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4NTM5NzEsImV4cCI6MjA3NjQyOTk3MX0.1pRZrkCSqD97qRjZBYNM2sd4t1ZFkd-HQP2kUJQMA28" // process.env.SUPABASE_API_KEY
 );
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from "react-router-dom";
+import { Button } from "reactstrap";
 
 {/* supabase保存 */}
 async function saveTaskToSupabase(taskData) {
@@ -44,6 +46,8 @@ function AITaskColl({ onTaskCreated }) {
   const [error, setError] = useState(null);
   const [needsMoreDetail, setNeedsMoreDetail] = useState(false);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetchScheduleData();
   }, []);
@@ -64,6 +68,15 @@ function AITaskColl({ onTaskCreated }) {
     }
   };
 
+  const pressEsc = useCallback((event) => {
+    if (event.keyCode === 27) {
+      navigate(-1);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("keydown", pressEsc, false);
+  }, [pressEsc]);
 
   {/* AI呼び出し */}
 
@@ -232,7 +245,7 @@ function AITaskColl({ onTaskCreated }) {
       overflowY: 'auto',
       backgroundColor: 'white',
       borderRadius: '12px',
-      padding: '20px',
+      padding: '30px 20px',
       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
       position: 'relative'
     },
@@ -391,6 +404,12 @@ function AITaskColl({ onTaskCreated }) {
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <form onSubmit={handleSubmit} style={{ display: 'block' }}>
           <div style={styles.formGrid}>
+
+            {/* キャンセルボタン */}
+            <button
+              onClick={() => {navigate(-1)}}
+              className="text-3lg font-bold absolute top-1 right-4 pb-0.5 bg-white text-gray-700"
+            >x</button>
 
           {/* タスク入力グループ（ラベル上） */}
           <div style={styles.formGroup}>

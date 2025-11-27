@@ -15,7 +15,7 @@ function NavigationBar({ currentPage, onPageChange }) {
   ]
 
   return (
-    <div className="nav-container">
+    <div className="nav-container no-underline">
       <nav className="navigation-bar">
         {pages.map(page => (
           <NavLink
