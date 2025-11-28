@@ -78,13 +78,13 @@ function TaskDetailPage({ task, onBack, onUpdateTask }) {
 
         <div className="task-info-section">
           <div className="info-item">
-            <span className="info-label">📅 期間:</span>
+            <span className="info-label"> 期間:</span>
             <span className="info-value">{currentTask.startDate} 〜 {currentTask.endDate}</span>
           </div>
 
           {currentTask.estimatedTime && (
             <div className="info-item">
-              <span className="info-label">⏱ 予想時間:</span>
+              <span className="info-label"> 予想時間:</span>
               <span className="info-value">{currentTask.estimatedTime}分</span>
             </div>
           )}
@@ -92,20 +92,20 @@ function TaskDetailPage({ task, onBack, onUpdateTask }) {
 
         {currentTask.detail && (
           <div className="task-detail-section">
-            <h3>📝 詳細</h3>
+            <h3> 詳細</h3>
             <p className="task-detail-text">{currentTask.detail}</p>
           </div>
         )}
 
         {/* --- ストップウォッチ --- */}
         <div className="stopwatch-section">
-          <h3>⏳ 作業時間を記録</h3>
+          <h3> 作業時間を記録</h3>
           <div className="time-display">{formatTime(elapsedTime)}</div>
           <div className="stopwatch-buttons">
             <button onClick={() => setIsRunning(true)} disabled={isRunning}>▶ 開始</button>
             <button onClick={() => setIsRunning(false)} disabled={!isRunning}>⏸ 停止</button>
             <button onClick={() => setElapsedTime(0)}>⏹ リセット</button>
-            <button onClick={handleSaveTime}>💾 記録する</button>
+            <button onClick={handleSaveTime}> 記録する</button>
           </div>
         </div>
       </div>

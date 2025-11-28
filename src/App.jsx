@@ -50,22 +50,26 @@ const App = () => {
 
   {/* タスク追加関数 */}
   const handleAddTaskFromAI = (data) => {
-    const targetDate = data.dueDate ? (data.dueDate instanceof Date ? data.dueDate : new Date(data.dueDate)) : selectedDate;
-    const taskText = data.taskName;
-    if (!taskText) return;
-    const targetKey = formatDate(targetDate);
+    // AITaskColl から送信されたデータを使用 (data.sta を日付キーとして使用)
+    const targetKey = data.sta;
+    if (!targetKey) return;  // 日付が設定されていない場合は処理しない
     if (typeof setTasks === 'function') {
       setTasks((prevTasks) => {
         const newTasks = { ...prevTasks };
         if (!newTasks[targetKey]) newTasks[targetKey] = [];
-        newTasks[targetKey].push(taskText);
-        if (data.subTasks && data.subTasks.length > 0) {
-          data.subTasks.forEach((sub) => newTasks[targetKey].push(`- ${sub}`));
-        }
+        // タスクオブジェクトとして保存 (Supabase 形式に合わせる)
+        const newTask = {
+          task: data.tas,
+          sub: data.sub,
+          imp: parseInt(data.imp),
+          sta: data.sta,
+          end: data.end,
+        };
+        newTasks[targetKey].push(newTask);
+        localStorage.setItem('tasks', JSON.stringify({ ...prevTasks, [targetKey]: [...(prevTasks[targetKey] || []), newTask] }));
         return newTasks;
       });
     }
-    if (data.dueDate) setSelectedDate(targetDate);
 };
 
   {/* _init_ supabase読み込み */}
