@@ -70,7 +70,7 @@ const App = () => {
   useEffect(() => {
       const fetchTasks = async () => {
         try {
-          const { data, error } = await supabase.from('tasks').select('*')
+          const { data, error } = await supabase.from('task_pre').select('*')
           if (error) throw error
           const loadedTasks = {}
           data.forEach((row) => {
