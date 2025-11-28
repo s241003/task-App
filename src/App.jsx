@@ -8,7 +8,7 @@ import NavigationBar from '../components/Function/NavigationBar';
 import CalendarPage from '../components/Function/Pages/CalendarPage';
 import AIChat from '../components/AI/AIChat';
 import TaskPage from '../components/Function/Pages/TaskPage';
-import { setSelectedDate } from '../components/Function/Pages/CalendarPage';
+
 
 export const formatDate = (date) => {
   const year = date.getFullYear();
@@ -34,7 +34,7 @@ export const NotFound = ({ setIsNotFound }) =>{
   return(
     <div>
       <h1>404: NOT FOUND</h1>
-      <div>お探しのページが見つかりませんでした。<br/><Link to="/calendar">ホームへ</Link></div>
+      <div>お探しのページは見つかりませんでした。<br/><Link to="/calendar">ホームへ</Link></div>
     </div>
   )
 }

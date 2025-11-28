@@ -13,7 +13,7 @@ import { Button } from "reactstrap";
 
 {/* supabase保存 */}
 async function saveTaskToSupabase(taskData) {
-  const { data, error } = await supabase.from('tasks').insert([
+  const { data, error } = await supabase.from('task_pre').insert([
     {
       task_name: taskData.tas,
       sub_tasks: taskData.sub,
@@ -58,7 +58,7 @@ function AITaskColl({ onTaskCreated }) {
   const fetchScheduleData = async () => {
     try {
       const { data, error } = await supabase
-        .from('tasks')
+        .from('task_pre')
         .select('*')
         .order('start_date', { ascending: true });
 
