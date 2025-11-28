@@ -6,7 +6,7 @@ import { formatDate, formatDateDisplay } from '../../../src/App';
 import { Button } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 
-function CalendarPage({ tasks, setTasks }) {
+function CalendarPage({ tasks, setTasks, onTaskClick }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [taskInput, setTaskInput] = useState('');
@@ -318,7 +318,7 @@ function CalendarPage({ tasks, setTasks }) {
           ) : (
             <ul className="task-list">
               {selectedTasks.map((task, index) => (
-                <li key={index} className="task-item">
+                <li key={index} className="task-item" onClick={() => onTaskClick(task)}>
                   <div className="priority-bar" style={{ backgroundColor: getPriorityColor(task.imp) }} />
                   <div className="task-content">
                     <strong>{String(task.task)}</strong>

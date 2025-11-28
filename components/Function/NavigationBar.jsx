@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink,useNavigate } from "react-router-dom";
 import { IconContext } from 'react-icons'
 import { RiChatAiLine } from "react-icons/ri";
 import AIChat from "../AI/AIChat";
@@ -13,6 +13,7 @@ function NavigationBar({ currentPage, onPageChange }) {
     { id: 'groupwork', label: 'グループワーク' },
     { id: 'settings', label: '設定' }
   ]
+  const navigate = useNavigate();
 
   return (
     <div className="nav-container no-underline">
@@ -28,6 +29,7 @@ function NavigationBar({ currentPage, onPageChange }) {
               {page.label}
           </NavLink>
         ))}
+        <button onClick={()=>{navigate("/addTask")}} className="bg-gray-400 text-white rounded-full cursor-pointer">+</button>
       </nav>
 
 

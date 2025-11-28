@@ -8,6 +8,7 @@ import NavigationBar from '../components/Function/NavigationBar';
 import CalendarPage from '../components/Function/Pages/CalendarPage';
 import AIChat from '../components/AI/AIChat';
 import TaskPage from '../components/Function/Pages/TaskPage';
+import TaskDetailPage from '../components/Function/Pages/TaskDetailPage';
 
 
 export const formatDate = (date) => {
@@ -44,7 +45,8 @@ const App = () => {
     const saved = localStorage.getItem('tasks')
     return saved ? JSON.parse(saved) : {}
   })
-    const [isNotFound, setIsNotFound] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null)
+  const [isNotFound, setIsNotFound] = useState(false);
 
   {/* タスク追加関数 */}
   const handleAddTaskFromAI = (data) => {
@@ -96,17 +98,60 @@ const App = () => {
     }, [])
     const navigate = useNavigate();
 
+    // タスククリック時のハンドラー
+    const handleTaskClick = (task) => {
+      const normalizedTask = {
+        title: task.task || task.title,
+        startDate: task.sta || task.startDate,
+        endDate: task.end || task.endDate,
+        detail: task.sub || task.detail || '',
+        priority: task.imp || task.priority || 0,
+        estimatedTime: task.estimatedTime || 60,
+        loggedTime: task.loggedTime || 0
+      };
+      setSelectedTask(normalizedTask);
+      navigate('/taskdetail');
+    };
+
+    // タスク更新時のハンドラー (作業時間更新)
+    const handleUpdateTask = (task, loggedTime) => {
+      const dateKey = formatDate(new Date(task.startDate));
+      setTasks((prevTasks) => {
+        const updatedTasks = { ...prevTasks };
+        if (updatedTasks[dateKey]) {
+          updatedTasks[dateKey] = updatedTasks[dateKey].map(existingTask => {
+            const tTitle = existingTask.task || existingTask.title;
+            const tStart = existingTask.sta || existingTask.startDate;
+            const tEnd = existingTask.end || existingTask.endDate;
+            if (tTitle === task.title && tStart === task.startDate && tEnd === task.endDate) {
+              return { ...existingTask, loggedTime };
+            }
+            return existingTask;
+          });
+        }
+        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+        return updatedTasks;
+      });
+    };
+
+    // 戻るハンドラー
+    const handleBack = () => {
+      setSelectedTask(null);
+      navigate(-1);
+    };
+
   return (
 
     // ルーティング
     <div className="app-container">
         <Routes>
-          <Route path="/" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
-          <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClicked={() => navigate("/")} />} />
-          <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
+          <Route path="/" element={<CalendarPage tasks={tasks} setTasks={setTasks} onTaskClick={handleTaskClick} />} />
+          <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClick={handleTaskClick} />} />
+          <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} onTaskClick={handleTaskClick} />} />
           <Route path="/addTask" element={<AITaskColl onTaskCreated={handleAddTaskFromAI} />} />
+          <Route path="/taskdetail" element={<TaskDetailPage task={selectedTask} onBack={handleBack} onUpdateTask={handleUpdateTask} />} />
           <Route path="/aichat" element={<AIChat />} />
-          <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
+          <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} onTaskClick={handleTaskClick} />} />
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
         {(!isNotFound) ? <NavigationBar />: null}

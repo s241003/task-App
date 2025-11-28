@@ -6,7 +6,7 @@ import './index.css';     // Tailwind CSS読み込み
 
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode className="bg-blue-500">
+  <StrictMode>
     <Router>
       <App />
     </Router>
