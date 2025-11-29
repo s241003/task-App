@@ -47,12 +47,11 @@ function TaskPage({ tasks, onTaskClick }) {
                     style={{ backgroundColor: getPriorityColor(task.priority) }}
                   ></div>
                   <div className="task-btn-content">
-                    <strong>{task.title}</strong>
+                    <strong>{task.task}</strong>
                     <div className="task-btn-meta">
-                      <span>重要度: {task.priority}</span>
-                      {task.estimatedTime && <span>⏱ {task.estimatedTime}分</span>}
-                      {task.startDate && task.endDate && (
-                        <span>📆 {task.startDate}〜{task.endDate}</span>
+                      <span>重要度: {task.imp}</span>
+                      {task.sta && task.end && (
+                        <span>📆 {task.sta}〜{task.end}</span>
                       )}
                     </div>
                   </div>
