@@ -1,101 +1,175 @@
-  calendarContainer: {
-      borderRadius: '12px',
-      overflow: 'hidden',
-      border: '1px solid #e5e7eb',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.06)',
-      marginTop: '1rem',
-      width: '100%',      // ← 画面いっぱい
-      maxWidth: '100%',
-      boxSizing: 'border-box',
-    },
-    header: {
-      background: '#f9fafb',
-      padding: '12px 16px',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      borderBottom: '1px solid #e5e7eb',
-    },
-    weekRow: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(7, 1fr)',
-      background: '#f3f4f6',
-      padding: '10px 0',
-      fontWeight: '500',
-      color: '#374151',
-    },
-    grid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(7, 1fr)',
-      gap: '10px',
-      padding: '12px',
-      justifyContent: 'stretch', // ←列を画面いっぱいに広げる
-      width: '100%',
-      boxSizing: 'border-box',
-    },
-    day: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-      padding: '10px',
-      borderRadius: '12px',
-      cursor: 'pointer',
-      position: 'relative',
-      transition: 'background 0.15s, transform 0.08s',
-      width: '100%',
-      aspectRatio: '1 / 1', // 正方形
-      overflow: 'hidden',
-      boxSizing: 'border-box',
-      background: '#ffffff',
-      border: '1px solid #e6edf3',
-      boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
-    },
-    emptyDay: {
-      background: 'transparent',
-      border: 'none',
-      boxShadow: 'none',
-      cursor: 'default',
-      width: '100%',
-      aspectRatio: '1 / 1',
-    },
-    dayNumber: {
-      fontSize: '16px',
-      fontWeight: '600',
-      lineHeight: '1.2',
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'flex-start',
-      alignItems: 'center'
-    },
-    dayTasks: {
-      marginTop: '6px',
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '4px',
-    },
-    taskBadge: {
-      background: '#ecfdf5',
-      color: '#065f46',
-      padding: '4px 8px',
-      borderRadius: '999px',
-      fontSize: '11px',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      maxWidth: '100%'
-    },
-    moreBadge: {
-      fontSize: '12px',
-      color: '#6b7280',
-      textAlign: 'center',
-    },
-    selected: {
-      background: '#eef2ff',
-      border: '1px solid #c7d2fe',
-      boxShadow: '0 6px 12px rgba(37,99,235,0.06)',
-    },
-    hasTaskAccent: {
-      boxShadow: 'inset 0 0 0 2px rgba(16,185,129,0.06)',
-    },
-  };
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.app-container {
+  width: 1600px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (max-width: 1280px) {
+  .app-container {
+    width: 90%;
+    max-width: 1200px;
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    width: 95%;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    width: 98%;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+}
+
+h1, h2, h3 {
+  text-align: center;
+  color: #2c3e50;
+}
+
+/* --- カレンダー --- */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-header button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background-color 0.2s;
+}
+
+.calendar-header button:hover {
+  background: #2980b9;
+}
+
+.calendar-weekdays, .calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  text-align: center;
+}
+
+.calendar-weekdays div {
+  font-weight: bold;
+  color: #7f8c8d;
+}
+
+.calendar-day {
+  padding: 0.8rem 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  position: relative;
+}
+
+.calendar-day:not(.empty):hover {
+  background-color: #ecf0f1;
+}
+
+.calendar-day.selected {
+  background-color: #3498db;
+  color: white;
+  font-weight: bold;
+}
+
+/* タスクがある日の目印 */
+.calendar-day.has-task::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: #e74c3c;
+  border-radius: 50%;
+}
+.calendar-day.selected.has-task::after {
+  background-color: white;
+}
+
+.calendar-day.empty {
+  cursor: default;
+}
+
+
+/* --- タスク関連 --- */
+.task-container {
+  border-top: 1px solid #ddd;
+  padding-top: 1.5rem;
+}
+
+.task-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.task-form input {
+  flex-grow: 1;
+  padding: 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.task-form button {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.task-form button:hover {
+  background-color: #27ae60;
+}
+
+.task-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.task-list li {
+  background: #f9f9f9;
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.task-list p {
+  color: #7f8c8d;
+  text-align: center;
+}

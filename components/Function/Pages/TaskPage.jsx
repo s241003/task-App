@@ -51,7 +51,7 @@ function TaskPage({ tasks, onTaskClick }) {
                     <div className="task-btn-meta">
                       <span>重要度: {task.imp}</span>
                       {task.sta && task.end && (
-                        <div>📆 {task.sta}〜{task.end}</div>
+                        <div><br />📆 {task.sta}〜{task.end}</div>
                       )}
                     </div>
                   </div>
