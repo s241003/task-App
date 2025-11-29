@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import '../../../src/App.css';
 import AITaskColl from "../../AI/AITaskColl";
@@ -6,7 +5,7 @@ import { formatDate, formatDateDisplay } from '../../../src/App';
 import { Button } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 
-function CalendarPage({ tasks, setTasks, onTaskClick }) {
+function CalendarPage({ tasks, setTasks }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [taskInput, setTaskInput] = useState('');
@@ -180,6 +179,10 @@ function CalendarPage({ tasks, setTasks, onTaskClick }) {
   // ─────────────────────────────────────────────
   // スタイル
   // ─────────────────────────────────────────────
+  // スマートフォンでの表示判定
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480;
+  const isTablet = typeof window !== 'undefined' && window.innerWidth <= 768;
+
   const styles = {
     calendarContainer: {
       borderRadius: '12px',
@@ -187,13 +190,13 @@ function CalendarPage({ tasks, setTasks, onTaskClick }) {
       border: '1px solid #e5e7eb',
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.06)',
       marginTop: '1rem',
-      width: '100%',      // ← 画面いっぱい
+      width: '100%',
       maxWidth: '100%',
       boxSizing: 'border-box',
     },
     header: {
       background: '#f9fafb',
-      padding: '12px 16px',
+      padding: isMobile ? '8px 12px' : '12px 16px',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
@@ -203,31 +206,30 @@ function CalendarPage({ tasks, setTasks, onTaskClick }) {
       display: 'grid',
       gridTemplateColumns: 'repeat(7, 1fr)',
       background: '#f3f4f6',
-      padding: '10px 0',
+      padding: isMobile ? '6px 0' : '10px 0',
       fontWeight: '500',
       color: '#374151',
+      fontSize: isMobile ? '11px' : '13px',
     },
     grid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(7, 1fr)',
-      gap: '3px',
-      padding: '6px',
-      justifyContent: 'stretch', // ←列を画面いっぱいに広げる
+      gap: isMobile ? '2px' : '3px',
+      padding: isMobile ? '4px' : '6px',
       width: '100%',
       boxSizing: 'border-box',
-      gridAutoRows: 'minmax(80px, auto)',
+      gridAutoRows: isMobile ? 'minmax(90px, auto)' : 'minmax(80px, auto)',
     },
     day: {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'flex-start',
-      padding: '0.5rem',
-      borderRadius: '8px',
+      padding: isMobile ? '0.3rem' : '0.5rem',
+      borderRadius: '6px',
       cursor: 'pointer',
       position: 'relative',
       transition: 'background 0.15s, transform 0.08s',
       width: '100%',
-      aspectRatio: '1 / 1', // 正方形統一
       overflow: 'hidden',
       boxSizing: 'border-box',
       background: '#ffffff',
@@ -243,7 +245,7 @@ function CalendarPage({ tasks, setTasks, onTaskClick }) {
       aspectRatio: '1 / 1',
     },
     dayNumber: {
-      fontSize: '16px',
+      fontSize: isMobile ? '12px' : '16px',
       fontWeight: '600',
       lineHeight: '1.2',
       width: '100%',
@@ -252,24 +254,27 @@ function CalendarPage({ tasks, setTasks, onTaskClick }) {
       alignItems: 'center'
     },
     dayTasks: {
-      marginTop: '6px',
+      marginTop: isMobile ? '3px' : '6px',
       width: '90%',
       display: 'flex',
       flexDirection: 'column',
-      gap: '4px',
+      gap: isMobile ? '2px' : '4px',
       margin: '0 auto',
     },
     taskBadge: (imp) => ({
       fontWeight: "bold",
       backgroundColor: getPriorityColor(imp),
       color: '#ffffff',
-      padding: '0.15rem 0.5rem',
-      borderRadius: '999px',
-      fontSize: '0.8rem',
-      whiteSpace: 'nowrap',
+      padding: isMobile ? '0.05rem 0.2rem' : '0.15rem 0.5rem',
+      borderRadius: '2px',
+      fontSize: isMobile ? '0.45rem' : '0.8rem',
+      whiteSpace: 'normal',
       overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      maxWidth: '100%'
+      maxWidth: '100%',
+      lineHeight: '1.1',
+      display: '-webkit-box',
+      WebkitBoxOrient: 'vertical',
+      WebkitLineClamp: 2
     }),
     moreBadge: {
       fontSize: '1rem',
@@ -318,7 +323,7 @@ function CalendarPage({ tasks, setTasks, onTaskClick }) {
           ) : (
             <ul className="task-list">
               {selectedTasks.map((task, index) => (
-                <li key={index} className="task-item" onClick={() => onTaskClick(task)}>
+                <li key={index} className="task-item">
                   <div className="priority-bar" style={{ backgroundColor: getPriorityColor(task.imp) }} />
                   <div className="task-content">
                     <strong>{String(task.task)}</strong>
