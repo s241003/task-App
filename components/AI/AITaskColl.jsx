@@ -206,6 +206,9 @@ function AITaskColl({ onTaskCreated }) {
       // 終了処理
       setTaskData(null);
       setIsLoading(false);
+
+      // モーダルを閉じる
+      navigate(-1);
   };
 
   const handleReset = () => {

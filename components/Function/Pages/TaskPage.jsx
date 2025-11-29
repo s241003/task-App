@@ -44,14 +44,14 @@ function TaskPage({ tasks, onTaskClick }) {
                 >
                   <div
                     className="priority-bar"
-                    style={{ backgroundColor: getPriorityColor(task.priority) }}
+                    style={{ backgroundColor: getPriorityColor(task.imp) }}
                   ></div>
                   <div className="task-btn-content">
                     <strong>{task.task}</strong>
                     <div className="task-btn-meta">
                       <span>重要度: {task.imp}</span>
                       {task.sta && task.end && (
-                        <span>📆 {task.sta}〜{task.end}</span>
+                        <div>📆 {task.sta}〜{task.end}</div>
                       )}
                     </div>
                   </div>
