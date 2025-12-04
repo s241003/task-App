@@ -24,7 +24,16 @@ body {
 
 @media (max-width: 480px) {
   .app-container {
-    padding: 1rem;
+     width: 90%;
+  /* max-width: 80rem; */
+  max-width: none;
+  background: #000400;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   }
 }
 
