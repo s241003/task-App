@@ -16,12 +16,18 @@ body {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  /* padding: 4rem; */
-  padding: clamp(1rem, 4vw, 4rem);
+  padding: 4rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: 1rem;
+  }
+}
+
 
 /* .main-content {
   width: 100%;
