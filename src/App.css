@@ -35,6 +35,28 @@ body {
   flex-direction: column;
   gap: 0.5rem;
   }
+    .calendar-day {
+    padding: 0.4rem 0;   
+    font-size: 0.85rem;  
+    border-radius: 6px;  
+  }
+
+  /* 曜日の文字も小さめに */
+  .calendar-weekdays div {
+    font-size: 0.7rem;
+  }
+
+  /* グリッドの余白（gap）も小さく */
+  .calendar-grid {
+    gap: 3px;
+  }
+
+  /* アイコン（赤・青・黄の丸）も縮める */
+  .calendar-day.has-task::after {
+    width: 4px;
+    height: 4px;
+    bottom: 4px;
+  }
 }
 
 
