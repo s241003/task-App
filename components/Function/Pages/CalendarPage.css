@@ -7,10 +7,10 @@
       width: '100%',      // ← 画面いっぱい
       maxWidth: '100%',
       boxSizing: 'border-box',
-      background: '#7b917b',
     },
     header: {
-      background: '#f9fafb',
+      /* background: '#f9fafb', */
+      background: '#7b917b',
       padding: '12px 16px',
       display: 'flex',
       justifyContent: 'space-between',
