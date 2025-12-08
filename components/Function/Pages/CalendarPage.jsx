@@ -133,6 +133,7 @@ function CalendarPage({ tasks, setTasks }) {
       const dateString = formatDate(date);
       const isSelected = dateString === formatDate(selectedDate);
       const dayTasks = tasks[dateString] || [];
+      const sorted = [...dayTasks].sort((a, b) => b.priority - a.priority)//追加
       const hasTask = dayTasks.length > 0;
       const weekday = date.getDay();
       const holidayName = isJapaneseHoliday(date);
@@ -157,7 +158,8 @@ function CalendarPage({ tasks, setTasks }) {
             </div>
           )}
           <div style={styles.dayTasks}>
-            {dayTasks.slice(0, 3).map((t, idx) => {
+            /* {dayTasks.slice(0, 3).map((t, idx) => { */
+               {dayTasks.sorted(0, 3).map((t, idx) =>
               const raw = typeof t === 'string' ? t : t.task;
               const text = typeof raw === 'string' ? raw : (raw && (raw.text || raw.title)) || JSON.stringify(raw || '');
               return (
