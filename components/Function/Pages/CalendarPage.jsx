@@ -195,7 +195,7 @@ function CalendarPage({ tasks, setTasks }) {
       width: '100%',      // ← 画面いっぱい
       maxWidth: '100%',
       boxSizing: 'border-box',
-      background: '#ffffff',
+      background: '#000000',
     },
     header: {
       background: '#f9fafb',
