@@ -134,7 +134,8 @@ function CalendarPage({ tasks, setTasks }) {
       const dateString = formatDate(date);
       const isSelected = dateString === formatDate(selectedDate);
       const dayTasks = tasks[dateString] || [];
-      const sorted = [...dayTasks].sort((a, b) => a.priority　- b.priority)//追加
+      // const sorted = [...dayTasks].sort((a, b) => a.priority　- b.priority)//追加
+      const sorted = [...dayTasks].sort((a, b) => (b.priority || 0) - (a.priority || 0))
       const hasTask = dayTasks.length > 0;
       const weekday = date.getDay();
       const holidayName = isJapaneseHoliday(date);
@@ -193,7 +194,7 @@ function CalendarPage({ tasks, setTasks }) {
       width: '100%',      // ← 画面いっぱい
       maxWidth: '100%',
       boxSizing: 'border-box',
-      background: '#000000',
+      background: '#ffffff',
     },
     header: {
       background: '#f9fafb',
