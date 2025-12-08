@@ -135,7 +135,8 @@ function CalendarPage({ tasks, setTasks }) {
       const isSelected = dateString === formatDate(selectedDate);
       const dayTasks = tasks[dateString] || [];
       // const sorted = [...dayTasks].sort((a, b) => a.priority　- b.priority)//追加
-      const sorted = [...dayTasks].sort((a, b) => (b.priority || 0) - (a.priority || 0))
+      // const sorted = [...dayTasks].sort((a, b) => (b.priority || 0) - (a.priority || 0))
+      const sorted = [...dayTasks].sort((a, b) => (a.priority || 0) - (b.priority || 0))
       const hasTask = dayTasks.length > 0;
       const weekday = date.getDay();
       const holidayName = isJapaneseHoliday(date);
