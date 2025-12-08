@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import '../../../src/App.css';
+import './CalendarPage.css';
 import AITaskColl from "../../AI/AITaskColl";
 import { formatDate, formatDateDisplay } from '../../../src/App';
 import { Button } from "reactstrap";
