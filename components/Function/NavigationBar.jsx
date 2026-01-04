@@ -29,7 +29,7 @@ function NavigationBar({ currentPage, onPageChange }) {
               {page.label}
           </NavLink>
         ))}
-        <button onClick={()=>{navigate("/addTask")}}>＋</button>
+        <button className=" bg-gray-500 text-lg text-white border-2 !rounded-full hover:bg-gray-400" onClick={()=>{navigate("/addTask")}}>＋</button>
       </nav>
 
 

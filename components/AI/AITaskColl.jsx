@@ -9,7 +9,6 @@ export const supabase = createClient(
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Button } from "reactstrap";
 
 {/* supabase保存 */}
 async function saveTaskToSupabase(taskData) {
@@ -174,6 +173,7 @@ function AITaskColl({ onTaskCreated }) {
 
     setIsLoading(true);
 
+    try {
       // データベースに保存
       const dataSet = {
         tas: text||null,
@@ -209,6 +209,11 @@ function AITaskColl({ onTaskCreated }) {
 
       // モーダルを閉じる
       navigate(-1);
+    } catch (error) {
+      console.error('タスク保存中にエラーが発生しました:', error);
+      setError('タスクの保存に失敗。もう一度試してください。');
+      setIsLoading(false);
+    }
   };
 
   const handleReset = () => {

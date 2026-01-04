@@ -10,10 +10,9 @@ body {
 }
 
 .app-container {
-  width: 90%;
+  width: 100%;
   max-width: 80rem;
   background: white;
-  border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   padding: 4rem;
   display: flex;
