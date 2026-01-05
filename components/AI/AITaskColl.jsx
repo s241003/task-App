@@ -9,6 +9,7 @@ export const supabase = createClient(
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
+import '../../src/dateInput.css';
 
 {/* supabase保存 */}
 async function saveTaskToSupabase(taskData) {
@@ -281,7 +282,12 @@ function AITaskColl({ onTaskCreated }) {
       color: '#374151',
       fontWeight: '600',
     },
-    row: { display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' },
+    row: {
+      display: 'flex',
+      gap: '10px',
+      alignItems: 'center',
+      flexWrap: 'wrap'
+    },
     input: {
       width: '100%', // タスク入力を幅いっぱいにして、AIボタンは右に寄せるので内部調整
       color: '#0f0f0f',
@@ -419,7 +425,7 @@ function AITaskColl({ onTaskCreated }) {
             {/* キャンセルボタン */}
             <button
               onClick={() => {navigate(-1)}}
-              className="text-3lg font-bold absolute top-1 right-4 pb-0.5 bg-white text-gray-700"
+              className="text-lg font-bold absolute top-1 py-3 right-4 bg-white text-gray-700"
             >x</button>
 
           {/* タスク入力グループ（ラベル上） */}
@@ -470,15 +476,15 @@ function AITaskColl({ onTaskCreated }) {
                 setSubTasks(e.target.value);
                 if (error) setError(null);
               }}
-              placeholder="スペースで区切って入力（例: 調査 準備 実施）"
+              placeholder="スペースで区切って入力（例: リスニング リーディング ライティング）"
               disabled={isLoadAI || isLoading}
               style={ error && needsMoreDetail ? { ...styles.fullInput, border: '2px solid #f59e0b' } : styles.fullInput }
             />
           </div>
 
 
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ ...styles.formGroup, flex: '0 0 180px' }}>
+          <div style={{ display: 'flex', gap: '12px 12px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ ...styles.formGroup, flex: '0 0 100px' }}>
               <label style={styles.labelStyle} htmlFor="importance">重要度</label>
 
               {/* 重要度 */}
@@ -498,10 +504,10 @@ function AITaskColl({ onTaskCreated }) {
               </select>
             </div>
 
-            <div style={{ ...styles.formGroup, flex: 1 }}>
+            <div style={{ ...styles.formGroup, flex: 1 ,margin: "0 0 0 4rem" }}>
               <label style={styles.labelStyle} htmlFor="turm">期間</label>
               {/* 期間 */}
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '1rem'}}>
                 <input
                   id="turm"
                   type="date"
@@ -510,8 +516,9 @@ function AITaskColl({ onTaskCreated }) {
                   placeholder="開始日"
                   disabled={isLoading}
                   style={styles.dateInput}
+                  className="date-input"
                 />
-                <span style={{ alignSelf: 'center', color: '#6b7280' }}>〜</span>
+                <span style={{ alignSelf: 'center', color: '#495060' }}>から</span>
                 <input
                   type="date"
                   value={endDate}
@@ -519,19 +526,20 @@ function AITaskColl({ onTaskCreated }) {
                   placeholder="期日"
                   disabled={isLoading}
                   style={styles.dateInput}
+                  className="date-input"
                 />
+                <span style={{ alignSelf: 'center', color: '#495060' }}>まで</span>
               </div>
             </div>
-
-            {/* タスク送信ボタン */}
+          </div><br />
+           {/* タスク送信ボタン */}
            <button
               type="submit"
               disabled={isLoadAI || isLoading || !text.trim() || !importance.trim() || !startDate.trim() || !endDate.trim()}
-              style={styles.submitButton(isLoadAI || isLoading || !text.trim() || !importance.trim() || !subTasks.trim() || !startDate.trim() || !endDate.trim())}
+              style={styles.submitButton(isLoadAI || isLoading || !text.trim() || !importance.trim() || !startDate.trim() || !endDate.trim())}
             >
               タスクを作成
             </button>
-          </div>
         </div>
       </form>
         {/* 以上 タスク生成ウィンドウ */}
@@ -608,7 +616,7 @@ function AITaskColl({ onTaskCreated }) {
           <h4 style={{ margin: '0 0 15px 0', color: AMBER.deep, fontSize: '18px' }}>
           　AIによる解析結果
           </h4>
-          
+
           <div style={{ marginBottom: '15px' }}>
             <strong style={{ color: AMBER.deep }}>タスク:</strong>
             <p style={{ 
@@ -678,30 +686,6 @@ function AITaskColl({ onTaskCreated }) {
            </details>
          </div>
        )}
-
-      {/* 入力例の表示 */}
-      <div
-        style={{
-          marginTop: '20px',
-          padding: '15px',
-          background: '#f9fafb',
-          borderRadius: '8px',
-          fontSize: '14px',
-          color: '#6b7280',
-        }}
-      >
-        <h4 style={{ margin: '0 0 10px 0', color: '#374151' }}>
-          入力例
-        </h4>
-        <div style={{ lineHeight: '1.8' }}>
-          <p style={{ margin: '5px 0' }}>
-            <strong>良い例:</strong> 「英検2級に合格する」「ReactでTodoアプリを作る」「毎日30分ランニングする」
-          </p>
-          <p style={{ margin: '5px 0' }}>
-            <strong>悪い例:</strong> 「勉強する」「頑張る」「運動する」
-          </p>
-        </div>
-      </div>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink,useNavigate } from "react-router-dom";
-import { IconContext } from 'react-icons'
-import { RiChatAiLine } from "react-icons/ri";
+//import { IconContext } from 'react-icons'
+//import { RiChatAiLine } from "react-icons/ri";
 import AIChat from "../AI/AIChat";
 
 function NavigationBar({ currentPage, onPageChange }) {
@@ -16,8 +16,8 @@ function NavigationBar({ currentPage, onPageChange }) {
   const navigate = useNavigate();
 
   return (
-    <div className="nav-container no-underline">
-      <nav className="navigation-bar">
+    <div className="navigation-container z-50 no-underline">
+      <nav className="navigation-bar bg-gray-500">
         {pages.map(page => (
           <NavLink
             key={page.id}
@@ -29,35 +29,31 @@ function NavigationBar({ currentPage, onPageChange }) {
               {page.label}
           </NavLink>
         ))}
-        <button className=" bg-gray-500 text-lg text-white border-2 !rounded-full hover:bg-gray-400" onClick={()=>{navigate("/addTask")}}>＋</button>
+        <button className="addtask-button bg-gray-500" onClick={()=>{navigate("/addTask")}}>＋</button>
       </nav>
 
 
       <style jsx>{`
 
-        .nav-container {
-          width: 100%;
+        .navigation-container {
           display: flex;
-          justify-content: center; /* 中央寄せ */
+          justify-content: space-around;
+          width: 100%;
           position: fixed;
-          bottom: 0;
           left: 0;
-          background: transparent;
-          z-index: 100;
+          bottom: 0;
+          background-color: transparent;
         }
 
-        /* 実際のバー部分（細長い枠） */
         .navigation-bar {
           display: flex;
           justify-content: space-around;
           align-items: center;
           width: 100%;
-          max-width: 420px; /* ← ページ幅と揃える */
+          max-width: 100%; /* ← ページ幅と揃える */
           height: 56px;
-          background-color: #ffffff;
-          border-top: 1.5px solid #e5e7eb;
-          border-radius: 12px 12px 0 0; /* 丸みを上だけ */
-          box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.08);
+          background-color: #ececef;
+          border-top: 1.0px solid #d3d3d3;
           margin: 0 auto;
         }
 
@@ -65,9 +61,8 @@ function NavigationBar({ currentPage, onPageChange }) {
           flex: 1;
           text-align: center;
           background: none;
-          border: none;
           font-size: 14px;
-          color: #6b7280;
+          color: #59606f;
           font-weight: 500;
           height: 100%;
           cursor: pointer;
@@ -75,15 +70,25 @@ function NavigationBar({ currentPage, onPageChange }) {
         }
 
         .nav-button:hover {
-          background: #f3f4f6;
+          background: #ececef;
           color: #111827;
+        }
+
+        .addtask-button {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #ffffff;
+          padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+          margin-right: 0.75rem;
+          border-radius: 0.75rem;
         }
 
         .active {
           color: #3b82f6;
           border-top: 3px solid #3b82f6;
-          background: #f9fafb;
+          background: #f4f4f7;
         }
+
       `}</style>
     </div>
   )

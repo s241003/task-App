@@ -9,6 +9,8 @@ import CalendarPage from '../components/Function/Pages/CalendarPage';
 import AIChat from '../components/AI/AIChat';
 import TaskPage from '../components/Function/Pages/TaskPage';
 import TaskDetailPage from '../components/Function/Pages/TaskDetailPage';
+import GroupWorkPage from "../components/Function/Pages/GroupWorkPage";
+import Settings from "../components/Function/Pages/SettingsPage"
 
 
 export const formatDate = (date) => {
@@ -45,7 +47,8 @@ const App = () => {
     const saved = localStorage.getItem('tasks')
     return saved ? JSON.parse(saved) : {}
   })
-  const [selectedTask, setSelectedTask] = useState(null)
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [theme, setTheme] = useState("");
   const [isNotFound, setIsNotFound] = useState(false);
 
   {/* タスク追加関数 */}
@@ -74,24 +77,24 @@ const App = () => {
 
   {/* _init_ supabase読み込み */}
   useEffect(() => {
-      const fetchTasks = async () => {
-        try {
-          const { data, error } = await supabase.from('tasks').select('*')
-          if (error) throw error
-          const loadedTasks = {}
-          data.forEach((row) => {
-            const task = {
-              task: row.task_name,
-              sub: row.sub_tasks,
-              imp: row.importance,
-              sta: row.start_date,
-              end: row.end_date,
-              state: row.state,
-            }
-            const key = formatDate(new Date(task.sta))
-            if (!loadedTasks[key]) loadedTasks[key] = []
-            loadedTasks[key].push(task)
-          })
+    const fetchTasks = async () => {
+      try {
+        const { data, error } = await supabase.from('tasks').select('*')
+        if (error) throw error
+        const loadedTasks = {}
+        data.forEach((row) => {
+          const task = {
+            task: row.task_name,
+            sub: row.sub_tasks,
+            imp: row.importance,
+            sta: row.start_date,
+            end: row.end_date,
+            state: row.state,
+          }
+          const key = formatDate(new Date(task.sta))
+          if (!loadedTasks[key]) loadedTasks[key] = []
+          loadedTasks[key].push(task)
+        })
           setTasks(loadedTasks)
           localStorage.setItem('tasks', JSON.stringify(loadedTasks))
         } catch (err) {
@@ -155,7 +158,8 @@ const App = () => {
           <Route path="/addTask" element={<AITaskColl onTaskCreated={handleAddTaskFromAI} />} />
           <Route path="/taskdetail" element={<TaskDetailPage task={selectedTask} onBack={handleBack} onUpdateTask={handleUpdateTask} />} />
           <Route path="/aichat" element={<AIChat />} />
-          <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} onTaskClick={handleTaskClick} />} />
+          <Route path="/groupwork" element={<GroupWorkPage />} />
+          <Route path="/settings" element={<Settings theme={theme} setTheme={setTheme}/>} />
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
         {(!isNotFound) ? <NavigationBar />: null}
