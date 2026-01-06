@@ -9,8 +9,7 @@
       boxSizing: 'border-box',
     },
     header: {
-      /* background: '#f9fafb', */
-      background: '#7b917b',
+      background: '#f9fafb',
       padding: '12px 16px',
       display: 'flex',
       justifyContent: 'space-between',
