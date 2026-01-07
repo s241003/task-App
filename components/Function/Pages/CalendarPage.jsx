@@ -195,7 +195,7 @@ function CalendarPage({ tasks, setTasks }) {
       width: '100%',      // ← 画面いっぱい
       maxWidth: '100%',
       boxSizing: 'border-box',
-      background: '#000000',
+      background: '#ffffff',
     },
     header: {
       background: '#f9fafb',
@@ -221,7 +221,7 @@ function CalendarPage({ tasks, setTasks }) {
       justifyContent: 'stretch', // ←列を画面いっぱいに広げる
       width: '100%',
       boxSizing: 'border-box',
-      gridAutoRows: 'minmax(80px, auto)',
+      gridAutoRows: 'minmax(130px, 130px)',
     },
     day: {
       display: 'flex',
