@@ -1,100 +1,125 @@
-  calendarContainer: {
-      borderRadius: '12px',
-      overflow: 'hidden',
-      border: '1px solid #e5e7eb',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.06)',
-      marginTop: '1rem',
-      width: '100%',      // ← 画面いっぱい
-      maxWidth: '100%',
-      boxSizing: 'border-box',
-    },
-    header: {
-      background: '#f9fafb',
-      padding: '12px 16px',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      borderBottom: '1px solid #e5e7eb',
-    },
-    weekRow: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(7, 1fr)',
-      background: '#f3f4f6',
-      padding: '10px 0',
-      fontWeight: '500',
-      color: '#374151',
-    },
-    grid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(7, 1fr)',
-      gap: '10px',
-      padding: '12px',
-      justifyContent: 'stretch', // ←列を画面いっぱいに広げる
-      width: '100%',
-      boxSizing: 'border-box',
-    },
-    day: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-      padding: '10px',
-      borderRadius: '12px',
-      cursor: 'pointer',
-      position: 'relative',
-      transition: 'background 0.15s, transform 0.08s',
-      width: '100%',
-      aspectRatio: '1 / 1', // 正方形
-      overflow: 'hidden',
-      boxSizing: 'border-box',
-      background: '#ffffff',
-      border: '1px solid #e6edf3',
-      boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
-    },
-    emptyDay: {
-      background: 'transparent',
-      border: 'none',
-      boxShadow: 'none',
-      cursor: 'default',
-      width: '100%',
-      aspectRatio: '1 / 1',
-    },
-    dayNumber: {
-      fontSize: '16px',
-      fontWeight: '600',
-      lineHeight: '1.2',
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'flex-start',
-      alignItems: 'center'
-    },
-    dayTasks: {
-      marginTop: '6px',
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '4px',
-    },
-    taskBadge: {
-      background: '#ecfdf5',
-      color: '#065f46',
-      padding: '4px 8px',
-      borderRadius: '999px',
-      fontSize: '11px',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      maxWidth: '100%'
-    },
-    moreBadge: {
-      fontSize: '12px',
-      color: '#6b7280',
-      textAlign: 'center',
-    },
-    selected: {
-      background: '#eef2ff',
-      border: '1px solid #c7d2fe',
-      boxShadow: '0 6px 12px rgba(37,99,235,0.06)',
-    },
-    hasTaskAccent: {
-      boxShadow: 'inset 0 0 0 2px rgba(16,185,129,0.06)',
-    },
+/* カレンダー全体 */
+.calendar-container {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+/* ヘッダー */
+.calendar-header {
+  background: #f9fafb;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* 曜日行 */
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: #f3f4f6;
+  padding: 10px 0;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* 日付グリッド */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  padding: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: stretch;
+  grid-auto-rows: 130px;
+}
+
+/* 日付セル */
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s, transform 0.08s;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #e6edf3;
+  box-shadow: 0 1px 1px rgba(15, 23, 42, 0.04);
+}
+
+/* 空白セル */
+.calendar-day.empty {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  cursor: default;
+}
+
+/* 日付数字 */
+.calendar-day-number {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+/* タスク一覧 */
+.calendar-day-tasks {
+  margin-top: 6px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* タスクバッジ（色は inline style or CSS変数で） */
+.task-badge {
+  font-weight: bold;
+  color: #ffffff;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* もっと見る */
+.more-badge {
+  font-size: 1rem;
+  color: #f5f5f5;
+  text-align: center;
+}
+
+/* 選択中 */
+.calendar-day.selected {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.06);
+}
+
+/* タスクあり */
+.calendar-day.has-task {
+  box-shadow: inset 0 0 0 2px rgba(16, 185, 129, 0.06);
+}
