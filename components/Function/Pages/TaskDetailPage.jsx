@@ -1,31 +1,33 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import Modal from "react-modal";
 
-function TaskDetailPage({ task, onBack, onUpdateTask }) {
-  const [currentTask, setCurrentTask] = useState(task)
+Modal.setAppElement("#root");
+
+function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask }) {
+  const [ task, setTask ] = useState({});
+  const { taskId } = useParams();
+  const [currentTask, setCurrentTask] = useState("")
   const [elapsedTime, setElapsedTime] = useState(task?.loggedTime || 0)
   const [isRunning, setIsRunning] = useState(false)
-  const timerRef = useRef(null)
+  const [ isOpen , setIsOpen ] = useState(false);
+  const timerRef = useRef(null);
 
-  // 🧠 --- 初期化時に localStorage から復元 ---
+
+  useEffect(()=>{
+    const flatArray = Object.values(tasks).flat();
+    const matched =
+      flatArray.find( t =>
+      {
+        return t.id === taskId;
+      })
+      setTask(matched);
+      console.log({task, matched});
+  },[taskId]);
+
   useEffect(() => {
-    if (!task) {
-      const saved = localStorage.getItem('selectedTask')
-      if (saved) {
-        const parsed = JSON.parse(saved)
-        setCurrentTask(parsed)
-        setElapsedTime(parsed.loggedTime || 0)
-      }
-    } else {
-      setCurrentTask(task)
-    }
+    setCurrentTask(task);
   }, [task])
-
-  // 💾 --- 選択タスクを保存 ---
-  useEffect(() => {
-    if (currentTask) {
-      localStorage.setItem('selectedTask', JSON.stringify(currentTask))
-    }
-  }, [currentTask])
 
   // ⏱ --- タイマー動作 ---
   useEffect(() => {
@@ -64,6 +66,22 @@ function TaskDetailPage({ task, onBack, onUpdateTask }) {
     onBack()
   }
 
+  const navigate = useNavigate();
+
+  const handleDelete = () => {
+    setIsOpen(false);
+    del(taskId);
+    alert("タスクを削除しました!");
+    navigate(-1);
+  }
+
+  const handleUpdate = ()=>{
+    update()
+  }
+
+
+
+
   // ⚠ --- currentTaskがまだ読み込まれていない場合 ---
   if (!currentTask) {
     return <div className="page-content">読み込み中...</div>
@@ -71,15 +89,47 @@ function TaskDetailPage({ task, onBack, onUpdateTask }) {
 
   return (
     <div className="page-content">
-      <button className="back-btn" onClick={handleBackClick}>← 戻る</button>
+      <div className="buttons">
+        <button className="back-btn" onClick={handleBackClick}>← 戻る</button>
+        <button className="delete-btn" >🗑️</button>
+        <button className="edit-btn" onClick={()=>setIsOpen(true)}>📝</button>
+      </div>
+
+        <Modal
+          style={{
+              overlay: {
+                backgroundColor: "rgba(0, 0, 0, 0.6)", 
+              },
+              content: {
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                padding: "24px",
+                borderRadius: "12px",
+                border: "none",
+                width: "400px",
+                background: "#fff", 
+              },
+            }}
+           isOpen={isOpen}
+           onRequestClose={() => setIsOpen(false)}
+           contentLabel="Example Modal"
+            onAfterOpen={() => { document.getElementsByClassName("modalClose")[0].focus(); }}
+        >
+          <h2 style={{color:"red", fontWeight:"500",marginBottom: "1rem"}}>タスク『{task.task}』を削除しますか？</h2>
+          <div classname="right-0 w-full flex justify-end!">
+            <button className="bg-red-500 rounded-xl!  left-0! bottom-0! p-3! opacity-90" onClick={handleDelete}>はい</button>
+            <button className="modalClose rounded-xl! bg-gray-400 ml-1! left-0! bottom-0! p-3! opacity-90" onClick={() => setIsOpen(false)}>いいえ</button>
+          </div>
+        </Modal>
 
       <div className="task-detail-container">
-        <h1 className="task-title">{currentTask.title}</h1>
+        <h1 className="task-title">{currentTask.task}</h1>
 
         <div className="task-info-section">
           <div className="info-item">
             <span className="info-label"> 期間:</span>
-            <span className="info-value">{currentTask.startDate} 〜 {currentTask.endDate}</span>
+            <span className="info-value">{currentTask.sta} 〜 {currentTask.end}</span>
           </div>
 
           {currentTask.estimatedTime && (
@@ -90,12 +140,7 @@ function TaskDetailPage({ task, onBack, onUpdateTask }) {
           )}
         </div>
 
-        {currentTask.detail && (
-          <div className="task-detail-section">
-            <h3> 詳細</h3>
-            <p className="task-detail-text">{currentTask.detail}</p>
-          </div>
-        )}
+        {currentTask.sub}
 
         {/* --- ストップウォッチ --- */}
         <div className="stopwatch-section">
@@ -111,6 +156,56 @@ function TaskDetailPage({ task, onBack, onUpdateTask }) {
       </div>
 
       <style jsx>{`
+        .buttons{
+          width:100%;
+          position:relative;
+          margin: 0;
+          font-size: 1.1rem;
+        }
+        .back-btn {
+          position:absolute;
+          display:flex;
+          left:0; top:0;
+          border-radius: 0.75rem;
+          background: rgba(175,175,175,0.7);
+          padding: 0.5rem 0.8rem;
+          transition: 0.3s ease;
+        }
+        .back-btn:hover {
+          background: rgba(175,175,175,0.5);
+        }
+        .delete-btn {
+          position:absolute;
+          display:flex;
+          right: 6vw; top:0;
+          border-radius: 0.75rem;
+          color: rgba(255,40,40,0.9);
+          background: rgba(255,30,30,0.7);
+          padding: 0.5rem 0.8rem;
+          transition: 0.3s ease;
+        }
+        .delete-btn:hover {
+          opacity: 0.75;
+        }
+        .edit-btn {
+          position:absolute;
+          display:flex;
+          border-radius: 0.75rem;
+          right:0; top:0;
+          color: #000000;
+          background: rgba(40,40,235,0.7);
+          padding: 0.5rem 0.8rem;
+          transition: 0.3s ease;
+        }
+        .edit-btn:hover {
+          background: rgba(50,50,235,0.6);
+        }
+
+        /* モーダル関連 */
+
+
+        /* ストップウォッチ関連 */
+
         .stopwatch-section {
           margin-top: 30px;
           background: #f3f4f6;

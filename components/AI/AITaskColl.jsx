@@ -1,3 +1,5 @@
+import { DBname } from "../../src/App";
+import Modal from "react-modal";
 import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -13,7 +15,7 @@ import '../../src/dateInput.css';
 
 {/* supabase保存 */}
 async function saveTaskToSupabase(taskData) {
-  const { data, error } = await supabase.from('tasks').insert([
+  const { data, error } = await supabase.from(DBname).insert([
     {
       task_name: taskData.tas,
       sub_tasks: taskData.sub,
@@ -48,6 +50,7 @@ function AITaskColl({ onTaskCreated }) {
   const [isLoadAI, setIsLoadAI] = useState(false);
   const [error, setError] = useState(null);
   const [needsMoreDetail, setNeedsMoreDetail] = useState(false);
+  const [isOpen ,setIsOpen ] = useState(true);
 
   const navigate = useNavigate();
 
@@ -58,7 +61,7 @@ function AITaskColl({ onTaskCreated }) {
   const fetchScheduleData = async () => {
     try {
       const { data, error } = await supabase
-        .from('tasks')
+        .from(DBname)
         .select('*')
         .order('start_date', { ascending: true });
 
@@ -251,7 +254,6 @@ function AITaskColl({ onTaskCreated }) {
       fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial'
     },
     modal: {
-      maxWidth: '800px',
       width: '90%',
       maxHeight: '90vh',
       overflowY: 'auto',
@@ -417,15 +419,21 @@ function AITaskColl({ onTaskCreated }) {
   };
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={() => setIsOpen(false)}
+      onAfterOpen={() => { document.getElementsByClassName("modalClose")[0].focus(); }}
+      style={{
+        overlay:{...styles.overlay},content:{...styles.modal}
+      }}>
+      <div onClick={(e) => e.stopPropagation()}>
         <form onSubmit={handleSubmit} style={{ display: 'block' }}>
           <div style={styles.formGrid}>
 
             {/* キャンセルボタン */}
             <button
               onClick={() => {navigate(-1)}}
-              className="text-lg font-bold absolute top-1 py-3 right-4 bg-white text-gray-700"
+              className="modalClose text-lg font-bold absolute top-1 py-3 right-4 bg-white text-gray-700"
             >x</button>
 
           {/* タスク入力グループ（ラベル上） */}
@@ -687,7 +695,7 @@ function AITaskColl({ onTaskCreated }) {
          </div>
        )}
       </div>
-    </div>
+    </Modal>
   );
 }
 

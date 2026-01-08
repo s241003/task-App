@@ -20,6 +20,11 @@ export const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+export const parseDate = (dateString) => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 export const formatDateDisplay = (date) => {
   if (!date) return "日付未選択";
   const year = date.getFullYear();
@@ -42,9 +47,11 @@ export const NotFound = ({ setIsNotFound }) =>{
   )
 }
 
+export const DBname = "tasks";
+
 const App = () => {
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('tasks')
+    const saved = localStorage.getItem("tasks")
     return saved ? JSON.parse(saved) : {}
   })
   const [selectedTask, setSelectedTask] = useState(null);
@@ -79,7 +86,11 @@ const App = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const { data, error } = await supabase.from('tasks').select('*')
+        const { data, error } =
+        await supabase
+          .from(DBname)
+          .select('*')
+
         if (error) throw error
         const loadedTasks = {}
         data.forEach((row) => {
@@ -90,6 +101,7 @@ const App = () => {
             sta: row.start_date,
             end: row.end_date,
             state: row.state,
+            id: row.id,
           }
           const key = formatDate(new Date(task.sta))
           if (!loadedTasks[key]) loadedTasks[key] = []
@@ -97,27 +109,30 @@ const App = () => {
         })
           setTasks(loadedTasks)
           localStorage.setItem('tasks', JSON.stringify(loadedTasks))
+          console.log({tasks});
         } catch (err) {
           console.warn('Supabase読み込み失敗:', err.message)
         }
       }
       fetchTasks()
-    }, [])
+  }, [])
     const navigate = useNavigate();
 
     // タスククリック時のハンドラー
     const handleTaskClick = (task) => {
       const normalizedTask = {
-        title: task.task || task.title,
-        startDate: task.sta || task.startDate,
-        endDate: task.end || task.endDate,
+        taskId: task.id,
+        title: task.task,
+        startDate: task.sta,
+        endDate: task.end,
         detail: task.sub || task.detail || '',
         priority: task.imp || task.priority || 0,
         estimatedTime: task.estimatedTime || 60,
         loggedTime: task.loggedTime || 0
       };
       setSelectedTask(normalizedTask);
-      navigate('/taskdetail');
+      navigate(`/taskdetail/${normalizedTask.taskId}`);
+      console.log({task, normalizedTask});
     };
 
     // タスク更新時のハンドラー (作業時間更新)
@@ -147,21 +162,47 @@ const App = () => {
       navigate(-1);
     };
 
+    const deleteTask = async (id) => {
+      try {
+        const { error } =
+          await supabase.
+            from(DBname)
+            .delete().
+            eq('id', id)
+
+        } catch (err) {
+          console.warn('[エラー] Supabase 削除 failed:', err.message)
+        }
+    };
+
+    const updateTask = async (oblect, id) => {
+      try{
+        const { error } = await supabase
+          .from(DBname)
+          .update(object)
+          .eq('id', id)
+      }catch(error){
+        console.warn('[エラー] Supabase 更新 failed:', err.message)
+      }
+    }
+
   return (
 
     // ルーティング
-    <div className="app-container">
+    <div>
+      <div className="app-container">
         <Routes>
           <Route path="/" element={<CalendarPage tasks={tasks} setTasks={setTasks} onTaskClick={handleTaskClick} />} />
           <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClick={handleTaskClick} />} />
           <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} onTaskClick={handleTaskClick} />} />
           <Route path="/addTask" element={<AITaskColl onTaskCreated={handleAddTaskFromAI} />} />
-          <Route path="/taskdetail" element={<TaskDetailPage task={selectedTask} onBack={handleBack} onUpdateTask={handleUpdateTask} />} />
+          <Route path="/taskdetail/:taskId" element={<TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} onUpdateTask={handleUpdateTask} />} />
           <Route path="/aichat" element={<AIChat />} />
           <Route path="/groupwork" element={<GroupWorkPage />} />
           <Route path="/settings" element={<Settings theme={theme} setTheme={setTheme}/>} />
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
+      </div>
         {(!isNotFound) ? <NavigationBar />: null}
     </div>
   );
