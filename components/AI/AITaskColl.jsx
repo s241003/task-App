@@ -154,6 +154,9 @@ function AITaskColl({isOpen,setIsOpen}) {
       // 成功時の処理
       setTaskData(data);
       setSubTasks(data.subTasks.join(' '));
+      setImportance(data.importance.toString());
+      setHours(Math.floor(data.estimated_time / 60));
+      setMinutes(data.estimated_time % 60);
       console.log('AI Response:', data);
 
       // 成功時ログ

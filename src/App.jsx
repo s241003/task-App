@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import AITaskColl, { supabase } from "../components/AI/AITaskColl";
-import { Router, Route, Routes, Link, useNavigate } from "react-router-dom";
+import { Router, Route, Routes, Link, Navigate, useNavigate } from "react-router-dom";
 import './App.css';
 import "bootstrap/dist/css/bootstrap.css";
 import NavigationBar from '../components/Function/NavigationBar';
@@ -107,6 +107,8 @@ const App = () => {
     return saved ? JSON.parse(saved) : {}
   })
   const [selectedTask, setSelectedTask] = useState(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [theme, setTheme] = useState("");
   const [isNotFound, setIsNotFound] = useState(false);
   const [popUpText ,setPopUpText ] = useState("");
@@ -228,9 +230,10 @@ const App = () => {
       <div className="app-container">
         <PopUp text={popUpText}  />
         <Routes>
-          <Route path="/" element={<CalendarPage tasks={tasks} setTasks={setTasks} onTaskClick={handleTaskClick} />} />
+          <Route path="/" element={<Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}/${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`} replace/>} />
           <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClick={handleTaskClick} />} />
-          <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} onTaskClick={handleTaskClick} />} />
+          <Route path="/calendar" element={<Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}/${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`} replace/>} />
+          <Route path="/calendar/:current/:selected" element={<CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} />} />
           <Route path="/addTask" element={<AITaskColl />} />
           <Route path="/taskdetail/:taskId" element={<TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} onUpdateTask={handleUpdateTask} setPopUpText={setPopUpText} />} />
           <Route path="/aichat" element={<AIChat />} />

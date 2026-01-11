@@ -4,15 +4,27 @@ import "./CalendarPage.css";
 import AITaskColl from "../../AI/AITaskColl";
 import { formatDate ,parseDate ,formatDateDisplay } from '../../../src/App';
 import { Button } from "reactstrap";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 
-function CalendarPage({ tasks, setTasks,onTaskClick }) {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
+function CalendarPage({ tasks, setTasks, onTaskClick, currentDate, setCurrentDate, selectedDate, setSelectedDate }) {
   const [today, setToday] = useState(new Date());
   const [expandedTasks, setExpandedTasks] = useState({});
   const [taskInput, setTaskInput] = useState('');
+  const { current, selected } = useParams();
+  const navigate= useNavigate();
+
+
+  useEffect(()=>{
+    const [ curYear,curMonth, ] = current.split("-");
+    setCurrentDate(new Date(parseInt(curYear), parseInt(curMonth) - 1, 1));
+    const [ selYear,selMonth,selDate ] = selected.split("-");
+    setSelectedDate(new Date(parseInt(selYear), parseInt(selMonth) - 1, parseInt(selDate)));
+  },[current,selected])
+
+  useEffect(()=>{
+    navigate(`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}/${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`);
+  },[currentDate,selectedDate]);
 
   const selectedTasksRaw = expandedTasks[formatDate(selectedDate)] || [];
   let selectedTasks = selectedTasksRaw.map((t) => {
@@ -129,7 +141,6 @@ function CalendarPage({ tasks, setTasks,onTaskClick }) {
     return () => clearInterval(timer);
   }, [today]);
 
-  const navigate= useNavigate();
 
   // ─────────────────────────────────────────────
   // 期間タスクの展開
@@ -311,7 +322,7 @@ function CalendarPage({ tasks, setTasks,onTaskClick }) {
       </div>
 
       <div className="task-container">
-        <Button  onClick={ ()=> navigate("/addtask")} >タスク作成</Button>
+        <Button onClick={ ()=> navigate("/addtask")} >タスク作成</Button>
         <div className="task-list-section">
           <h3 style={{ marginTop: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
           {selectedTasks.length === 0 ? (
