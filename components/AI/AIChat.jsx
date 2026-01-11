@@ -105,7 +105,7 @@ export default function AIChat() {
           </ListGroup>
           {}
           <Button className="px-4! py-1.5! rounded-full!
-              text-white! font-semibold!
+              text-blue-400! font-semibold!
               transition-all! duration-300!
               bg-cyan-400/20!
               backdrop-blur-md!

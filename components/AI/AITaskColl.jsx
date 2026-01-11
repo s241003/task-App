@@ -58,6 +58,7 @@ function AITaskColl({isOpen,setIsOpen}) {
   const [isLoadAI, setIsLoadAI] = useState(false);
   const [error, setError] = useState(null);
   const [needsMoreDetail, setNeedsMoreDetail] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
 
   const navigate = useNavigate();
 
@@ -445,7 +446,7 @@ function AITaskColl({isOpen,setIsOpen}) {
       onRequestClose={() => setIsOpen(false)}
       onAfterOpen={() => { document.getElementsByClassName("modalClose")[0].focus(); }}
       style={{
-        overlay:{...styles.overlay},content:{...styles.modal}
+        overlay:{...styles.overlay},content:{...styles.modal,overflow:"scroll"}
       }}>
       <div onClick={(e) => e.stopPropagation()}>
         <form onSubmit={handleSubmit} style={{ display: 'block' }}>
@@ -613,7 +614,8 @@ function AITaskColl({isOpen,setIsOpen}) {
 
 
         {/* 以下 AI結果ウィンドウ */}
-        <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+
+        {/* <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
 
           {(taskData || error) && (
             <button
@@ -624,7 +626,7 @@ function AITaskColl({isOpen,setIsOpen}) {
               リセット
             </button>
           )}
-        </div>
+        </div>*/}
 
       {/* エラーメッセージ表示 */}
       {error && (
@@ -679,79 +681,84 @@ function AITaskColl({isOpen,setIsOpen}) {
 
       {/* 成功時の結果表示 */}
       {taskData && !error && (
-        <div style={styles.successBox}>
-          <h4 style={{ margin: '0 0 15px 0', color: AMBER.deep, fontSize: '18px' }}>
-          　AIによる解析結果
-          </h4>
+        <div>
+          <button onClick={() => setIsHidden(!isHidden)}>
+            {isHidden ? "▸ 表示" : "▾ 非表示"}
+          </button>
+          <div style={{ ...styles.successBox, ...(isHidden ? { display: "none" } : {}) }}>
+            <h4 style={{ margin: '0 0 15px 0', color: AMBER.deep, fontSize: '18px' }}>
+            　AIによる解析結果
+            </h4>
 
-          <div style={{ marginBottom: '15px' }}>
-            <strong style={{ color: AMBER.deep }}>タスク:</strong>
-            <p style={{ 
-              margin: '5px 0', 
-              fontSize: '16px', 
-              color: AMBER.base,
-              fontWeight: 'bold'
-            }}>
-              {taskData.taskName}
-            </p>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <strong style={{ color: AMBER.deep }}>サブタスク一覧:</strong>
-            <ul style={{ 
-              margin: '5px 0', 
-              paddingLeft: '20px',
-              color: AMBER.base
-            }}>
-              {taskData.subTasks && taskData.subTasks.map((subTask, index) => (
-                <li key={index} style={{ marginBottom: '5px' }}>
-                  {subTask}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {taskData.reason && (
-            <div style={{ 
-              marginTop: '10px',
-              padding: '10px',
-              background: '#fff',
-              borderRadius: '6px',
-              fontSize: '14px',
-              color: AMBER.deep,
-              fontStyle: 'italic'
-            }}>
-              <strong>分析理由:</strong> {taskData.reason}
+            <div style={{ marginBottom: '15px' }}>
+              <strong style={{ color: AMBER.deep }}>タスク:</strong>
+              <p style={{ 
+                margin: '5px 0', 
+                fontSize: '16px', 
+                color: AMBER.base,
+                fontWeight: 'bold'
+              }}>
+                {taskData.taskName}
+              </p>
             </div>
-          )}
 
-          <div style={{
-            marginTop: '10px',
-            fontSize: '14px',
-            color: AMBER.deep
-          }}>
-            <p style={{ margin: '5px 0' }}>
-              <strong>重要度:</strong> {importance || '未設定'}
-            </p>
-            <p style={{ margin: '5px 0' }}>
-              <strong>期間:</strong> {startDate || '未設定'} 〜 {endDate || '未設定'}
-            </p>
-          </div>
+            <div style={{ marginBottom: '15px' }}>
+              <strong style={{ color: AMBER.deep }}>サブタスク一覧:</strong>
+              <ul style={{ 
+                margin: '5px 0', 
+                paddingLeft: '20px',
+                color: AMBER.base
+              }}>
+                {taskData.subTasks && taskData.subTasks.map((subTask, index) => (
+                  <li key={index} style={{ marginBottom: '5px' }}>
+                    {subTask}
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* デバッグ用（本番環境では削除推奨） */}
-          <details style={{ marginTop: '15px' }}>
-            <summary style={{ 
-              cursor: 'pointer', 
-              color: AMBER.deep,
-              fontSize: '12px'
+            {taskData.reason && (
+              <div style={{ 
+                marginTop: '10px',
+                padding: '10px',
+                background: '#fff',
+                borderRadius: '6px',
+                fontSize: '14px',
+                color: AMBER.deep,
+                fontStyle: 'italic'
+              }}>
+                <strong>分析理由:</strong> {taskData.reason}
+              </div>
+            )}
+
+            <div style={{
+              marginTop: '10px',
+              fontSize: '14px',
+              color: AMBER.deep
             }}>
-               詳細データを表示
-             </summary>
-             <pre style={styles.debugPre}>
-               {JSON.stringify(taskData, null, 2)}
-             </pre>
-           </details>
-         </div>
+              <p style={{ margin: '5px 0' }}>
+                <strong>重要度:</strong> {importance || '未設定'}
+              </p>
+              <p style={{ margin: '5px 0' }}>
+                <strong>期間:</strong> {startDate || '未設定'} 〜 {endDate || '未設定'}
+              </p>
+            </div>
+
+            {/* デバッグ用（本番環境では削除推奨） */}
+            <details style={{ marginTop: '15px' }}>
+              <summary style={{ 
+                cursor: 'pointer', 
+                color: AMBER.deep,
+                fontSize: '12px'
+              }}>
+                詳細データを表示
+              </summary>
+              <pre style={styles.debugPre}>
+                {JSON.stringify(taskData, null, 2)}
+              </pre>
+            </details>
+          </div>
+        </div>
        )}
       </div>
     </Modal>
