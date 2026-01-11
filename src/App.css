@@ -7,6 +7,20 @@ body {
   width:100%;
 }
 
+input[type="date"]{
+  cursor:text;
+}
+
+select{
+  cursor:pointer;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  cursor:pointer;
+  color: #f59e0b;
+  filter: invert(0.6) sepia(1) saturate(5) hue-rotate(25deg);
+}
+
 .app-container {
   margin: 1rem 1vw;
   max-width: 100%;
@@ -26,13 +40,58 @@ h1, h2, h3 {
   font-weight: 700;
 }
 
-/* Modal styles */
-.modal-content {
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
+.popup {
+  position: fixed;
+  top: -60px; /* 最初は画面外 */
+  left: 50%;
+  transform: translateX(-50%);
+  background: #d5ebd3;
+  color: rgb(0, 0, 0);
+  border-color:#393b3c;
+  padding: 12px 20px;
+  border-radius: 8px;
+  animation: slideDownUp 3s ease forwards;
 }
 
-.modal-overlay {
-  background: rgba(0, 0, 0, 0.75) !important;
+@keyframes slideDownUp {
+  0% {
+    top: -60px;
+    opacity: 0;
+  }
+  15% {
+    top: 20px;
+    opacity: 1;
+  }
+  85% {
+    top: 20px;
+    opacity: 1;
+  }
+  100% {
+    top: -60px;
+    opacity: 0;
+  }
+}
+
+
+/* Modal 関連 */
+
+.modalContent{
+  width:100%;
+  height:100%;
+}
+.modalBtns{
+  display:flex;
+  justify-content: center;
+}
+.modalBtn {
+  border-radius:0.75rem;
+  margin-left:0.5rem;
+  padding: 0.8rem;
+  opacity: 0.9;
+}
+
+
+
+.overlay {
+  background-color: rgba(0, 0, 0, 0.6);
 }

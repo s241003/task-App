@@ -45,9 +45,52 @@ export const NotFound = ({ setIsNotFound }) =>{
       <div>お探しのページは見つかりませんでした。<br/><Link to="/calendar">ホームへ</Link></div>
     </div>
   )
-}
+};
+
+export const PopUp = ({text})=>{
+  const [showPopUp ,setShowPopUp ] = useState(false);
+
+      useEffect(()=>{
+        setShowPopUp(true);
+      },[text]);
+
+      useEffect(()=>{
+        const timer = setTimeout(() => {
+          setShowPopUp(false);
+        }, 2500);
+      return () => clearTimeout(timer);
+      },[showPopUp]);
+
+    return(
+      showPopUp||text==="" ? <div className="popup">{text}</div>:null
+    )
+};
 
 export const DBname = "tasks";
+
+{/* タスク追加関数 */}
+export const onTaskCreated = (data) => {
+  // AITaskColl から送信されたデータを使用 (data.sta を日付キーとして使用)
+  const targetKey = data.sta;
+  if (!targetKey) return;  // 日付が設定されていない場合は処理しない
+  if (typeof setTasks === 'function') {
+    setTasks((prevTasks) => {
+      const newTasks = { ...prevTasks };
+      if (!newTasks[targetKey]) newTasks[targetKey] = [];
+      // タスクオブジェクトとして保存 (Supabase 形式に合わせる)
+      const newTask = {
+        task: data.tas,
+        sub: data.sub,
+        imp: parseInt(data.imp),
+        sta: data.sta,
+        end: data.end,
+      };
+      newTasks[targetKey].push(newTask);
+      localStorage.setItem('tasks', JSON.stringify({ ...prevTasks, [targetKey]: [...(prevTasks[targetKey] || []), newTask] }));
+      return newTasks;
+    });
+  }
+};
 
 const App = () => {
   const [tasks, setTasks] = useState(() => {
@@ -57,30 +100,7 @@ const App = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [theme, setTheme] = useState("");
   const [isNotFound, setIsNotFound] = useState(false);
-
-  {/* タスク追加関数 */}
-  const handleAddTaskFromAI = (data) => {
-    // AITaskColl から送信されたデータを使用 (data.sta を日付キーとして使用)
-    const targetKey = data.sta;
-    if (!targetKey) return;  // 日付が設定されていない場合は処理しない
-    if (typeof setTasks === 'function') {
-      setTasks((prevTasks) => {
-        const newTasks = { ...prevTasks };
-        if (!newTasks[targetKey]) newTasks[targetKey] = [];
-        // タスクオブジェクトとして保存 (Supabase 形式に合わせる)
-        const newTask = {
-          task: data.tas,
-          sub: data.sub,
-          imp: parseInt(data.imp),
-          sta: data.sta,
-          end: data.end,
-        };
-        newTasks[targetKey].push(newTask);
-        localStorage.setItem('tasks', JSON.stringify({ ...prevTasks, [targetKey]: [...(prevTasks[targetKey] || []), newTask] }));
-        return newTasks;
-      });
-    }
-};
+  const [popUpText ,setPopUpText ] = useState("いにっと");
 
   {/* _init_ supabase読み込み */}
   useEffect(() => {
@@ -98,6 +118,8 @@ const App = () => {
             task: row.task_name,
             sub: row.sub_tasks,
             imp: row.importance,
+            est: row.estimated_time,
+            doing: row.doing_task,
             sta: row.start_date,
             end: row.end_date,
             state: row.state,
@@ -116,87 +138,92 @@ const App = () => {
       }
       fetchTasks()
   }, [])
-    const navigate = useNavigate();
 
-    // タスククリック時のハンドラー
-    const handleTaskClick = (task) => {
-      const normalizedTask = {
-        taskId: task.id,
-        title: task.task,
-        startDate: task.sta,
-        endDate: task.end,
-        detail: task.sub || task.detail || '',
-        priority: task.imp || task.priority || 0,
-        estimatedTime: task.estimatedTime || 60,
-        loggedTime: task.loggedTime || 0
-      };
-      setSelectedTask(normalizedTask);
-      navigate(`/taskdetail/${normalizedTask.taskId}`);
-      console.log({task, normalizedTask});
+  const navigate = useNavigate();
+
+  // タスククリック時のハンドラー
+  const handleTaskClick = (task) => {
+    const normalizedTask = {
+      taskId: task.id,
+      title: task.task,
+      startDate: task.sta,
+      endDate: task.end,
+      detail: task.sub,
+      imp: task.imp,
+      estimated: task.est,
+      doing: task.doing,
+      state: task.state,
     };
+    setSelectedTask(normalizedTask);
+    navigate(`/taskdetail/${normalizedTask.taskId}`);
+    //console.log({task, normalizedTask});
+  };
 
-    // タスク更新時のハンドラー (作業時間更新)
-    const handleUpdateTask = (task, loggedTime) => {
-      const dateKey = formatDate(new Date(task.startDate));
-      setTasks((prevTasks) => {
-        const updatedTasks = { ...prevTasks };
-        if (updatedTasks[dateKey]) {
-          updatedTasks[dateKey] = updatedTasks[dateKey].map(existingTask => {
-            const tTitle = existingTask.task || existingTask.title;
-            const tStart = existingTask.sta || existingTask.startDate;
-            const tEnd = existingTask.end || existingTask.endDate;
-            if (tTitle === task.title && tStart === task.startDate && tEnd === task.endDate) {
-              return { ...existingTask, loggedTime };
-            }
-            return existingTask;
-          });
-        }
-        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-        return updatedTasks;
-      });
-    };
-
-    // 戻るハンドラー
-    const handleBack = () => {
-      setSelectedTask(null);
-      navigate(-1);
-    };
-
-    const deleteTask = async (id) => {
-      try {
-        const { error } =
-          await supabase.
-            from(DBname)
-            .delete().
-            eq('id', id)
-
-        } catch (err) {
-          console.warn('[エラー] Supabase 削除 failed:', err.message)
-        }
-    };
-
-    const updateTask = async (oblect, id) => {
-      try{
-        const { error } = await supabase
-          .from(DBname)
-          .update(object)
-          .eq('id', id)
-      }catch(error){
-        console.warn('[エラー] Supabase 更新 failed:', err.message)
+  // タスク更新時のハンドラー (作業時間更新)
+  const handleUpdateTask = (task, loggedTime) => {
+    const dateKey = formatDate(new Date(task.startDate));
+    setTasks((prevTasks) => {
+      const updatedTasks = { ...prevTasks };
+      if (updatedTasks[dateKey]) {
+        updatedTasks[dateKey] = updatedTasks[dateKey].map(existingTask => {
+          const tTitle = existingTask.task || existingTask.title;
+          const tStart = existingTask.sta || existingTask.startDate;
+          const tEnd = existingTask.end || existingTask.endDate;
+          if (tTitle === task.title && tStart === task.startDate && tEnd === task.endDate) {
+            return { ...existingTask, loggedTime };
+          }
+          return existingTask;
+        });
       }
+      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+      return updatedTasks;
+    });
+  };
+
+  // 戻るハンドラー
+  const handleBack = () => {
+    setSelectedTask(null);
+    navigate(-1);
+  };
+
+  const deleteTask = async (id) => {
+    try {
+      const { error } =
+        await supabase.
+          from(DBname)
+          .delete()
+          .eq('id', id)
+
+      } catch (err) {
+        console.warn('[エラー] Supabase 削除 failed:', err.message)
+      }
+  };
+
+  const updateTask = async (object, id) => {
+    try{
+      const { error } = await supabase
+       .from(DBname)
+        .update(object)
+        .eq('id', id)
+    }catch(err){
+      console.warn('[エラー] Supabase 更新 failed:', err.message)
+      
     }
+    console.log(object);
+  }
 
   return (
 
     // ルーティング
     <div>
       <div className="app-container">
+        <PopUp text={popUpText} />
         <Routes>
           <Route path="/" element={<CalendarPage tasks={tasks} setTasks={setTasks} onTaskClick={handleTaskClick} />} />
           <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClick={handleTaskClick} />} />
           <Route path="/calendar" element={<CalendarPage tasks={tasks} setTasks={setTasks} onTaskClick={handleTaskClick} />} />
-          <Route path="/addTask" element={<AITaskColl onTaskCreated={handleAddTaskFromAI} />} />
-          <Route path="/taskdetail/:taskId" element={<TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} onUpdateTask={handleUpdateTask} />} />
+          <Route path="/addTask" element={<AITaskColl />} />
+          <Route path="/taskdetail/:taskId" element={<TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} onUpdateTask={handleUpdateTask} setPopUpText={setPopUpText} />} />
           <Route path="/aichat" element={<AIChat />} />
           <Route path="/groupwork" element={<GroupWorkPage />} />
           <Route path="/settings" element={<Settings theme={theme} setTheme={setTheme}/>} />

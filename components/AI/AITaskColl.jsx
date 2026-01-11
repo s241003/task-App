@@ -1,4 +1,4 @@
-import { DBname } from "../../src/App";
+import { DBname, onTaskCreated } from "../../src/App";
 import Modal from "react-modal";
 import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient(
@@ -15,15 +15,18 @@ import '../../src/dateInput.css';
 
 {/* supabase保存 */}
 async function saveTaskToSupabase(taskData) {
-  const { data, error } = await supabase.from(DBname).insert([
-    {
-      task_name: taskData.tas,
-      sub_tasks: taskData.sub,
-      importance: taskData.imp,
-      start_date: taskData.sta,
-      end_date: taskData.end,
-    },
-  ]);
+  const { data, error } = await supabase
+    .from(DBname)
+    .insert([
+      {
+        task_name: taskData.tas,
+        sub_tasks: taskData.sub,
+        importance: taskData.imp,
+        estimated_time: taskData.est,
+        start_date: taskData.sta,
+        end_date: taskData.end,
+      },
+    ]);
 
   if (error) {
     console.error('保存失敗:', error);
@@ -32,7 +35,7 @@ async function saveTaskToSupabase(taskData) {
   return data;
 }
 
-function AITaskColl({ onTaskCreated }) {
+function AITaskColl({isOpen,setIsOpen}) {
 
   //配列
   const [schedules, setSchedules] = useState([]);
@@ -41,6 +44,7 @@ function AITaskColl({ onTaskCreated }) {
   const [text, setText] = useState('');
   const [subTasks,setSubTasks] = useState('')
   const [importance, setImportance] = useState('');
+  const [estimated, setEstimated] = useState("");
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
@@ -50,7 +54,6 @@ function AITaskColl({ onTaskCreated }) {
   const [isLoadAI, setIsLoadAI] = useState(false);
   const [error, setError] = useState(null);
   const [needsMoreDetail, setNeedsMoreDetail] = useState(false);
-  const [isOpen ,setIsOpen ] = useState(true);
 
   const navigate = useNavigate();
 
@@ -80,6 +83,9 @@ function AITaskColl({ onTaskCreated }) {
     }
   }, []);
 
+  useEffect(()=>{
+    console.log(estimated)
+  },[estimated])
   useEffect(() => {
     document.addEventListener("keydown", pressEsc, false);
   }, [pressEsc]);
@@ -183,6 +189,7 @@ function AITaskColl({ onTaskCreated }) {
         tas: text||null,
         sub: subTasks.split(' ')||null,
         imp: importance || null,
+        est: estimated ||null,
         sta: startDate || null,
         end: endDate || null,
       };
@@ -201,6 +208,7 @@ function AITaskColl({ onTaskCreated }) {
       setText('');
       setSubTasks('');
       setImportance('');
+      setEstimated('');
       setStartDate('');
       setEndDate('');
 
@@ -254,8 +262,8 @@ function AITaskColl({ onTaskCreated }) {
       fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial'
     },
     modal: {
-      width: '90%',
-      maxHeight: '90vh',
+      width: '75vw',
+      maxHeight: 'auto',
       overflowY: 'auto',
       backgroundColor: 'white',
       borderRadius: '12px',
@@ -427,12 +435,12 @@ function AITaskColl({ onTaskCreated }) {
         overlay:{...styles.overlay},content:{...styles.modal}
       }}>
       <div onClick={(e) => e.stopPropagation()}>
-        <form onSubmit={handleSubmit} style={{ display: 'block' }}>
+        <form /*onSubmit={handleSubmit}*/ style={{ display: 'block' }}>
           <div style={styles.formGrid}>
 
             {/* キャンセルボタン */}
             <button
-              onClick={() => {navigate(-1)}}
+              onClick={() => setIsOpen(false)}
               className="modalClose text-lg font-bold absolute top-1 py-3 right-4 bg-white text-gray-700"
             >x</button>
 
@@ -467,7 +475,7 @@ function AITaskColl({ onTaskCreated }) {
                 disabled={isLoadAI || isLoading || !text.trim()}
                 style={styles.aiButton(isLoadAI || isLoading || !text.trim())}
               >
-                {isLoadAI || isLoading ? '解析中…' : 'AIに送る'}
+                {isLoadAI || isLoading ? '解析中…' : 'AIにおまかせ'}
               </button>
             </div>
           </div>
@@ -491,11 +499,12 @@ function AITaskColl({ onTaskCreated }) {
           </div>
 
 
-          <div style={{ display: 'flex', gap: '12px 12px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ ...styles.formGroup, flex: '0 0 100px' }}>
+          <div className="flex flex-row w-full gap-5">
+            <div style={{ ...styles.formGroup, flexBasis: "2rem" }}>
               <label style={styles.labelStyle} htmlFor="importance">重要度</label>
 
               {/* 重要度 */}
+
               <select
                 id="importance"
                 value={importance}
@@ -512,32 +521,48 @@ function AITaskColl({ onTaskCreated }) {
               </select>
             </div>
 
-            <div style={{ ...styles.formGroup, flex: 1 ,margin: "0 0 0 4rem" }}>
-              <label style={styles.labelStyle} htmlFor="turm">期間</label>
-              {/* 期間 */}
-              <div style={{ display: 'flex', gap: '1rem'}}>
-                <input
-                  id="turm"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  placeholder="開始日"
+            <div style={{ ...styles.formGroup, flexBasis: '12rem', }}>
+              <label style={styles.labelStyle} htmlFor="estimated">必要な時間</label>
+
+              {/* 推定かかり時間 */}
+              <input
+                  id="estimated"
+                  type="time"
+                  value={estimated}
+                  onChange={(e) => setEstimated(e.target.value)}
+                  placeholder="達成までにどのくらいかかる？"
                   disabled={isLoading}
-                  style={styles.dateInput}
+                  style={styles.input}
                   className="date-input"
                 />
-                <span style={{ alignSelf: 'center', color: '#495060' }}>から</span>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  placeholder="期日"
-                  disabled={isLoading}
-                  style={styles.dateInput}
-                  className="date-input"
-                />
-                <span style={{ alignSelf: 'center', color: '#495060' }}>まで</span>
               </div>
+          </div>
+
+          <div style={{ ...styles.formGroup, flex: 1}}>
+            <label style={styles.labelStyle} htmlFor="turm">期間</label>
+            {/* 期間 */}
+            <div style={{ display: 'flex', gap: '1rem'}}>
+              <input
+                id="turm"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                placeholder="開始日"
+                disabled={isLoading}
+                style={styles.dateInput}
+                className="date-input"
+              />
+              <span style={{ alignSelf: 'center', color: '#495060' }}>から</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                placeholder="期日"
+                disabled={isLoading}
+                style={styles.dateInput}
+                className="date-input"
+              />
+              <span style={{ alignSelf: 'center', color: '#495060' }}>まで</span>
             </div>
           </div><br />
            {/* タスク送信ボタン */}

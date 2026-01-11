@@ -268,6 +268,7 @@ function CalendarPage({ tasks, setTasks,onTaskClick }) {
       fontSize: "0.8rem",
       padding: "0.3rem 0.5rem",
       transition: "all 0.2s ease",
+      whiteSpace: "nowrap",
     }),
     taskStart: {
       borderTopLeftRadius: "0.65rem",

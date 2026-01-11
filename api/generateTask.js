@@ -93,18 +93,23 @@ export default async function handler(req, res) {
 {
   "taskName": "タスクの内容",
   "subTasks": ["サブタスク1", "サブタスク2", "サブタスク3"],
+  "importance": 1~5のint型整数,
+  "estimated_time": int型整数,
   "Concrete": true or false,
-  "reason": "Concreteの判定理由（任意）"
+  "reason": "Concreteとestimated_timeの判定理由（任意）"
 }
 
 ルール:
 1. taskName: 入力されたタスクの内容を簡潔にまとめる
 2. subTasks: そのタスクを達成するために必要な具体的なステップを3〜7個程度の配列にする
-3. Concrete: 
+3. impotance: 1を最もどうでもいい、5を最重要として、そのタスクがユーザにとってどれくらい重要であるか判断する
+4. estimated_time:そのタスクを達成するまでに累計何分かかるかを推定する
+4. Concrete: 
    - True: 入力が具体的で、明確なサブタスクを生成できる場合
    - False: 入力が曖昧すぎて、適切なサブタスクを生成できない場合
      （例: "勉強する"、"頑張る"、"やる"などの抽象的すぎる入力）
-4. reason: Concreteの判定理由を簡潔に（Falseの場合は特に重要）
+     これがTrueの場合、reason以外の項目はnullでいい
+. reason: Concreteとestimated_timeの判定理由を簡潔に（Falseの場合は特に重要）
 
 例1（Concrete=true）:
 入力: "英検2級に合格する"
@@ -112,8 +117,10 @@ export default async function handler(req, res) {
 {
   "taskName": "英検2級合格",
   "subTasks": ["リスニング対策", "リーディング対策", "ライティング対策", "過去問演習", "模擬試験受験"],
+  "importance": 4,
+  "estimated_time": 15000,
   "Concrete": true,
-  "reason": "具体的な目標があり、明確なステップに分解可能"
+  "reason": "concrete:具体的な目標があり、明確なステップに分解可能,estimated_time: 一般に英検2級に合格するには200~300時間必要と言われているため"
 }
 
 例2（Concrete=false）:
@@ -122,8 +129,10 @@ export default async function handler(req, res) {
 {
   "taskName": "勉強",
   "subTasks": [],
+  "importance": null,
+  "estimated_time":null,
   "Concrete": false,
-  "reason": "何を勉強するのか不明確。具体的な科目や目標を指定してください"
+  "reason": "concrete:何を勉強するのか不明確。具体的な科目や目標を指定してください"
 }
 `.trim();
 
