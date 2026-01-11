@@ -25,6 +25,15 @@ export const parseDate = (dateString) => {
   return new Date(year, month - 1, day);
 };
 
+export const calcDays = (sta, end) => {
+  const startDate = new Date(sta);
+  const endDate = new Date(end);
+  const oneDay = 1000 * 60 * 60 * 24;
+  const diff = Math.floor((endDate - startDate) / oneDay);
+  return diff + 1;
+};
+
+
 export const formatDateDisplay = (date) => {
   if (!date) return "日付未選択";
   const year = date.getFullYear();
@@ -51,7 +60,7 @@ export const PopUp = ({text})=>{
   const [showPopUp ,setShowPopUp ] = useState(false);
 
       useEffect(()=>{
-        setShowPopUp(true);
+        text===""?null:setShowPopUp(true);
       },[text]);
 
       useEffect(()=>{
@@ -62,7 +71,7 @@ export const PopUp = ({text})=>{
       },[showPopUp]);
 
     return(
-      showPopUp||text==="" ? <div className="popup">{text}</div>:null
+      showPopUp&&text!=="" ? <div className="popup">{text}</div>:null
     )
 };
 
@@ -100,7 +109,7 @@ const App = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [theme, setTheme] = useState("");
   const [isNotFound, setIsNotFound] = useState(false);
-  const [popUpText ,setPopUpText ] = useState("いにっと");
+  const [popUpText ,setPopUpText ] = useState("");
 
   {/* _init_ supabase読み込み */}
   useEffect(() => {
@@ -119,7 +128,7 @@ const App = () => {
             sub: row.sub_tasks,
             imp: row.importance,
             est: row.estimated_time,
-            doing: row.doing_task,
+            doing: row.doing_time,
             sta: row.start_date,
             end: row.end_date,
             state: row.state,
@@ -217,7 +226,7 @@ const App = () => {
     // ルーティング
     <div>
       <div className="app-container">
-        <PopUp text={popUpText} />
+        <PopUp text={popUpText}  />
         <Routes>
           <Route path="/" element={<CalendarPage tasks={tasks} setTasks={setTasks} onTaskClick={handleTaskClick} />} />
           <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClick={handleTaskClick} />} />

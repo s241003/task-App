@@ -104,7 +104,18 @@ export default function AIChat() {
             )}
           </ListGroup>
           {}
-          <InputGroup className="mt-3">
+          <Button className="px-4! py-1.5! rounded-full!
+              text-white! font-semibold!
+              transition-all! duration-300!
+              bg-cyan-400/20!
+              backdrop-blur-md!
+              border border-cyan-300/40!
+              shadow-[0_0_20px_rgba(0,200,255,0.4)]!
+              hover:shadow-[0_0_30px_rgba(0,200,255,0.7)]!
+              hover:bg-cyan-400/30!
+              active:scale-95!
+">AIとタスクを考える</Button>
+          <InputGroup className="mt-1">
             <Input
               placeholder="AIになんでも相談！"
               value={input}

@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Modal from "react-modal";
-import PopUp from "../../../src/App"
+
+import PopUp, { calcDays } from "../../../src/App"
 /*import "../../../src/App.css";*/
 
 Modal.setAppElement("#root");
@@ -10,7 +11,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
   const [ task, setTask ] = useState({});
   const { taskId } = useParams();
   const [currentTask, setCurrentTask] = useState("")
-  const [elapsedTime, setElapsedTime] = useState(task?.loggedTime || 0)
+  const [elapsedTime, setElapsedTime] = useState(task?.loggedTime || 0);
   const [isRunning, setIsRunning] = useState(false)
   const [ isOpen , setIsOpen ] = useState(false);
   const [ isUpdate , setIsUpdate ] = useState(false);
@@ -21,6 +22,10 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
   const [ newStart,setNewStart ] = useState("");
   const [ newImp,setNewImp ] = useState("");
   const [ newEnd,setNewEnd ] = useState("");
+  const [newHours, setNewHours] = useState(0);
+  const [newMins, setNewMins] = useState(0);
+  const [newEst, setNewEst] = useState("");
+  const [newDoing, setNewDoing] = useState(0);
 
   useEffect(()=>{
     const flatArray = Object.values(tasks).flat();
@@ -35,12 +40,18 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
   },[taskId]);
 
   useEffect(()=>{
+    setNewEst(`${newHours*60+parseInt(newMins)}`);
+  },[newMins,newHours])
+
+  useEffect(()=>{
     setNewTitle(task.task);
     setNewImp(task.imp);
     setNewStart(task.sta);
     setNewEnd(task.end);
+    setNewEst(task.est);
+    setNewHours(Math.floor(parseInt(task.est)/60));
+    setNewMins(parseInt(task.est)%60);
   },[isUpdate]);
-
 
   useEffect(() => {
     setCurrentTask(task);
@@ -97,6 +108,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
         {
           task_name: newTitle,
           importance: newImp,
+          estimated_time: newEst,
           start_date: newStart,
           end_date: newEnd
         }
@@ -120,14 +132,16 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
       <div className="buttons bg-gray-400">
         <></>
         <button className="back-btn" onClick={handleBackClick}>← 戻る</button>
-        <button className="delete-btn" onClick={()=>setIsOpen(true)}>🗑️</button>
-        <button className="edit-btn" onClick={()=>setIsUpdate(true)}>📝</button>
+        <div className="flex flex-row gap-2 absolute right-0 top-0">
+          <button className="delete-btn" onClick={()=>setIsOpen(true)}>🗑️</button>
+          <button className="edit-btn" onClick={()=>setIsUpdate(true)}>📝</button>
+        </div>
       </div>
 
         <Modal
           style={{
               overlay: {
-                backgroundColor: "rgba(0, 0, 0, 0.6)", 
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
               },
               content: {
                 top: "50%",
@@ -165,7 +179,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                padding: "3rem",
+                padding: "3vh 3vw 3vh 3vw",
                 borderRadius: "0.8rem",
                 border: "none",
                 width: "60vw",
@@ -180,35 +194,71 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
             onAfterOpen={() => { document.getElementsByClassName("modalCloseU")[0].focus(); }}
         >
           <div classname="modalContent">
-            <div className="inputForm">
-              <h2>『{task.task}』の内容を編集</h2>
-              <div><span>タスク名</span><br/><input type="text" value={newTitle} onChange={(e) => setNewTitle(e.target.value)}  /></div>
-              <div><span>重要度</span><br/>
-                <select
-                  className="select"
-                  value={newImp}
-                  onChange={(e) => setNewImp(e.target.value)}
+            <h2>『{task.task}』の内容を編集</h2>
+            <div className="inputForm flex flex-col gap-2">
+              <div className="flex flex-col"><span>タスク名</span><input type="text" value={newTitle} onChange={(e) => setNewTitle(e.target.value)}  /></div>
 
-                >
-                  <option value="">未選択</option>
-                  <option value="1">🟦 低</option>
-                  <option value="2">🟩 やや低</option>
-                  <option value="3">🟨 中</option>
-                  <option value="4">🟧 やや高</option>
-                  <option value="5">🟥 高</option>
-                </select>
+              <div className="flex flex-row gap-4 w-full">
+                <div className="flex flex-col w-3/8">
+                  <span>重要度</span>
+                  <select
+                    className="select"
+                    value={newImp}
+                    onChange={(e) => setNewImp(e.target.value)}
+                  >
+                    <option value="1">🟦 低</option>
+                    <option value="2">🟩 やや低</option>
+                    <option value="3">🟨 中</option>
+                    <option value="4">🟧 やや高</option>
+                    <option value="5">🟥 高</option>
+                  </select>
+                </div>
+                <div className="flex flex-col w-1/2">
+                  <span className="white-nowrap">達成までに必要な時間</span>
+                  <div className="flex flex-row items-center w-full gap-2">
+                    <input
+                      id="hours"
+                      type="number"
+                      min="0"
+                      value={newHours}
+                      onChange={(e) => setNewHours(e.target.value)}
+                      className="w-15 py-2 px-2 border rounded-md text-center"
+                    />
+                    <label htmlFor="hours" className="text-base text-gray-600 whitespace-nowrap">時間</label>
+
+                    <input
+                      id="minutes"
+                      type="number"
+                      min={-1}
+                      max={60}
+                      value={newMins}
+                      onChange={(e) =>
+                        {const v = Number(e.target.value);
+                          if (v < 0) setNewMins(59);
+                          else if (v > 59) setNewMins(0);
+                          else setNewMins(v);
+                        }}
+                      className="w-15 py-2 px-2 border rounded-md text-center"
+                    />
+                    <label htmlFor="minutes" className="text-base text-gray-600">分</label>
+                  </div>
+                </div>
               </div>
+
               <div className="ml-1">
-                <div><span>期間</span><br/>
-                <input className="w-2/5! date-input mr-2!" type="date" value={newStart} onChange={(e) => setNewStart(e.target.value)} />から
-                <input className="w-2/5! date-input mr-2! ml-2!" type="date" value={newEnd} onChange={(e) => setNewEnd(e.target.value)} />まで</div>
+                <div className="flex flex-col w-full">
+                  <span>期間</span>
+                  <div>
+                    <input className="w-2/5! date-input mr-2!" type="date" value={newStart} onChange={(e) => setNewStart(e.target.value)} />から
+                    <input className="w-2/5! date-input mr-2! ml-2!" type="date" value={newEnd} onChange={(e) => setNewEnd(e.target.value)} />
+                  </div>
+                </div>
               </div>
-
             </div>
             <button
-              style={{background: (newTitle==task.task&&newImp==task.imp&&newStart==task.sta&&newEnd==task.end)?"#fde9d0": "rgba(122,122,255,0.9)"}}
+              style={{ transition:"0.3s ease",background: (newTitle==task.task&&newImp==task.imp&&newStart==task.sta&&newEnd==task.end&&newEst==task.est)?"#fde9d0": "rgba(122,122,255,0.9)"}}
               className="modalBtn top-0 right-0"
-              disabled={newTitle==task.task&&newImp==task.imp&&newStart==task.sta&&newEnd==task.end}
+              disabled={newTitle==task.task&&newImp==task.imp&&newStart==task.sta&&newEnd==task.end&&newEst==task.est}
               onClick={(handleUpdate)}>
                 更新する
               </button>
@@ -226,20 +276,23 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
             <span className="info-label"> 期間:</span>
             <span className="info-value">{currentTask.sta} 〜 {currentTask.end}</span>
           </div>
-
-          {currentTask.estimatedTime && (
-            <div className="info-item">
-              <span className="info-label"> 予想時間:</span>
-              <span className="info-value">{currentTask.estimatedTime}分</span>
-            </div>
-          )}
         </div>
 
-        {currentTask.sub}
+        {currentTask.sub}<br/>
+        重要度:{["🟦低","🟩やや低","🟨中","🟧やや高","🟥高"][currentTask.imp-1]}<br/>
+        必要な時間:{currentTask.est}分<br/>
+        取り組んだ時間:{currentTask.doing}分<br/>
+        残り日数:{calcDays(currentTask.sta,currentTask.end)}日<br/>
+        1日あたり約:{Math.floor((currentTask.est-currentTask.doing)/calcDays(currentTask.sta,currentTask.end))}分 取り組む必要がある<br/>
+
 
         {/* --- ストップウォッチ --- */}
         <div className="stopwatch-section">
-          <h3> 作業時間を記録</h3>
+          <p> 作業時間を記録</p>
+          <h3>{Math.floor((currentTask.est-currentTask.doing)/calcDays(currentTask.sta,currentTask.end))>0
+          ?`今日はあと${Math.floor((currentTask.est-currentTask.doing)/calcDays(currentTask.sta,currentTask.end))}分取り組もう！`
+          :"おっ！目標時間達成だ！やるなあ！"
+          }</h3>
           <div className="time-display">{formatTime(elapsedTime)}</div>
           <div className="stopwatch-buttons">
             <button onClick={() => setIsRunning(true)} disabled={isRunning}>▶ 開始</button>
@@ -272,7 +325,9 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
           font-size: 16px;
         }
         .select{
-          width: 30%;
+          width: 100%;
+          font-size: 0.9rem;
+          align-items:left;
         }
 
         .buttons{
@@ -295,9 +350,6 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
           background: rgba(175,175,175,0.5);
         }
         .delete-btn {
-          position:absolute;
-          display:flex;
-          right: 6vw; top:0;
           border-radius: 0.75rem;
           color: rgba(255,40,40,0.9);
           background: rgba(255,30,30,0.7);
@@ -308,10 +360,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
           opacity: 0.75;
         }
         .edit-btn {
-          position:absolute;
-          display:flex;
           border-radius: 0.75rem;
-          right:0; top:0;
           color: #000000;
           background: rgba(40,40,235,0.7);
           padding: 0.5rem 0.8rem;

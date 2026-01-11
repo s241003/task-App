@@ -200,7 +200,6 @@ h1, h2, h3 {
   color: #1a202c;
   top: 0.1rem;
   left: 0.35rem;
-  margin-right: 0.4rem;
   z-index:0;
 }
 
@@ -213,7 +212,6 @@ h1, h2, h3 {
   display: flex;
   position: absolute;
   justify-content: flex-start;
-  
   top: -0.2rem;
   left: -0.488rem;
   z-index:-1;
@@ -225,12 +223,13 @@ h1, h2, h3 {
   color: #dc2626;
   margin-top: 0.15rem;
   margin-left: 0.4rem;
-  
+  white-space: nowrap;
 }
 
 .holiNumberContainer{
   display: flex;
-  align-items: center;
+  flex-direction:row;
+  gap: 0.6rem;
   margin-bottom: 0.5rem;
 }
 

@@ -37,16 +37,20 @@ async function saveTaskToSupabase(taskData) {
 
 function AITaskColl({isOpen,setIsOpen}) {
 
-  //配列
+  //array
   const [schedules, setSchedules] = useState([]);
 
-  //文字型
+  //str
   const [text, setText] = useState('');
   const [subTasks,setSubTasks] = useState('')
   const [importance, setImportance] = useState('');
   const [estimated, setEstimated] = useState("");
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  //int
+  const [hours, setHours] = useState(0);
+  const [minutes, setMinutes] = useState(0);
 
   //bool
   const [taskData, setTaskData] = useState(null);
@@ -84,8 +88,13 @@ function AITaskColl({isOpen,setIsOpen}) {
   }, []);
 
   useEffect(()=>{
-    console.log(estimated)
-  },[estimated])
+    setEstimated(`${hours*60+parseInt(minutes)}`);
+  },[minutes,hours]);
+
+  useEffect(()=>{
+    console.log(estimated+"分");
+  },[estimated]);
+
   useEffect(() => {
     document.addEventListener("keydown", pressEsc, false);
   }, [pressEsc]);
@@ -208,7 +217,8 @@ function AITaskColl({isOpen,setIsOpen}) {
       setText('');
       setSubTasks('');
       setImportance('');
-      setEstimated('');
+      setHours(0);
+      setMinutes(0);
       setStartDate('');
       setEndDate('');
 
@@ -435,7 +445,7 @@ function AITaskColl({isOpen,setIsOpen}) {
         overlay:{...styles.overlay},content:{...styles.modal}
       }}>
       <div onClick={(e) => e.stopPropagation()}>
-        <form /*onSubmit={handleSubmit}*/ style={{ display: 'block' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'block' }}>
           <div style={styles.formGrid}>
 
             {/* キャンセルボタン */}
@@ -509,7 +519,7 @@ function AITaskColl({isOpen,setIsOpen}) {
                 id="importance"
                 value={importance}
                 onChange={(e) => setImportance(e.target.value)}
-                disabled={isLoading}
+                disabled={isLoading||isLoadAI}
                 style={styles.select}
               >
                 <option value="">未選択</option>
@@ -521,25 +531,45 @@ function AITaskColl({isOpen,setIsOpen}) {
               </select>
             </div>
 
-            <div style={{ ...styles.formGroup, flexBasis: '12rem', }}>
+            <div style={{ ...styles.formGroup }}>
               <label style={styles.labelStyle} htmlFor="estimated">必要な時間</label>
 
               {/* 推定かかり時間 */}
-              <input
-                  id="estimated"
-                  type="time"
-                  value={estimated}
-                  onChange={(e) => setEstimated(e.target.value)}
-                  placeholder="達成までにどのくらいかかる？"
-                  disabled={isLoading}
-                  style={styles.input}
-                  className="date-input"
+              <div className="flex flex-row items-center w-3/4 gap-2">
+                <input
+                  id="hours"
+                  type="number"
+                  min="0"
+                  value={hours}
+                  onChange={(e) => setHours(e.target.value)}
+                  disabled={isLoading || isLoadAI}
+                  className="w-15 px-1 py-2 border rounded-md text-center"
                 />
+                <label htmlFor="hours" className="text-base text-gray-600 whitespace-nowrap">時間</label>
+
+                <input
+                  id="minutes"
+                  type="number"
+                  min={-1}
+                  max={60}
+                  value={minutes}
+                  onChange={(e) =>
+                    {const v = Number(e.target.value);
+                      if (v < 0) setMinutes(59);
+                      else if (v > 59) setMinutes(0);
+                      else setMinutes(v);
+                    }}
+                  disabled={isLoading || isLoadAI}
+                  className="w-15 px-1 py-2 border rounded-md text-center"
+                />
+                <label htmlFor="minutes" className="text-base text-gray-600">分</label>
               </div>
+            </div>
           </div>
 
           <div style={{ ...styles.formGroup, flex: 1}}>
             <label style={styles.labelStyle} htmlFor="turm">期間</label>
+
             {/* 期間 */}
             <div style={{ display: 'flex', gap: '1rem'}}>
               <input
@@ -564,12 +594,13 @@ function AITaskColl({isOpen,setIsOpen}) {
               />
               <span style={{ alignSelf: 'center', color: '#495060' }}>まで</span>
             </div>
+
           </div><br />
            {/* タスク送信ボタン */}
            <button
               type="submit"
-              disabled={isLoadAI || isLoading || !text.trim() || !importance.trim() || !startDate.trim() || !endDate.trim()}
-              style={styles.submitButton(isLoadAI || isLoading || !text.trim() || !importance.trim() || !startDate.trim() || !endDate.trim())}
+              disabled={isLoadAI || isLoading || !text.trim() || !importance.trim() || !startDate.trim() || !endDate.trim()|| estimated==="0"}
+              style={styles.submitButton(isLoadAI || isLoading || !text.trim() || !importance.trim() || !startDate.trim() || !endDate.trim() || estimated==="0")}
             >
               タスクを作成
             </button>
