@@ -1,4 +1,4 @@
-function SettingsPage({ theme, onToggleTheme }) {
+function Settings({ theme,setTheme }) {
   return (
     <div className="page-content">
       <h1>設定</h1>
@@ -9,7 +9,7 @@ function SettingsPage({ theme, onToggleTheme }) {
         <div className="setting-item">
           <h3>テーマ設定</h3>
           <p>現在のテーマ: {theme === 'light' ? '🌞 ライトモード' : '🌙 ダークモード'}</p>
-          <button className="theme-toggle-btn" onClick={onToggleTheme}>
+          <button className="theme-toggle-btn" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
             テーマを切り替える
           </button>
         </div>
@@ -36,4 +36,4 @@ function SettingsPage({ theme, onToggleTheme }) {
   )
 }
 
-export default SettingsPage
+export default Settings

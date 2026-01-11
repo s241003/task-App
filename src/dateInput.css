@@ -1,0 +1,4 @@
+.date-input::-webkit-calendar-picker-indicator {
+  color: #f59e0b;
+  filter: invert(0.6) sepia(1) saturate(5) hue-rotate(25deg);
+}

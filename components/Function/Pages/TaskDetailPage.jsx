@@ -1,31 +1,50 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import Modal from "react-modal";
+import PopUp from "../../../src/App"
+/*import "../../../src/App.css";*/
 
-function TaskDetailPage({ task, onBack, onUpdateTask }) {
-  const [currentTask, setCurrentTask] = useState(task)
+Modal.setAppElement("#root");
+
+function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText }) {
+  const [ task, setTask ] = useState({});
+  const { taskId } = useParams();
+  const [currentTask, setCurrentTask] = useState("")
   const [elapsedTime, setElapsedTime] = useState(task?.loggedTime || 0)
   const [isRunning, setIsRunning] = useState(false)
-  const timerRef = useRef(null)
+  const [ isOpen , setIsOpen ] = useState(false);
+  const [ isUpdate , setIsUpdate ] = useState(false);
+  const timerRef = useRef(null);
 
-  // 🧠 --- 初期化時に localStorage から復元 ---
+  /* タスク更新関連 */
+  const [ newTitle,setNewTitle ] = useState("");
+  const [ newStart,setNewStart ] = useState("");
+  const [ newImp,setNewImp ] = useState("");
+  const [ newEnd,setNewEnd ] = useState("");
+
+  useEffect(()=>{
+    const flatArray = Object.values(tasks).flat();
+    const matched =
+      flatArray.find( t =>
+      {
+        return t.id === taskId;
+      })
+      setTask(matched);
+      console.log({task});
+
+  },[taskId]);
+
+  useEffect(()=>{
+    setNewTitle(task.task);
+    setNewImp(task.imp);
+    setNewStart(task.sta);
+    setNewEnd(task.end);
+  },[isUpdate]);
+
+
   useEffect(() => {
-    if (!task) {
-      const saved = localStorage.getItem('selectedTask')
-      if (saved) {
-        const parsed = JSON.parse(saved)
-        setCurrentTask(parsed)
-        setElapsedTime(parsed.loggedTime || 0)
-      }
-    } else {
-      setCurrentTask(task)
-    }
+    setCurrentTask(task);
   }, [task])
-
-  // 💾 --- 選択タスクを保存 ---
-  useEffect(() => {
-    if (currentTask) {
-      localStorage.setItem('selectedTask', JSON.stringify(currentTask))
-    }
-  }, [currentTask])
 
   // ⏱ --- タイマー動作 ---
   useEffect(() => {
@@ -64,6 +83,33 @@ function TaskDetailPage({ task, onBack, onUpdateTask }) {
     onBack()
   }
 
+  const navigate = useNavigate();
+
+  const handleDelete = () => {
+    setIsOpen(false);
+    del(taskId);
+    setPopUpText("タスクの削除できました！\n※少し遅れて反映されることがあります");
+    navigate(-1);
+  }
+
+  const handleUpdate = ()=>{
+    const newContent=[
+        {
+          task_name: newTitle,
+          importance: newImp,
+          start_date: newStart,
+          end_date: newEnd
+        }
+      ];
+    update(newContent,taskId);
+    setIsUpdate(false);
+    setPopUpText("タスクの更新できました！\n※少し遅れて反映されます");
+  }
+
+
+
+
+
   // ⚠ --- currentTaskがまだ読み込まれていない場合 ---
   if (!currentTask) {
     return <div className="page-content">読み込み中...</div>
@@ -71,15 +117,114 @@ function TaskDetailPage({ task, onBack, onUpdateTask }) {
 
   return (
     <div className="page-content">
-      <button className="back-btn" onClick={handleBackClick}>← 戻る</button>
+      <div className="buttons bg-gray-400">
+        <></>
+        <button className="back-btn" onClick={handleBackClick}>← 戻る</button>
+        <button className="delete-btn" onClick={()=>setIsOpen(true)}>🗑️</button>
+        <button className="edit-btn" onClick={()=>setIsUpdate(true)}>📝</button>
+      </div>
+
+        <Modal
+          style={{
+              overlay: {
+                backgroundColor: "rgba(0, 0, 0, 0.6)", 
+              },
+              content: {
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                padding: "3rem",
+                borderRadius: "0.8rem",
+                border: "none",
+                height:"35vh",
+                background: "#fff",
+                overflow:"hidden",
+                boxShadow: "0 3px 14px -1px #faaaaa",
+              },
+            }}
+           isOpen={isOpen}
+           onRequestClose={() => setIsOpen(false)}
+           contentLabel="Example Modal"
+            onAfterOpen={() => { document.getElementsByClassName("modalClose")[0].focus(); }}
+        >
+          <div classname="modalContent">
+            <h2 style={{color:"red", fontWeight:"500",marginBottom: "2rem" }}>タスク<b>『{task.task}』</b>を削除しますか？</h2>
+            <div className="modalBtns">
+              <button className="modalBtn bg-red-500 right-0 bottom-0" onClick={handleDelete}>はい</button>
+              <button className="modalClose modalBtn bg-gray-400 right-0 bottom-0" onClick={() => setIsOpen(false)}>いいえ</button>
+            </div>
+          </div>
+        </Modal>
+
+        <Modal
+          style={{
+              overlay: {
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
+              },
+              content: {
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                padding: "3rem",
+                borderRadius: "0.8rem",
+                border: "none",
+                width: "60vw",
+                height:"70vh",
+                background: "#fff",
+                overflow:"hidden",
+                boxShadow: "0 3px 14px -1px #aaaafa",
+              },
+            }}
+           isOpen={isUpdate}
+           onRequestClose={() => setIsUpdate(false)}
+            onAfterOpen={() => { document.getElementsByClassName("modalCloseU")[0].focus(); }}
+        >
+          <div classname="modalContent">
+            <div className="inputForm">
+              <h2>『{task.task}』の内容を編集</h2>
+              <div><span>タスク名</span><br/><input type="text" value={newTitle} onChange={(e) => setNewTitle(e.target.value)}  /></div>
+              <div><span>重要度</span><br/>
+                <select
+                  className="select"
+                  value={newImp}
+                  onChange={(e) => setNewImp(e.target.value)}
+
+                >
+                  <option value="">未選択</option>
+                  <option value="1">🟦 低</option>
+                  <option value="2">🟩 やや低</option>
+                  <option value="3">🟨 中</option>
+                  <option value="4">🟧 やや高</option>
+                  <option value="5">🟥 高</option>
+                </select>
+              </div>
+              <div className="ml-1">
+                <div><span>期間</span><br/>
+                <input className="w-2/5! date-input mr-2!" type="date" value={newStart} onChange={(e) => setNewStart(e.target.value)} />から
+                <input className="w-2/5! date-input mr-2! ml-2!" type="date" value={newEnd} onChange={(e) => setNewEnd(e.target.value)} />まで</div>
+              </div>
+
+            </div>
+            <button
+              style={{background: (newTitle==task.task&&newImp==task.imp&&newStart==task.sta&&newEnd==task.end)?"#fde9d0": "rgba(122,122,255,0.9)"}}
+              className="modalBtn top-0 right-0"
+              disabled={newTitle==task.task&&newImp==task.imp&&newStart==task.sta&&newEnd==task.end}
+              onClick={(handleUpdate)}>
+                更新する
+              </button>
+            <button className="modalCloseU modalBtn top-0 right-0 bg-gray-400" onClick={() => setIsUpdate(false)}>キャンセル</button>
+              
+
+          </div>
+        </Modal>
 
       <div className="task-detail-container">
-        <h1 className="task-title">{currentTask.title}</h1>
+        <h1 className="task-title">{currentTask.task}</h1>
 
         <div className="task-info-section">
           <div className="info-item">
             <span className="info-label"> 期間:</span>
-            <span className="info-value">{currentTask.startDate} 〜 {currentTask.endDate}</span>
+            <span className="info-value">{currentTask.sta} 〜 {currentTask.end}</span>
           </div>
 
           {currentTask.estimatedTime && (
@@ -90,12 +235,7 @@ function TaskDetailPage({ task, onBack, onUpdateTask }) {
           )}
         </div>
 
-        {currentTask.detail && (
-          <div className="task-detail-section">
-            <h3> 詳細</h3>
-            <p className="task-detail-text">{currentTask.detail}</p>
-          </div>
-        )}
+        {currentTask.sub}
 
         {/* --- ストップウォッチ --- */}
         <div className="stopwatch-section">
@@ -111,6 +251,84 @@ function TaskDetailPage({ task, onBack, onUpdateTask }) {
       </div>
 
       <style jsx>{`
+        .inputForm{
+          margin:1rem;
+          display: 
+        }
+        .inputForm span{
+          font-weight:700;
+          font-size:0.9rem;
+          
+        }
+        .inputForm input,select{
+          width: 100%;
+          color: #0f0f0f;
+          background: #f8fafc;
+          padding: 12px;
+          margin-top:0.3rem;
+          margin-bottom:0.4rem;
+          border-radius: 9px;
+          border: 1px solid #e6edf3;
+          font-size: 16px;
+        }
+        .select{
+          width: 30%;
+        }
+
+        .buttons{
+          width:100%;
+          position:relative;
+          border-radius:0.75rem;
+          margin-bottom: 10vh;
+          font-size: 1.1rem;
+        }
+        .back-btn {
+          position:absolute;
+          display:flex;
+          left:0; top:0;
+          border-radius: 0.75rem;
+          background: rgba(175,175,175,0.7);
+          padding: 0.5rem 0.8rem;
+          transition: 0.3s ease;
+        }
+        .back-btn:hover {
+          background: rgba(175,175,175,0.5);
+        }
+        .delete-btn {
+          position:absolute;
+          display:flex;
+          right: 6vw; top:0;
+          border-radius: 0.75rem;
+          color: rgba(255,40,40,0.9);
+          background: rgba(255,30,30,0.7);
+          padding: 0.5rem 0.8rem;
+          transition: 0.3s ease;
+        }
+        .delete-btn:hover {
+          opacity: 0.75;
+        }
+        .edit-btn {
+          position:absolute;
+          display:flex;
+          border-radius: 0.75rem;
+          right:0; top:0;
+          color: #000000;
+          background: rgba(40,40,235,0.7);
+          padding: 0.5rem 0.8rem;
+          transition: 0.3s ease;
+        }
+        .edit-btn:hover {
+          background: rgba(50,50,235,0.6);
+        }
+
+        /* モーダル関連 */
+
+        
+        
+
+
+        /* ストップウォッチ関連 */
+
         .stopwatch-section {
           margin-top: 30px;
           background: #f3f4f6;
