@@ -1,10 +1,22 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, #f5f7fa 10%, #c3cfe2 90%);
+  background: linear-gradient(135deg, #667eea 0%, #b8a4cd 100%);
   color: #333;
-  margin: 0;
-  min-height: 100vh;
+  height: auto;
   width:100%;
+}
+
+.app-container {
+  max-width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 5vh 3vw;
+  width: 90vw;
+  min-height:100vh;
+  max-height: auto;
+  border-radius: 2rem;
+  margin:5vh 5vw;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 input[type="date"]{
@@ -19,19 +31,6 @@ select{
   cursor:pointer;
   color: #f59e0b;
   filter: invert(0.6) sepia(1) saturate(5) hue-rotate(25deg);
-}
-
-.app-container {
-  margin: 1rem 1vw;
-  max-width: 100%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 h1, h2, h3 {

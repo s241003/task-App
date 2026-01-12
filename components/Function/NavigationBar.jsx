@@ -12,7 +12,7 @@ function NavigationBar({ currentPage, onPageChange }) {
   const pages = [
     { id: 'aichat', label: 'チャット' },
     { id: 'tasks', label: 'タスク' },
-    { id: 'calendar', label: 'カレンダー' },
+    { id: ``, label: 'カレンダー' },
     { id: 'settings', label: '設定' }
   ]
   const navigate = useNavigate();
@@ -55,6 +55,7 @@ function NavigationBar({ currentPage, onPageChange }) {
             left: 0;
             bottom: 0;
             background-color: transparent;
+            z-index: 800;
           }
 
           .navigation-bar {

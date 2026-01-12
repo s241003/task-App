@@ -3,7 +3,7 @@ function Settings({ theme,setTheme }) {
     <div className="page-content">
       <h1>設定</h1>
 
-      <div className="settings-section">
+      <div>
 
         {/* 🌙 テーマ設定 */}
         <div className="setting-item">

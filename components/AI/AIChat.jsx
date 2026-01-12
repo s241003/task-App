@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Container, Card, CardHeader, CardBody,
   ListGroup, ListGroupItem, Input, Button, InputGroup, Spinner
@@ -25,10 +25,25 @@ async function callAIRetry(model, prompt, retries = 3) {
 }
 
 export default function AIChat() {
-  const [messages, setMessages] = useState([]);
+  const CHAT_HISTORY_KEY = "chatHistory";
+  const [messages, setMessages] = useState(() => {
+    // 初期化時にlocalStorageから履歴を読み込む
+    const savedMessages = localStorage.getItem(CHAT_HISTORY_KEY);
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
+  useEffect(() => {
+    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+  }, [messages]);
+
+  const clearHistory = () => {
+    // 履歴をクリア
+    localStorage.removeItem(CHAT_HISTORY_KEY);
+    setMessages([]);
+  };
+
   //プロンプト群
   const general = `
 あなたは親切なチャットアシスタントです。
@@ -52,6 +67,8 @@ export default function AIChat() {
 
 ユーザー: "${input}"
 アシスタント:`.trim();
+
+
 
   const sendMessage = async (prompt) => {
     if (!input.trim()) return;
@@ -118,6 +135,7 @@ export default function AIChat() {
             )}
           </ListGroup>
           {}
+          <div className="bg-gray-200 p-3 mt-3 rounded-lg">
             <Button
             onClick={()=>sendMessage(startTask)}
             className="px-4! py-1.5! rounded-full!
@@ -133,22 +151,26 @@ export default function AIChat() {
             "> 
             AIとタスクを考える
             </Button>
-          <InputGroup className="mt-1">
-            <Input
-              placeholder="AIになんでも相談！"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage(general)}
-              style={{ backgroundColor: "#f6f6f6"}} // 入力欄も拡大
-            />
-            <Button
-              color="primary"
-              onClick={() => sendMessage(general)}
-              disabled={loading}
-            >
-              送信
+            <InputGroup className="mt-1">
+              <Input
+                placeholder="AIになんでも相談！"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && sendMessage(general)}
+                style={{ backgroundColor: "#f6f6f6"}} // 入力欄も拡大
+              />
+              <Button
+                color="primary"
+                onClick={() => sendMessage(general)}
+                disabled={loading}
+              >
+                送信
+              </Button>
+            </InputGroup>
+            <Button color="danger" className="mt-3" onClick={clearHistory}>
+              履歴をクリア
             </Button>
-          </InputGroup>
+          </div>
         </CardBody>
       </Card>
     </Container>

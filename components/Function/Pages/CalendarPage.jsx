@@ -271,6 +271,7 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
       fontWeight: "500",
       backgroundColor: getPriorityColor(imp),
       color: '#ffffff',
+      textAlign: 'left',
       whiteSpace: 'normal',
       overflow: 'hidden',
       maxWidth: '100%',
@@ -279,7 +280,7 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
       WebkitBoxOrient: 'vertical',
       WebkitLineClamp: 2,
       fontSize: "0.8rem",
-      padding: "0.3rem 0.5rem",
+      padding: "0.7vh 0 0.7vh 1vw",
       transition: "all 0.2s ease",
       whiteSpace: "nowrap",
     }),
@@ -303,20 +304,22 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
 
   return (
     <div>
-      <div className=" calendarContainer">
-        <div className=" header">
-          <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}>&lt;</button>
-          <h2>{`${currentDate.getFullYear()}年 ${currentDate.getMonth() + 1}月`}</h2>
-          <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}>&gt;</button>
-        </div>
-        <div className="weekRow">
-          <div className="weekday sunday">日</div>
-          <div className="weekday">月</div>
-          <div className="weekday">火</div>
-          <div className="weekday">水</div>
-          <div className="weekday">木</div>
-          <div className="weekday">金</div>
-          <div className="weekday saturday">土</div>
+      <div className="calendarContainer">
+        <div className="calendarHeader">
+          <div className=" header">
+            <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}>&lt;</button>
+            <h2>{`${currentDate.getFullYear()}年 ${currentDate.getMonth() + 1}月`}</h2>
+            <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}>&gt;</button>
+          </div>
+          <div className="weekRow">
+            <div className="weekday sunday">日</div>
+            <div className="weekday">月</div>
+            <div className="weekday">火</div>
+            <div className="weekday">水</div>
+            <div className="weekday">木</div>
+            <div className="weekday">金</div>
+            <div className="weekday saturday">土</div>
+          </div>
         </div>
         <div className="grid">
           {renderCalendar()}
@@ -326,7 +329,7 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
       <div className="task-container">
         <Button onClick={ ()=> navigate("/addtask")} >タスク作成</Button>
         <div className="task-list-section">
-          <h3 style={{ marginTop: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
+          <h3 style={{ margin: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
           {selectedTasks.length === 0 ? (
             <p>タスクはありません</p>
           ) : (

@@ -226,13 +226,12 @@ const App = () => {
   return (
 
     // ルーティング
-    <div>
+    <div className="flex flex-col gap-5">
       <div className="app-container">
         <PopUp text={popUpText}  />
         <Routes>
           <Route path="/" element={<Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}/${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`} replace/>} />
           <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClick={handleTaskClick} />} />
-          <Route path="/calendar" element={<Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}/${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`} replace/>} />
           <Route path="/calendar/:current/:selected" element={<CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} />} />
           <Route path="/addTask" element={<AITaskColl />} />
           <Route path="/taskdetail/:taskId" element={<TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} onUpdateTask={handleUpdateTask} setPopUpText={setPopUpText} />} />
