@@ -7,10 +7,11 @@ import { Button } from "reactstrap";
 import { useParams, useNavigate } from "react-router-dom";
 
 
-function CalendarPage({ tasks, setTasks, onTaskClick, currentDate, setCurrentDate, selectedDate, setSelectedDate }) {
+function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDate, setSelectedDate, onTaskClick }) {
   const [today, setToday] = useState(new Date());
   const [expandedTasks, setExpandedTasks] = useState({});
   const [taskInput, setTaskInput] = useState('');
+  const [isNavigating, setIsNavigating] = useState(false);
   const { current, selected } = useParams();
   const navigate= useNavigate();
 
@@ -23,6 +24,7 @@ function CalendarPage({ tasks, setTasks, onTaskClick, currentDate, setCurrentDat
   },[current,selected])
 
   useEffect(()=>{
+    if(isNavigating){setIsNavigating(false);return;}
     navigate(`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}/${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`);
   },[currentDate,selectedDate]);
 
@@ -228,7 +230,7 @@ function CalendarPage({ tasks, setTasks, onTaskClick, currentDate, setCurrentDat
               const isMiddle = t.sta < dateString && dateString < t.end;
               const isSingle = isStart && isEnd;
               return (
-                <div key={idx} onClick={()=>onTaskClick(t)}
+                <div key={idx} onClick={()=>{onTaskClick(t);setIsNavigating(true)}}
                 style={{
                   ...styles.taskBadge(t.imp),
                   ...(isSingle ? styles.taskSingle : {}),
@@ -336,7 +338,7 @@ function CalendarPage({ tasks, setTasks, onTaskClick, currentDate, setCurrentDat
                     <strong>{String(task.task)}</strong>
                     <div className="task-meta">
                       {task.sta && task.end && (<span>{task.sta}〜{task.end}</span>)}
-                      <span>重要度: {task.imp || 0}</span>
+                      <span>重要度: {["🟦低","🟩やや低","🟨中","🟧やや高","🟥高"][task.imp-1]}</span>
                     </div>
                   </div>
                 </li>

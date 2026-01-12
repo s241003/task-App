@@ -446,7 +446,7 @@ function AITaskColl({isOpen,setIsOpen}) {
       onRequestClose={() => setIsOpen(false)}
       onAfterOpen={() => { document.getElementsByClassName("modalClose")[0].focus(); }}
       style={{
-        overlay:{...styles.overlay},content:{...styles.modal,overflow:"scroll"}
+        overlay:{...styles.overlay},content:{...styles.modal}
       }}>
       <div onClick={(e) => e.stopPropagation()}>
         <form onSubmit={handleSubmit} style={{ display: 'block' }}>

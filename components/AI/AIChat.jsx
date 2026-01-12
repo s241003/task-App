@@ -28,18 +28,9 @@ export default function AIChat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const sendMessage = async () => {
-    if (!input.trim()) return;
-    const userMsg = { role: "user", content: input };
-    setMessages([...messages, userMsg]);
-    setInput("");
-    setLoading(true);
-
-    try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-      const prompt = `
+  
+  //プロンプト群
+  const general = `
 あなたは親切なチャットアシスタントです。
 ただし、ユーザーからの質問に答える際には、必ず以下のルールを守ってください。
 
@@ -49,6 +40,29 @@ export default function AIChat() {
 
 ユーザー: "${input}"
 アシスタント:`.trim();
+
+  const startTask = `
+あなたはタスク管理の専門家です。
+ユーザーが「タスクを始める」ことを希望する場合、以下の手順でタスクを設定してください。
+
+1. ユーザーが指定したタスクの内容を明確にします。
+2. タスクの優先度を設定します。
+3. タスクの期限を設定します。
+4. タスクの詳細な説明を提供します。
+
+ユーザー: "${input}"
+アシスタント:`.trim();
+
+  const sendMessage = async (prompt) => {
+    if (!input.trim()) return;
+    const userMsg = { role: "user", content: input };
+    setMessages([...messages, userMsg]);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
 
       const result = await callAIRetry(model, prompt);
       const responseText = result.response.text();
@@ -104,8 +118,10 @@ export default function AIChat() {
             )}
           </ListGroup>
           {}
-          <Button className="px-4! py-1.5! rounded-full!
-              text-blue-400! font-semibold!
+            <Button
+            onClick={()=>sendMessage(startTask)}
+            className="px-4! py-1.5! rounded-full!
+                text-blue-400! font-semibold!
               transition-all! duration-300!
               bg-cyan-400/20!
               backdrop-blur-md!
@@ -114,18 +130,20 @@ export default function AIChat() {
               hover:shadow-[0_0_30px_rgba(0,200,255,0.7)]!
               hover:bg-cyan-400/30!
               active:scale-95!
-">AIとタスクを考える</Button>
+            "> 
+            AIとタスクを考える
+            </Button>
           <InputGroup className="mt-1">
             <Input
               placeholder="AIになんでも相談！"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              onKeyDown={(e) => e.key === 'Enter' && sendMessage(general)}
               style={{ backgroundColor: "#f6f6f6"}} // 入力欄も拡大
             />
             <Button
               color="primary"
-              onClick={sendMessage}
+              onClick={() => sendMessage(general)}
               disabled={loading}
             >
               送信

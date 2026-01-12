@@ -167,7 +167,7 @@ const App = () => {
     };
     setSelectedTask(normalizedTask);
     navigate(`/taskdetail/${normalizedTask.taskId}`);
-    //console.log({task, normalizedTask});
+    console.log({task, normalizedTask});
   };
 
   // タスク更新時のハンドラー (作業時間更新)
