@@ -296,7 +296,6 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
       borderRadius: "0.65rem",
     },
     taskBetween:(imp)=> ({
-      borderWidth: "2px 0",
       borderColor: getPriorityColor(imp),
       opacity: "0.75",
     }),
