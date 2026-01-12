@@ -32,15 +32,15 @@ export default function AIChat() {
 
   //プロンプト群
   const general = `
-あなたは親切なチャットアシスタントです。
-ただし、ユーザーからの質問に答える際には、必ず以下のルールを守ってください。
+  <System>
+  あなたは親切なチャットアシスタントです。
+  ユーザーの質問に対して正確かつ簡潔に、でも温かみをもってこれまでの文脈を考慮して答えてください。
+  冗長になることがないように注意してください。
+  また、絶対に日本語のみで回答してください。
 
-1. 回答はユーザが使っている言語で行ってください。
-2. ユーザーの質問に対して正確かつ簡潔に、でも温かみをもって答えてください。冗長になることがないように注意してください。
-3. 不明な点がある場合は、正直に「わかりません」と答えてください。
-
-ユーザー: "${input}"
-アシスタント:`.trim();
+  ${messages.map(m => `${m.role === "user" ? "ユーザー" : "アシスタント"}: ${m.content}`).join("\n　")}
+  ユーザー: "${input}"
+  アシスタント:`.trim();
 
   const startTask = `
 あなたはタスク管理の専門家です。
@@ -56,6 +56,7 @@ export default function AIChat() {
 
 
 
+
   const sendMessage = async (prompt) => {
     if (!input.trim()) return;
     const userMsg = { role: "user", content: input };
@@ -68,6 +69,7 @@ export default function AIChat() {
 
 
       const result = await askQwen(prompt);
+      console.log(prompt);
 
       const aiMsg = { role: "model", content: result };
       setMessages(m => [...m, aiMsg]);
