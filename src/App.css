@@ -10,11 +10,12 @@ body {
   max-width: 100%;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   padding: 5vh 3vw;
-  width: 90vw;
+  width: 94vw;
   min-height:100vh;
   max-height: auto;
   border-radius: 2rem;
-  margin:5vh 5vw;
+  margin:3vh 3vw;
+  position:relative;
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }

@@ -280,7 +280,7 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
       WebkitBoxOrient: 'vertical',
       WebkitLineClamp: 2,
       fontSize: "0.8rem",
-      padding: "0.7vh 0 0.7vh 1vw",
+      padding: "0.7vh 0 0.7vh 0.7vw",
       transition: "all 0.2s ease",
       whiteSpace: "nowrap",
     }),

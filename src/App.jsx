@@ -241,7 +241,7 @@ const App = () => {
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
       </div>
-        {(!isNotFound) ? <NavigationBar />: null}
+        {(!isNotFound) ? <NavigationBar selectedDate={selectedDate} currentDate={currentDate}/>: null}
     </div>
   );
 

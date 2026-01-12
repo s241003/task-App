@@ -128,9 +128,9 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
   }
 
   return (
-    <div className="page-content">
-      <div className="buttons bg-gray-400">
-        <></>
+    
+    <div className="relative">
+      <div className="buttons">
         <button className="back-btn" onClick={handleBackClick}>← 戻る</button>
         <div className="flex flex-row gap-2 absolute right-0 top-0">
           <button className="delete-btn" onClick={()=>setIsOpen(true)}>🗑️</button>
@@ -311,7 +311,6 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
         .inputForm span{
           font-weight:700;
           font-size:0.9rem;
-          
         }
         .inputForm input,select{
           width: 100%;
@@ -334,8 +333,11 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
           width:100%;
           position:relative;
           border-radius:0.75rem;
-          margin-bottom: 10vh;
           font-size: 1.1rem;
+          margin-bottom: 7vh;
+          top:0;
+          left:0;
+          padding: 0.5rem;
         }
         .back-btn {
           position:absolute;

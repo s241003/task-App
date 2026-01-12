@@ -106,7 +106,7 @@ h1, h2, h3 {
 .grid {
   display: grid;
   grid-template-columns: repeat(7, calc(99% / 7));
-  grid-auto-rows: 20vh;
+  grid-auto-rows: 18vh;
   padding: 1vh 1vw;
   width: 100%;
   gap: 0.1rem;

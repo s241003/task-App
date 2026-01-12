@@ -5,14 +5,14 @@ import { NavLink, useNavigate } from "react-router-dom";
 import AIChat from "../AI/AIChat";
 import AITaskColl from "../AI/AITaskColl";
 
-function NavigationBar({ currentPage, onPageChange }) {
+function NavigationBar({ currentPage, onPageChange,selectedDate, currentDate }) {
   const [showAI, setShowAI] = useState(false);
   const [isOpen ,setIsOpen] = useState(false);
 
   const pages = [
     { id: 'aichat', label: 'チャット' },
     { id: 'tasks', label: 'タスク' },
-    { id: ``, label: 'カレンダー' },
+    { id: `calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}/${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`, label: 'カレンダー' },
     { id: 'settings', label: '設定' }
   ]
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ function NavigationBar({ currentPage, onPageChange }) {
               if (index === 1) {
                 return [
                   navLink,
-                  <button key="addtask" className="addtask-button bg-gray-500 " onClick={() => setIsOpen(true)}>＋</button>
+                  <button key="addtask" className="addtask-button " onClick={() => setIsOpen(true)}>＋</button>
                 ];
               }
               return [navLink];
@@ -88,13 +88,26 @@ function NavigationBar({ currentPage, onPageChange }) {
           }
 
           .addtask-button {
-            font-size: 1.5rem;
-            font-weight: 700;
+            position: relative;
+            bottom: 1vh;
+            font-size: 4vh;
+            margin: 0 1vw;
+            width: 0.1vw;
+            height: 0.1vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            border: none;
+            font-weight: 900;
             color: #ffffff;
-            padding: 0.5rem 0.75rem 0.5rem 0.75rem;
-            margin-right: 0.75rem;
             border-radius: 100%;
-            margin:1rem;
+            transition: all 0.3s;
+          }
+          .addtask-button:hover{
+            background: #2563eb;
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
           }
 
           .active {
