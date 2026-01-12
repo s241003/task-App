@@ -5,9 +5,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import AIChat from "../AI/AIChat";
 import AITaskColl from "../AI/AITaskColl";
 
-function NavigationBar({ currentPage, onPageChange,selectedDate, currentDate }) {
-  const [showAI, setShowAI] = useState(false);
-  const [isOpen ,setIsOpen] = useState(false);
+function NavigationBar({ onPageChange,selectedDate, currentDate, isOpen, setIsOpen }) {
+
 
   const pages = [
     { id: 'aichat', label: 'チャット' },
@@ -20,7 +19,6 @@ function NavigationBar({ currentPage, onPageChange,selectedDate, currentDate }) 
 
   return (
     <div>
-      <AITaskColl isOpen={isOpen} setIsOpen={setIsOpen}/>
       <div className="navigation-container z-50 no-underline">
         <nav className="navigation-bar bg-gray-500">
             {pages.flatMap((page, index) => {
@@ -75,7 +73,7 @@ function NavigationBar({ currentPage, onPageChange,selectedDate, currentDate }) 
             flex: 1;
             text-align: center;
             background: none;
-            font-size: 1rem;
+            font-size: 2.2vh;
             color: #59606f;
             font-weight: 500;
             height: 100%;

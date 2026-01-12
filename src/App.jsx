@@ -112,6 +112,7 @@ const App = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [theme, setTheme] = useState("");
   const [isNotFound, setIsNotFound] = useState(false);
+  const [isOpen ,setIsOpen] = useState(false);
   const [popUpText ,setPopUpText ] = useState("");
 
   {/* _init_ supabase読み込み */}
@@ -230,10 +231,11 @@ const App = () => {
     <div className="flex flex-col gap-5">
       <div className="app-container">
         <PopUp text={popUpText}  />
+        <AITaskColl isOpen={isOpen} setIsOpen={setIsOpen}/>
         <Routes>
           <Route path="/" element={<Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}/${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`} replace/>} />
+          <Route path="/calendar/:current/:selected" element={<CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} isOpen={isOpen} setIsOpen={setIsOpen} />} />
           <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClick={handleTaskClick} />} />
-          <Route path="/calendar/:current/:selected" element={<CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} />} />
           <Route path="/addTask" element={<AITaskColl />} />
           <Route path="/taskdetail/:taskId" element={<TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} onUpdateTask={handleUpdateTask} setPopUpText={setPopUpText} />} />
           <Route path="/aichat" element={<AIChat />} />
@@ -243,7 +245,7 @@ const App = () => {
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
       </div>
-        {(!isNotFound) ? <NavigationBar selectedDate={selectedDate} currentDate={currentDate}/>: null}
+        {(!isNotFound) ? <NavigationBar selectedDate={selectedDate} currentDate={currentDate} isOpen={isOpen} setIsOpen={setIsOpen}/>: null}
     </div>
   );
 

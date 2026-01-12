@@ -7,7 +7,7 @@ import { Button } from "reactstrap";
 import { useParams, useNavigate } from "react-router-dom";
 
 
-function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDate, setSelectedDate, onTaskClick }) {
+function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDate, setSelectedDate, onTaskClick, isOpen, setIsOpen }) {
   const [today, setToday] = useState(new Date());
   const [expandedTasks, setExpandedTasks] = useState({});
   const [taskInput, setTaskInput] = useState('');
@@ -324,30 +324,31 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
         <div className="grid">
           {renderCalendar()}
         </div>
-      </div>
+      
 
-      <div className="task-container">
-        <Button onClick={ ()=> navigate("/addtask")} >タスク作成</Button>
-        <div className="task-list-section">
-          <h3 style={{ margin: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
-          {selectedTasks.length === 0 ? (
-            <p>タスクはありません</p>
-          ) : (
-            <ul className="task-list">
-              {selectedTasks.map((task, index) => (
-                <li key={index} className="task-item" onClick={()=>onTaskClick(task)}>
-                  <div className="priority-bar" style={{ backgroundColor: getPriorityColor(task.imp) }} />
-                  <div className="task-content">
-                    <strong>{String(task.task)}</strong>
-                    <div className="task-meta">
-                      {task.sta && task.end && (<span>{task.sta}〜{task.end}</span>)}
-                      <span>重要度: {["🟦低","🟩やや低","🟨中","🟧やや高","🟥高"][task.imp-1]}</span>
+        <div className="task-container">
+          <Button onClick={()=> setIsOpen(true) } >タスク作成</Button>
+          <div className="task-list-section">
+            <h3 style={{ margin: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
+            {selectedTasks.length === 0 ? (
+              <p>タスクはありません</p>
+            ) : (
+              <ul className="task-list">
+                {selectedTasks.map((task, index) => (
+                  <li key={index} className="task-item" onClick={()=>onTaskClick(task)}>
+                    <div className="priority-bar" style={{ backgroundColor: getPriorityColor(task.imp) }} />
+                    <div className="task-content">
+                      <strong>{String(task.task)}</strong>
+                      <div className="task-meta">
+                        {task.sta && task.end && (<span>{task.sta}〜{task.end}</span>)}
+                        <span>重要度: {["🟦低","🟩やや低","🟨中","🟧やや高","🟥高"][task.imp-1]}</span>
+                      </div>
                     </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </div>

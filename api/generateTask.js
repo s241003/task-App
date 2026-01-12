@@ -4,7 +4,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 //  import.meta.env.VITE_GOOGLE_API_KEY
 
 export async function askQwen(prompt) {
-  const QwenURL = "http://localhost:11434/api/generate";
+  const QwenURL = import.meta.env.VITE_QWEN_API_URL;
   const res = await fetch(QwenURL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

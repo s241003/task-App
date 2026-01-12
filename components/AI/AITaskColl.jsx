@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import '../../src/dateInput.css';
 
 
-async function askQwen(prompt) {
+export async function askQwen(prompt) {
   const QwenURL = "http://localhost:11434/api/generate";
   const res = await fetch(QwenURL, {
     method: "POST",
@@ -337,14 +337,15 @@ function AITaskColl({isOpen,setIsOpen}) {
       fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial'
     },
     modal: {
-      width: '75vw',
+      maxWidth: '95vw',
       maxHeight: 'auto',
-      overflowY: 'auto',
       backgroundColor: 'white',
       borderRadius: '12px',
-      padding: '30px 20px',
+      padding: '4vh 2vw',
       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-      position: 'relative'
+      position: 'relative',
+      top:"0",
+      left:"0",
     },
     container: {
       fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial'
@@ -353,64 +354,65 @@ function AITaskColl({isOpen,setIsOpen}) {
     formGrid: {
       display: 'grid',
       gridTemplateColumns: '1fr',
-      gap: '12px',
+      gap: '2vh',
       alignItems: 'start',
     },
     // 追加: 各入力グループのスタイル
     formGroup: {
       display: 'flex',
       flexDirection: 'column',
-      gap: '6px',
+      gap: '1vh',
     },
     labelStyle: {
-      fontSize: '14px',
+      fontSize: '2vh',
       color: '#374151',
       fontWeight: '600',
     },
     row: {
       display: 'flex',
-      gap: '10px',
+      gap: '2vw',
       alignItems: 'center',
       flexWrap: 'wrap'
     },
     input: {
-      width: '100%', // タスク入力を幅いっぱいにして、AIボタンは右に寄せるので内部調整
+      width: '68%', // タスク入力を幅いっぱいにして、AIボタンは右に寄せるので内部調整
       color: '#0f0f0f',
       background: '#f8fafc',
-      padding: '12px',
+      padding: '2vh 2vw',
       borderRadius: '9px',
       border: '1px solid #e6edf3',
       caretColor: '#0f0f0f',
-      fontSize: '16px',
+      fontSize: '2vh',
     },
     fullInput: {
       width: '100%',
       color: '#0f0f0f',
       background: '#f8fafc',
-      padding: '12px',
+      padding: '2vh 2vw',
       borderRadius: '9px',
       border: '1px solid #e6edf3',
       caretColor: '#0f0f0f',
-      fontSize: '16px',
+      fontSize: '1.9vh',
     },
     // AIボタンは右寄せの小さめボタンに調整（琥珀色）
     aiButton: (disabled) => ({
-      marginLeft: '10px',
-      padding: '10px 16px',
+      width: '35%',
+      padding: '2vh 2vw',
       background: disabled ? '#fde9d0' : AMBER.base,
       color: 'white',
       border: 'none',
       borderRadius: '9px',
       cursor: disabled ? 'not-allowed' : 'pointer',
-      fontSize: '14px',
+      fontSize: '2.2vh',
       fontWeight: '700',
-      alignSelf: 'center'
+      alignSelf: 'center',
+      zIndex: "10",
     }),
     actionRow: {
       display: 'flex',
-      gap: '10px',
+      gap: '2vw',
       alignItems: 'center',
-      justifyContent: 'space-between'
+      flexDirection: 'row',
     },
     select: {
       flex: '1',
@@ -516,7 +518,7 @@ function AITaskColl({isOpen,setIsOpen}) {
             {/* キャンセルボタン */}
             <button
               onClick={() => setIsOpen(false)}
-              className="modalClose text-lg font-bold absolute top-1 py-3 right-4 bg-white text-gray-700"
+              className="modalClose text-lg font-bold absolute top-1 py-3 right-4 bg-transparent text-gray-700"
             >x</button>
 
           {/* タスク入力グループ（ラベル上） */}
@@ -538,8 +540,8 @@ function AITaskColl({isOpen,setIsOpen}) {
                 disabled={isLoadAI || isLoading}
                 style={
                   error && needsMoreDetail
-                    ? { ...styles.input, border: '2px solid #f59e0b', flex: 1 }
-                    : { ...styles.input, flex: 1 }
+                    ? { ...styles.input, border: '2px solid #f59e0b' }
+                    : { ...styles.input }
                 }
               />
 
@@ -574,7 +576,7 @@ function AITaskColl({isOpen,setIsOpen}) {
           </div>
 
 
-          <div className="flex flex-row w-full gap-5">
+          <div className="flex flex-row w-full" style={{gap:"5vw"}}>
             <div style={{ ...styles.formGroup, flexBasis: "2rem" }}>
               <label style={styles.labelStyle} htmlFor="importance">重要度</label>
 
@@ -600,7 +602,7 @@ function AITaskColl({isOpen,setIsOpen}) {
               <label style={styles.labelStyle} htmlFor="estimated">必要な時間</label>
 
               {/* 推定かかり時間 */}
-              <div className="flex flex-row items-center w-3/4 gap-2">
+              <div className="flex flex-row items-center w-3/4" style={{gap:"1vw"}}>
                 <input
                   id="hours"
                   type="number"
@@ -636,7 +638,7 @@ function AITaskColl({isOpen,setIsOpen}) {
             <label style={styles.labelStyle} htmlFor="turm">期間</label>
 
             {/* 期間 */}
-            <div style={{ display: 'flex', gap: '1rem'}}>
+            <div style={{ display: 'flex', gap: '3vw'}}>
               <input
                 id="turm"
                 type="date"
@@ -657,7 +659,6 @@ function AITaskColl({isOpen,setIsOpen}) {
                 style={styles.dateInput}
                 className="date-input"
               />
-              <span style={{ alignSelf: 'center', color: '#495060' }}>まで</span>
             </div>
 
           </div><br />
