@@ -32,17 +32,19 @@ export default function AIChat() {
 
   //プロンプト群
   const general = `
-  <|system|>
-  あなたは親切なチャットアシスタントです。
-  ユーザーの質問に対して正確かつ簡潔に、でも温かみをもってこれまでの文脈を考慮して答えてください。
-  冗長になることがないように注意してください。
-  また、絶対に日本語のみで回答してください。
+<|system|>
+あなたは親切なチャットアシスタントです。
+ユーザーの質問に対して正確かつ簡潔に、温かみをもって答えてください。
+絶対に日本語のみで回答してください。
 
-  ${messages.map(m => `${m.role === "user" ? "<|user|>" : "<|assistant|>"}\n ${m.content}`).join("\n　")}
-  <|user|>
-  ${input}
-  <|assistant|>
-  `.trim();
+${messages
+  .map(m => `${m.role === "user" ? "<|user|>" : "<|assistant|>"}\n${m.content}`)
+  .join("\n")}
+
+<|user|>
+${input}
+<|assistant|>
+`.trim();
 
   const startTask = `
 あなたはタスク管理の専門家です。
@@ -127,8 +129,8 @@ export default function AIChat() {
           <div className="bg-gray-200 p-3 mt-3 rounded-lg">
             <Button
             onClick={()=>sendMessage(startTask)}
-            className="px-4! py-1.5! rounded-full!
-                text-blue-400! font-semibold!
+            className="px-4! mb-1! py-1.5! rounded-full!
+              text-blue-400! font-semibold!
               transition-all! duration-300!
               bg-cyan-400/20!
               backdrop-blur-md!
@@ -140,6 +142,9 @@ export default function AIChat() {
             "> 
             AIとタスクを考える
             </Button>
+            <Button color="danger" className="px-3 py-1 mb-1 mx-2 rounded-full!" onClick={clearHistory}>
+              履歴をクリア
+            </Button>
             <InputGroup className="mt-1">
               <Input
                 placeholder="AIになんでも相談！"
@@ -148,6 +153,7 @@ export default function AIChat() {
                 onKeyDown={(e) => e.key === 'Enter' && sendMessage(general)}
                 style={{ backgroundColor: "#f6f6f6"}} // 入力欄も拡大
               />
+              
               <Button
                 color="primary"
                 onClick={() => sendMessage(general)}
@@ -156,9 +162,6 @@ export default function AIChat() {
                 送信
               </Button>
             </InputGroup>
-            <Button color="danger" className="mt-3" onClick={clearHistory}>
-              履歴をクリア
-            </Button>
           </div>
         </CardBody>
       </Card>
