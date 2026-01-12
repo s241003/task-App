@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useState, useEffect } from "react";
+import { askQwen } from "../../api/generateTask";
 import {
   Container, Card, CardHeader, CardBody,
   ListGroup, ListGroupItem, Input, Button, InputGroup, Spinner
@@ -8,21 +9,6 @@ import {
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
 
-async function callAIRetry(model, prompt, retries = 3) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const result = await model.generateContent(prompt);
-      return result;
-    } catch (err) {
-      if (err.status === 503 && i < retries - 1) {
-        console.warn(`503エラー。${i + 1}回目のリトライを待機中...`);
-        await new Promise(res => setTimeout(res, 2000 * (i + 1)));
-        continue;
-      }
-      throw err;
-    }
-  }
-}
 
 export default function AIChat() {
   const CHAT_HISTORY_KEY = "chatHistory";
@@ -78,13 +64,12 @@ export default function AIChat() {
     setLoading(true);
 
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      /*const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });*/
 
 
-      const result = await callAIRetry(model, prompt);
-      const responseText = result.response.text();
+      const result = await askQwen(prompt);
 
-      const aiMsg = { role: "model", content: responseText };
+      const aiMsg = { role: "model", content: result };
       setMessages(m => [...m, aiMsg]);
     } catch (err) {
       setMessages(m => [...m, { role: "model", content: "すいません、エラーです" }]);

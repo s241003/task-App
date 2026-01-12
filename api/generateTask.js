@@ -1,21 +1,41 @@
+import { useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-export const genAI = new GoogleGenerativeAI(process.env.VITE_GOOGLE_API_KEY);
+//export const genAI = new GoogleGenerativeAI(process.env.VITE_GOOGLE_API_KEY);
 //  import.meta.env.VITE_GOOGLE_API_KEY
-async function callAIRetry(model, prompt, retries = 3) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const result = await model.generateContent(prompt);
-      return result;
-    } catch (err) {
-      if (err.status === 503 && i < retries - 1) {
-        console.warn(`503エラー。${i + 1}回目のリトライを待機中...`);
-        await new Promise(res => setTimeout(res, 2000 * (i + 1)));
-        continue;
-      }
-      throw err;
-    }
-  }
+
+export async function askQwen(prompt) {
+  const QwenURL = "http://localhost:11434/api/generate";
+  const res = await fetch(QwenURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "qwen2.5:7b",
+      prompt: prompt,
+      stream: false
+    })
+  });
+
+  const data = await res.json();
+  return data.response;
 }
+
+/*  AIChat.jsxでつかう
+async function sendMessage() {
+
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+
+  const userMsg = input;
+
+  setMessages(prev => [...prev, { role: "user", text: userMsg }]);
+  setInput("");
+
+  const aiReply = await askQwen(userMsg);
+
+  setMessages(prev => [...prev, { role: "assistant", text: aiReply }]);
+}
+*/
+
 
 // JSONを安全に抽出する関数
 function extractJSON(text) {
@@ -82,7 +102,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    /*const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });*/
     
     const prompt = `
 あなたはタスク管理の専門家です。以下のテキストを分析し、JSON形式のみで出力してください。
@@ -136,9 +156,8 @@ export default async function handler(req, res) {
 }
 `.trim();
 
-    const result = await callAIRetry(model, prompt);
-    const response = await result.response;
-    const responseText = response.text();
+    const result = await askQwen(prompt);
+    const responseText = result.text();
 
     // JSONを抽出
     const jsonString = extractJSON(responseText);

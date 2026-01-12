@@ -11,6 +11,7 @@ import TaskPage from '../components/Function/Pages/TaskPage';
 import TaskDetailPage from '../components/Function/Pages/TaskDetailPage';
 import GroupWorkPage from "../components/Function/Pages/GroupWorkPage";
 import Settings from "../components/Function/Pages/SettingsPage"
+import Login from "../components/Function/Pages/LoginPage"
 
 
 export const formatDate = (date) => {
@@ -238,6 +239,7 @@ const App = () => {
           <Route path="/aichat" element={<AIChat />} />
           <Route path="/groupwork" element={<GroupWorkPage />} />
           <Route path="/settings" element={<Settings theme={theme} setTheme={setTheme}/>} />
+          <Route path="/login" element={<Login />} />
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
       </div>

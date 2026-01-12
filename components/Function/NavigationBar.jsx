@@ -13,7 +13,8 @@ function NavigationBar({ currentPage, onPageChange,selectedDate, currentDate }) 
     { id: 'aichat', label: 'チャット' },
     { id: 'tasks', label: 'タスク' },
     { id: `calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}/${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`, label: 'カレンダー' },
-    { id: 'settings', label: '設定' }
+    { id: 'login', label: 'ログイン(仮)' },
+    //{ id: 'settings', label: '設定' },
   ]
   const navigate = useNavigate();
 

@@ -13,6 +13,23 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import '../../src/dateInput.css';
 
+
+async function askQwen(prompt) {
+  const QwenURL = "http://localhost:11434/api/generate";
+  const res = await fetch(QwenURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "qwen2.5:7b",
+      prompt: prompt,
+      stream: false
+    })
+  });
+
+  const data = await res.json();
+  return data.response;
+}
+
 {/* supabase保存 */}
 async function saveTaskToSupabase(taskData) {
   const { data, error } = await supabase
@@ -125,27 +142,69 @@ function AITaskColl({isOpen,setIsOpen}) {
 
     try {
       // API呼び出し
-      const response = await fetch('/api/generateTask', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text }),
-      });
+          const prompt = `
+あなたはタスク管理の専門家です。以下のテキストを分析し、JSON形式のみで出力してください。
 
-      const data = await response.json();
+テキスト: "${text}"
 
-      // エラーレスポンスの処理
-      if (!response.ok) {
-        throw new Error(data.error || 'API request failed');
-      }
+以下の形式で出力してください（説明文やマークダウンは不要、JSONのみ）:
+{
+  "taskName": "タスクの内容",
+  "subTasks": ["サブタスク1", "サブタスク2", "サブタスク3"],
+  "importance": 1~5のint型整数,
+  "estimated_time": int型整数,
+  "Concrete": true or false,
+  "reason": "Concreteとestimated_timeの判定理由（任意）"
+}
+
+ルール:
+1. taskName: 入力されたタスクの内容を簡潔にまとめる
+2. subTasks: そのタスクを達成するために必要な具体的なステップを3〜7個程度の配列にする
+3. impotance: 1を最もどうでもいい、5を最重要として、そのタスクがユーザにとってどれくらい重要であるか判断する
+4. estimated_time:そのタスクを達成するまでに累計何分かかるかを推定する
+5. Concrete: 
+   - True: 入力が具体的で、明確なサブタスクを生成できる場合
+   - False: 入力が曖昧すぎて、適切なサブタスクを生成できない場合
+     （例: "勉強する"、"頑張る"、"やる"などの抽象的すぎる入力）
+     これがTrueの場合、reason以外の項目はnullでいい
+. reason: Concreteとestimated_timeの判定理由を簡潔に（Falseの場合は特に重要）
+
+例1（Concrete=true）:
+入力: "英検2級に合格する"
+出力:
+{
+  "taskName": "英検2級合格",
+  "subTasks": ["リスニング対策", "リーディング対策", "ライティング対策", "過去問演習", "模擬試験受験"],
+  "importance": 4,
+  "estimated_time": 15000,
+  "Concrete": true,
+  "reason": "concrete:具体的な目標があり、明確なステップに分解可能,estimated_time: 一般に英検2級に合格するには200~300時間必要と言われているため"
+}
+
+例2（Concrete=false）:
+入力: "勉強する"
+出力:
+{
+  "taskName": "勉強",
+  "subTasks": [],
+  "importance": null,
+  "estimated_time":null,
+  "Concrete": false,
+  "reason": "concrete:何を勉強するのか不明確。具体的な科目や目標を指定してください"
+}
+`.trim();
+      const rawResponse = await askQwen(prompt);
+      const response = JSON.parse(rawResponse);
+      console.log(response);
+      console.log(response.taskName);
+
 
       // Concrete判定の処理
-      if (data.needsMoreDetail || data.Concrete === false) {
+      if (response.needsMoreDetail || response.Concrete === false) {
         setNeedsMoreDetail(true);
         setError(
-          data.suggestion ||
-          data.reason ||
+          response.suggestion ||
+          response.reason ||
           'もう少しタスクを具体的にしてください。\n例: 「勉強する」→「英検2級に合格する」'
         );
         setTaskData(null);
@@ -153,12 +212,14 @@ function AITaskColl({isOpen,setIsOpen}) {
       }
 
       // 成功時の処理
-      setTaskData(data);
-      setSubTasks(data.subTasks.join(' '));
-      setImportance(data.importance.toString());
-      setHours(Math.floor(data.estimated_time / 60));
-      setMinutes(data.estimated_time % 60);
-      console.log('AI Response:', data);
+      setTaskData(response);
+      console.log(response.subTasks);
+      console.log(response.taskName);
+      setSubTasks(response.subTasks.join(', '));
+      setImportance(response.importance.toString());
+      setHours(Math.floor(response.estimated_time / 60));
+      setMinutes(response.estimated_time % 60);
+      console.log('AI Response:', response);
 
       // 成功時ログ
       console.log('AIタスクが正常に生成されました');
