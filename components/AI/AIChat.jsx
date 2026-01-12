@@ -32,18 +32,21 @@ export default function AIChat() {
 
   //プロンプト群
   const general = `
-<|system|>
+<|im_start|>system
 あなたは親切なチャットアシスタントです。
 ユーザーの質問に対して正確かつ簡潔に、温かみをもって答えてください。
 絶対に日本語のみで回答してください。
+<|im_end|>
+
 
 ${messages
-  .map(m => `${m.role === "user" ? "<|user|>" : "<|assistant|>"}\n${m.content}`)
+  .map(m => `${m.role === "user" ? "<|im_start|>user" : "<|im_start|>assistant"}\n${m.content}\n<|im_end|>`)
   .join("\n")}
 
-<|user|>
+<|im_start|>user
 ${input}
-<|assistant|>
+<|im_end|>
+<|im_start|>assistant
 `.trim();
 
   const startTask = `
