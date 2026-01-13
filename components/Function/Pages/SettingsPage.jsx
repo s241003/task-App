@@ -1,5 +1,5 @@
-import { useState } from "react";
-
+import { useState, useRef, useEffect } from 'react'
+import './SettingsPage.css';
 function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
 
@@ -26,5 +26,5 @@ function ThemeToggle() {
   );
 }
 
-export default ThemeToggle;
+export default SettingsPage;
 
