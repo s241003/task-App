@@ -8,13 +8,14 @@ import {
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from "./AITaskColl";
 import { DBname } from "../../src/App.jsx"
+import { useNavigate } from "react-router-dom";
 
 
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
 
 
-export default function AIChat({setTasks}) {
+export default function AIChat({setTasks,setPopUpText}) {
   const CHAT_HISTORY_KEY = "chatHistory";
   const [messages, setMessages] = useState(() => {
     // 初期化時にlocalStorageから履歴を読み込む
@@ -34,6 +35,8 @@ export default function AIChat({setTasks}) {
 
   const [withAI, setWithAI] = useState(false);
   const [withState, setWithState] = useState(0);
+
+  const navigate=useNavigate();
 
   useEffect(() => {
     localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
@@ -72,35 +75,38 @@ export default function AIChat({setTasks}) {
   .trim();*/
 
   const startTask = "あなたの達成したいタスクを一緒に考えましょう。達成したいことを教えてください。";
-  const taskEstimateFirst = `
-  あなたはタスク管理AI(ぷらとん)です。
-  ユーザーの入力から達成すべきタスクを読み取り、
-  細かい情報を推測して、以下のJSON形式で必ず出力してください。
+  const taskEstimateFirst = `あなたはタスク管理AI「ぷらとん」です。
+ユーザーの入力から達成すべきタスクを読み取り、
+必要な情報を推測して、次のJSON形式で必ず出力してください。
 
-
-出力形式:
+出力形式（型定義）:
 {
-  "message": "ユーザへ修正案内メッセージ",
-  "taskName": 10文字以内のタイトル,
-  "subTasks": ["必要なら3〜7個のステップ"],
-  "importance": 数値1〜5 (5が最重要),
-  "estimated_time": 数値（そのタスクを達成するまでにかかる見込み分数）,
-  "start_date": "YYYY-MM-DD",
-  "end_date": "YYYY-MM-DD"
+  "message": string,                     // ユーザーへの返信
+  "taskName": string,                    // 10文字以内のタイトル
+  "subTasks": string[],                  // 3〜7個のステップ
+  "importance": number,                  // 1〜5
+  "estimated_time": number,              // 分数
+  "start_date": string,                  // YYYY-MM-DD
+  "end_date": string                     // YYYY-MM-DD
 }
+
+制約:
+- JSON以外の文章は一切出力しない。
+- start_date は必ず「2026-01-13」にする。
+- end_date はタスク内容から妥当な日付を推測する。
+- subTasks は必要な場合のみ3〜7個生成する。
+- estimated_time はタスク名からそのタスクを始めてから完了するまでにかかる妥当な分数を推測する。
 
 ユーザー入力:
 ${input}
-
-JSONのみを出力してください。`
+`
 .trim();
 
   const taskEstimate = `
   あなたはタスク管理AI(ぷらとん)です。
-  ユーザがタスク内容を修正したいときは
-  ユーザとあなたで考えている現在のタスク内容を踏まえ、
+  ユーザとあなたで考えている現在のタスク内容とこれまでの会話履歴を踏まえ、
   ユーザーの追加情報をもとにタスク内容を修正して、
-  以下のJSON形式で必ず出力してください。
+  出力形式に従った以下のJSON形式で必ず出力してください。
 
 現在のタスク内容:
 {
@@ -112,8 +118,21 @@ JSONのみを出力してください。`
   start_date: ${startDate},
   end_date: ${endDate}
 }
+
+  出力形式:
+{
+  "message": "ユーザへの返信メッセージ",
+  "taskName": 10文字以内のタイトル,
+  "subTasks": ["必要なら3〜7個のステップ"],
+  "importance": 数値1〜5 (5が最重要),
+  "estimated_time": 数値（そのタスクを達成するまでにかかる見込み分数）,
+  "start_date": "YYYY-MM-DD",
+  "end_date": "YYYY-MM-DD"
+}
   ユーザー入力:
   ${input}
+これまでの会話履歴:
+${messages!=[]?messages.map(m => `${m.role === "user" ? "ユーザ" : "アシスタント"}:${m.content}\n`).join("\n"):"なし"}
 
 JSONのみを出力してください。
 `.trim();
@@ -124,6 +143,7 @@ const promptGroup = [taskEstimateFirst,taskEstimate];
 
 
   const clearHistory = () => {
+    setPopUpText("履歴をクリアしました！");
     setWithAI(false);
     setWithState(0);
     // 履歴をクリア
@@ -191,7 +211,7 @@ const promptGroup = [taskEstimateFirst,taskEstimate];
 【推定所要時間】 ${response.estimated_time}分
 【開始日】 ${response.start_date}
 【締切日】 ${response.end_date}\n
-  ${response.message}。
+  修正したいことがあれば、なんでも言ってください！
       `;
       setWithState(1);
     }else if (withState === 1) {
@@ -202,7 +222,7 @@ const promptGroup = [taskEstimateFirst,taskEstimate];
 【推定所要時間】 ${response.estimated_time}分
 【開始日】 ${response.start_date}
 【締切日】 ${response.end_date}\n
-  ${response.message}。
+  ${response.message}
       `;
     }
     console.log(contentBody);
@@ -219,7 +239,7 @@ const promptGroup = [taskEstimateFirst,taskEstimate];
 
 const saveTask = async () => {
   if (!task||!startDate||!endDate||!importance||!estimated){
-    alert("タスク情報が不完全です。");
+    alert("タスク情報が足りません。");
     return;
   }
   const { data, error } = await supabase
@@ -233,7 +253,8 @@ const saveTask = async () => {
         start_date: startDate,
         end_date: endDate,
       },
-    ]);
+    ])
+    .select();;
 
   if (error) {
     console.error('保存失敗:', error);
@@ -248,7 +269,8 @@ const saveTask = async () => {
   setEndDate("");
   setWithAI(false);
   setWithState(0);
-  alert("タスクを保存しました！");
+  const taskId = data?.[0]?.id;
+  setPopUpText(/*() => (<button onClick={()=>navigate(`/taskdetail/${taskId}`)}>作ったタスクを見に行く</button>)*/"タスクが正常に作られました！");
   return data;
 }
 
@@ -276,11 +298,11 @@ const onTaskCreated = () => {
 };
 
   return (
-    <Container fluid>
+    <Container style={{margin:"2vh 2vw",position:"fixed",top:"1vh",left:"2vw",maxWidth:"90vw",height:"90vh",display:"flex",justifyContent:"center"}}>
       <Card style={{ fontSize: "1.2rem" }}> {/* 全体フォントサイズ拡大 */}
         <CardHeader className="fs-2 text-bg-secondary p-3">AI Chat</CardHeader>
         <CardBody>
-          <ListGroup style={{ maxHeight: "60vh", overflowY: "auto" }}>
+          <ListGroup style={{ maxHeight: "50vh", overflowY: "auto" }}>
             {messages.map((m, i) => (
               <ListGroupItem
                 key={i}
@@ -341,7 +363,7 @@ const onTaskCreated = () => {
             </Button>)}
             <InputGroup className="mt-1">
               <Input
-                placeholder={withState === 0 ? "AIになんでも相談！" : "タスク内容を修正してみましょう！"}
+                placeholder={withState === 0 ? "AIになんでも相談！" : "AIとタスクを理想化しよう！"}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (withAI ? estimate(promptGroup[withState]) : sendMessage(general))}

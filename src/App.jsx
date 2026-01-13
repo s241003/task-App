@@ -61,7 +61,7 @@ export const PopUp = ({text})=>{
   const [showPopUp ,setShowPopUp ] = useState(false);
 
       useEffect(()=>{
-        text===""?null:setShowPopUp(true);
+        text===``?null:setShowPopUp(true);
       },[text]);
 
       useEffect(()=>{
@@ -72,7 +72,7 @@ export const PopUp = ({text})=>{
       },[showPopUp]);
 
     return(
-      showPopUp&&text!=="" ? <div className="popup">{text}</div>:null
+      showPopUp&&text!==`` ? <div className="popup">{text}</div>:null
     )
 };
 
@@ -113,7 +113,7 @@ const App = () => {
   const [theme, setTheme] = useState("");
   const [isNotFound, setIsNotFound] = useState(false);
   const [isOpen ,setIsOpen] = useState(false);
-  const [popUpText ,setPopUpText ] = useState("");
+  const [popUpText ,setPopUpText ] = useState(``);
 
   {/* _init_ supabase読み込み */}
   useEffect(() => {
@@ -238,7 +238,7 @@ const App = () => {
           <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClick={handleTaskClick} />} />
           <Route path="/addTask" element={<AITaskColl />} />
           <Route path="/taskdetail/:taskId" element={<TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} onUpdateTask={handleUpdateTask} setPopUpText={setPopUpText} />} />
-          <Route path="/aichat" element={<AIChat setTasks={setTasks} />} />
+          <Route path="/aichat" element={<AIChat setTasks={setTasks} setPopUpText={setPopUpText} />} />
           <Route path="/groupwork" element={<GroupWorkPage />} />
           <Route path="/settings" element={<Settings theme={theme} setTheme={setTheme}/>} />
           <Route path="/login" element={<Login />} />

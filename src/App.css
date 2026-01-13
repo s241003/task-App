@@ -9,14 +9,14 @@ body {
 
 .app-container {
   max-width: 100vw;
+  min-width:90vw;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 5vh 3vw;
-  width: 94vw;
-  min-height:100vh;
+  padding: 5vh 1vw;
+  min-height:90vh;
   max-height: auto;
   overflow: hidden;
   border-radius: 2rem;
-  margin:3vh 3vw;
+  margin:1.5vh auto;
   position:relative;
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.2);

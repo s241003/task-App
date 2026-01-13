@@ -14,9 +14,7 @@ export default async function askQwen(prompt) {
 }
 
 export async function askGroq(prompt) {
-  console.log("URL:", import.meta.env.VITE_GROQ_URL);
-  console.log("KEY:", import.meta.env.VITE_GROQ_API_KEY);
-  console.log("PROMPT:", prompt);
+
 
   const res = await fetch(import.meta.env.VITE_GROQ_URL, {
     method: "POST",
