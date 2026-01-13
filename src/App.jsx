@@ -8,6 +8,7 @@ import NavigationBar from '../components/Function/NavigationBar';
 import CalendarPage from '../components/Function/Pages/CalendarPage';
 import AIChat from '../components/AI/AIChat';
 import TaskPage from '../components/Function/Pages/TaskPage';
+import TaskPage from '../components/Function/Pages/SettingsPage';
 
 export const formatDate = (date) => {
   const year = date.getFullYear();
