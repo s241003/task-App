@@ -299,10 +299,15 @@ const onTaskCreated = () => {
 
   return (
     <Container style={{margin:"2vh 2vw",position:"fixed",top:"1vh",left:"2vw",maxWidth:"90vw",height:"90vh",display:"flex",justifyContent:"center"}}>
-      <Card style={{ fontSize: "1.2rem" }}> {/* 全体フォントサイズ拡大 */}
-        <CardHeader className="fs-2 text-bg-secondary p-3">AI Chat</CardHeader>
+      <Card style={{ fontSize: "2vw" }}> {/* 全体フォントサイズ拡大 */}
+        <CardHeader style={{fontSize:"3.3vh"}} className="text-bg-secondary px-3 py-2.2">
+          <>AI Chat</>
+          <Button color="danger" style={{fontSize:"2vh"}} className="px-3 py-1.5 ml-5! mx-2 rounded-full!" onClick={clearHistory}>
+                履歴をクリア
+              </Button>
+        </CardHeader>
         <CardBody>
-          <ListGroup style={{ maxHeight: "50vh", overflowY: "auto" }}>
+          <ListGroup style={{  maxHeight: "50vh", overflowY: "auto" }}>
             {messages.map((m, i) => (
               <ListGroupItem
                 key={i}
@@ -339,28 +344,28 @@ const onTaskCreated = () => {
             )}
           </ListGroup>
           {}
-          <div className="bg-gray-200 p-3 mt-3 rounded-lg">
-            <Button
-            onClick={()=>setMessage(startTask)}
-            className="px-4! mb-1! py-1.5! rounded-full!
-              text-blue-400! font-semibold!
-              transition-all! duration-300!
-              bg-cyan-400/20!
-              backdrop-blur-md!
-              border border-cyan-300/40!
-              shadow-[0_0_20px_rgba(0,200,255,0.4)]!
-              hover:shadow-[0_0_30px_rgba(0,200,255,0.7)]!
-              hover:bg-cyan-400/30!
-              active:scale-95!
-            ">
-            {withAI?"最初からやり直す":"AIとタスクを考える"}
-            </Button>
-            <Button color="danger" className="px-3 py-1 mb-1 mx-2 rounded-full!" onClick={clearHistory}>
-              履歴をクリア
-            </Button>
-            {withState==1&&(<Button color="success" className="px-3 py-1 mb-1 mx-2 rounded-full!" onClick={saveTask}>
-              この内容でタスクを作成
-            </Button>)}
+          <div className="bg-gray-300 p-3 mt-2 rounded-lg">
+            <InputGroup className="flex flex-row">
+              <Button
+              onClick={()=>setMessage(startTask)}
+              className="px-4! mb-1! py-1.5! rounded-full!
+                text-blue-400! font-semibold!
+                transition-all! duration-300!
+                bg-cyan-400/20!
+                backdrop-blur-md!
+                border border-cyan-300/40!
+                shadow-[0_0_20px_rgba(0,200,255,0.4)]!
+                hover:shadow-[0_0_30px_rgba(0,200,255,0.7)]!
+                hover:bg-cyan-400/30!
+                active:scale-95!
+              ">
+              {withAI?"最初から":"AIとタスクを考える"}
+              </Button>
+              
+              {withState==1&&(<Button color="success" className="px-3 py-1 mb-1 mx-2 rounded-full!" onClick={saveTask}>
+                この内容でタスクを作成
+              </Button>)}
+            </InputGroup>
             <InputGroup className="mt-1">
               <Input
                 placeholder={withState === 0 ? "AIになんでも相談！" : "AIとタスクを理想化しよう！"}
