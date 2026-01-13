@@ -318,6 +318,7 @@ function AITaskColl({isOpen,setIsOpen}) {
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 1000,
+      overflow: "hidden",
       fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial'
     },
     modal: {
@@ -328,8 +329,10 @@ function AITaskColl({isOpen,setIsOpen}) {
       padding: '4vh 2vw',
       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
       position: 'relative',
+      overflowY: "auto",
       top:"0",
       left:"0",
+      zIndex: 10000,
     },
     container: {
       fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial'

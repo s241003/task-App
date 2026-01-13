@@ -28,15 +28,13 @@ export default function AIChat() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
+  const [withAI, setWithAI] = useState(false);
+  const [withState, setWithState] = useState(0);
+
   useEffect(() => {
     localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
   }, [messages]);
 
-  const clearHistory = () => {
-    // 履歴をクリア
-    localStorage.removeItem(CHAT_HISTORY_KEY);
-    setMessages([]);
-  };
 
   //プロンプト群
   const general = `
@@ -58,12 +56,14 @@ export default function AIChat() {
   .trim();
 
   const startTask = "あなたの達成したいタスクを一緒に考えましょう。達成したいことを教えてください。";
-  const taskEstimate = `
+  const taskEstimateFirst = `
   あなたはタスク管理AI(ぷらとん)です。
   次のユーザの入力から達成すべきタスクを読み取り、
   そこから推測できることを以下のJSON形式で必ず出力してください。
   また、タスクの内容が抽象的過ぎて具体的なタスクに落とし込めない場合は、
   messageにその旨を伝え、他の項目はnullまたは空配列で出力してください。
+
+  ユーザー: "${input}"
 
 {
   "message": "ユーザへの返信",
@@ -74,75 +74,40 @@ export default function AIChat() {
   "start_date": "YYYY-MM-DD(タスク開始日)",
   "end_date": "YYYY-MM-DD(締切日)"
 }
-
-JSON以外の文章は絶対に出力しない。
-
-
-
-
-
-
-ユーザー: "${input}"`.trim();
-
-
-/*
-const promptGroup = [general, startTask];
-`
-あなたはタスク管理の専門家で、タスクを作成したいユーザと対話しながら必要要項を聞き出し、記録してください。
-ユーザーと対話しながら、JSON形式のみで出力してください。
-
-これまでの対話記録:"${dialogue}"
-ユーザ: "${text}"
-アシスタント: "message"
-
-以下の形式で出力してください（説明文やマークダウンは不要、JSONのみ）:
-{
-  "message": "ユーザーに対する返答",
-  "taskName": "タスクの内容",
-  "subTasks": ["サブタスク1", "サブタスク2", "サブタスク3"],
-  "importance": 1~5のint型整数,
-  "estimated_time": int型整数,
-  "Concrete": true or false,
-  "reason": "Concreteとestimated_timeの判定理由（任意）"
-}
-
-ルール:
-1. message: "message"にあてはまるユーザへの返答を簡潔に記載する
-2. taskName: 入力されたタスクの内容を簡潔にまとめる(なるべく10文字以内)
-3. subTasks: そのタスクを達成するために必要な具体的なステップを3〜7個程度の配列にする。ただし、サブタスクが必要かどうか聞く
-4. impotance: 1を最もどうでもいい、5を最重要として、そのタスクがユーザにとってどれくらい重要であるか判断する
-5. estimated_time:そのタスクを達成するまでに累計何分かかるかを推定する
-6. 
-
-例1:
-入力: "英検2級に合格する"
+  例:
+  ユーザー: "おれは英検2級に合格するんだ!"
 出力:
 {
+
   "taskName": "英検2級合格",
   "subTasks": ["リスニング対策", "リーディング対策", "ライティング対策", "過去問演習", "模擬試験受験"],
   "importance": 4,
   "estimated_time": 15000,
-  "Concrete": true,
-  "reason": "concrete:具体的な目標があり、明確なステップに分解可能,estimated_time: 一般に英検2級に合格するには200~300時間必要と言われているため"
+  "start_date": "2026-01-16",
+  "end_date": "2026-02-28"
 }
 
-例2（Concrete=false）:
-入力: "勉強する"
-出力:
-{
-  "taskName": "勉強",
-  "subTasks": [],
-  "importance": null,
-  "estimated_time":null,
-  "Concrete": false,
-  "reason": "concrete:何を勉強するのか不明確。具体的な科目や目標を指定してください"
-}
-`
-*/
+JSON以外の文章は絶対に出力しない。
 
+`.trim();
+  const taskEstimate = "";
+
+
+
+const promptGroup = [taskEstimateFirst,taskEstimate];
+
+
+  const clearHistory = () => {
+    setWithAI(false);
+    setWithState(0);
+    // 履歴をクリア
+    localStorage.removeItem(CHAT_HISTORY_KEY);
+    setMessages([]);
+  };
 
   const setMessage = (msg) => {
     clearHistory();
+    setWithAI(true);
     const aiMsg = { role: "model", content: msg };
     setMessages(m => [...m, aiMsg]);
   }
@@ -169,6 +134,29 @@ const promptGroup = [general, startTask];
       setLoading(false);
     }
   };
+
+  const estimate = async (prompt) => {
+  if (!input.trim()) return;
+  const userMsg = { role: "user", content: input };
+  setMessages([...messages, userMsg]);
+  setInput("");
+  setLoading(true);
+
+  try {
+    /*const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });*/
+
+
+    const result = await askQwen(prompt);
+    console.log(prompt);
+
+    const aiMsg = { role: "model", content: result };
+    setMessages(m => [...m, aiMsg]);
+  } catch (err) {
+    setMessages(m => [...m, { role: "model", content: "すいません、エラーです" }]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Container fluid className="my-4">
@@ -242,7 +230,7 @@ const promptGroup = [general, startTask];
               
               <Button
                 color="primary"
-                onClick={() => sendMessage(general)}
+                onClick={() => withAI ? estimate(promptGroup[withState]) : sendMessage(general)}
                 disabled={loading}
               >
                 送信
