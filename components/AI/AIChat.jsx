@@ -246,6 +246,9 @@ const saveTask = async () => {
   setEstimated("");
   setStartDate("");
   setEndDate("");
+  setWithAI(false);
+  setWithState(0);
+  alert("タスクを保存しました！");
   return data;
 }
 
@@ -333,9 +336,9 @@ const onTaskCreated = () => {
             <Button color="danger" className="px-3 py-1 mb-1 mx-2 rounded-full!" onClick={clearHistory}>
               履歴をクリア
             </Button>
-            <Button color="success" className="px-3 py-1 mb-1 mx-2 rounded-full!" onClick={saveTask}>
+            {withState==1&&(<Button color="success" className="px-3 py-1 mb-1 mx-2 rounded-full!" onClick={saveTask}>
               この内容でタスクを作成
-            </Button>
+            </Button>)}
             <InputGroup className="mt-1">
               <Input
                 placeholder={withState === 0 ? "AIになんでも相談！" : "タスク内容を修正してみましょう！"}
