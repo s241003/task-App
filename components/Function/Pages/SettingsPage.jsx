@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import './SettingsPage.css';
 import '../../../src/App.css';
 import { formatDate, formatDateDisplay } from '../../../src/App';
-function ThemeToggle() {
+function SettingsPage() {
   const [isDark, setIsDark] = useState(false);
 
   return (
