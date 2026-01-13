@@ -1,1 +1,25 @@
+.lightModeButton {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    color: black;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;    /*マウスを乗せたとき手の形になる */
+}
+  
+.lightModeButton:hover {
+  background-color: #030303;
+}
 
+.darkModeButton {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    color: black;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;    /*マウスを乗せたとき手の形になる */
+}
+  
+.darkModeButton:hover {
+  background-color: #030303;
+}
