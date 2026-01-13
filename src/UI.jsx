@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./App.css";
+import TaskPage from '../components/Function/Pages/SettingsPage';
 
 function App() {
   // 現在選択中のタブ（初期値：カレンダー）
