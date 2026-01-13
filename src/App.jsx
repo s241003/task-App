@@ -107,6 +107,7 @@ const App = () => {
           <Route path="/addTask" element={<AITaskColl onTaskCreated={handleAddTaskFromAI} />} />
           <Route path="/aichat" element={<AIChat />} />
           <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
+          <Route path="/setting" element={<SettingsPage tasks={tasks} setTasks={setTasks} />} />
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
         {(!isNotFound) ? <NavigationBar />: null}
