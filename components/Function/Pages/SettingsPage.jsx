@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import './SettingsPage.css';
+import '../../../src/App.css';
+import { formatDate, formatDateDisplay } from '../../../src/App';
 function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
 
