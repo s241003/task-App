@@ -12,21 +12,19 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
   const [expandedTasks, setExpandedTasks] = useState({});
   const [taskInput, setTaskInput] = useState('');
   const [isNavigating, setIsNavigating] = useState(false);
-  const { current, selected } = useParams();
+  const { current } = useParams();
   const navigate= useNavigate();
 
 
   useEffect(()=>{
     const [ curYear,curMonth, ] = current.split("-");
     setCurrentDate(new Date(parseInt(curYear), parseInt(curMonth) - 1, 1));
-    const [ selYear,selMonth,selDate ] = selected.split("-");
-    setSelectedDate(new Date(parseInt(selYear), parseInt(selMonth) - 1, parseInt(selDate)));
-  },[current,selected])
+  },[current])
 
   useEffect(()=>{
     if(isNavigating){setIsNavigating(false);return;}
-    navigate(`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}/${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`);
-  },[currentDate,selectedDate]);
+    navigate(`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`);
+  },[currentDate]);
 
   const selectedTasksRaw = expandedTasks[formatDate(selectedDate)] || [];
   let selectedTasks = selectedTasksRaw.map((t) => {

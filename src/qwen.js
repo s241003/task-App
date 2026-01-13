@@ -12,3 +12,27 @@ export default async function askQwen(prompt) {
   const data = await res.json();
   return data.response;
 }
+
+export async function askGroq(prompt) {
+  console.log("URL:", import.meta.env.VITE_GROQ_URL);
+  console.log("KEY:", import.meta.env.VITE_GROQ_API_KEY);
+  console.log("PROMPT:", prompt);
+
+  const res = await fetch(import.meta.env.VITE_GROQ_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        { role: "user", content: prompt }
+      ]
+    })
+  });
+
+  const data = await res.json();
+  console.log(data);
+  return data.choices?.[0]?.message?.content || "";
+}

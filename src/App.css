@@ -6,9 +6,7 @@ body {
   width:100%;
 }
 
-.app-containerCal{
 
-}
 .app-container {
   max-width: 100vw;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -16,6 +14,7 @@ body {
   width: 94vw;
   min-height:100vh;
   max-height: auto;
+  overflow: hidden;
   border-radius: 2rem;
   margin:3vh 3vw;
   position:relative;
@@ -86,10 +85,10 @@ h1, h2, h3 {
 
 
 /* Modal 関連 */
-
 .modalContent{
   width:100%;
   height:100%;
+  overflow-y: scroll;
 }
 .modalBtns{
   display:flex;
@@ -102,8 +101,10 @@ h1, h2, h3 {
   opacity: 0.9;
 }
 
-
-
 .overlay {
   background-color: rgba(0, 0, 0, 0.6);
+}
+
+.ReactModal__Body--open {
+  position: fixed;
 }

@@ -52,7 +52,7 @@ export const NotFound = ({ setIsNotFound }) =>{
   return(
     <div>
       <h1>404: NOT FOUND</h1>
-      <div>お探しのページは見つかりませんでした。<br/><Link to="/calendar">ホームへ</Link></div>
+      <div>お探しのページは見つかりませんでした。<br/><Link to="/">ホームへ</Link></div>
     </div>
   )
 };
@@ -233,12 +233,12 @@ const App = () => {
         <PopUp text={popUpText}  />
         <AITaskColl isOpen={isOpen} setIsOpen={setIsOpen}/>
         <Routes>
-          <Route path="/" element={<Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}/${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`} replace/>} />
-          <Route path="/calendar/:current/:selected" element={<CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} isOpen={isOpen} setIsOpen={setIsOpen} />} />
+          <Route path="/" element={<Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`} replace/>} />
+          <Route path="/calendar/:current" element={<CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} isOpen={isOpen} setIsOpen={setIsOpen} />} />
           <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClick={handleTaskClick} />} />
           <Route path="/addTask" element={<AITaskColl />} />
           <Route path="/taskdetail/:taskId" element={<TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} onUpdateTask={handleUpdateTask} setPopUpText={setPopUpText} />} />
-          <Route path="/aichat" element={<AIChat />} />
+          <Route path="/aichat" element={<AIChat setTasks={setTasks} />} />
           <Route path="/groupwork" element={<GroupWorkPage />} />
           <Route path="/settings" element={<Settings theme={theme} setTheme={setTheme}/>} />
           <Route path="/login" element={<Login />} />

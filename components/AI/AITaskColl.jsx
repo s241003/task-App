@@ -1,6 +1,6 @@
 import { DBname, onTaskCreated } from "../../src/App";
 import Modal from "react-modal";
-import askQwen from "../../src/qwen.js";
+import askQwen, { askGroq } from "../../src/qwen.js";
 import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -67,21 +67,6 @@ function AITaskColl({isOpen,setIsOpen}) {
     fetchScheduleData();
   }, []);
 
-  const fetchScheduleData = async () => {
-    try {
-      const { data, error } = await supabase
-        .from(DBname)
-        .select('*')
-        .order('start_date', { ascending: true });
-
-      if (error) throw error;
-      setSchedules(data);
-    } catch (error) {
-      console.error('fetchでエラーが発生しました', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const pressEsc = useCallback((event) => {
     if (event.keyCode === 27) {
@@ -177,7 +162,7 @@ function AITaskColl({isOpen,setIsOpen}) {
   "reason": "concrete:何を勉強するのか不明確。具体的な科目や目標を指定してください"
 }
 `.trim();
-      const rawResponse = await askQwen(prompt);
+      const rawResponse = await askGroq(prompt);
       const response = JSON.parse(rawResponse);
       console.log(response);
       console.log(response.taskName);
@@ -224,6 +209,21 @@ function AITaskColl({isOpen,setIsOpen}) {
     }
   };
 
+  const fetchScheduleData = async () => {
+  try {
+    const { data, error } = await supabase
+      .from(DBname)
+      .select('*')
+      .order('start_date', { ascending: true });
+
+    if (error) throw error;
+    setSchedules(data);
+  } catch (error) {
+    console.error('fetchでエラーが発生しました', error);
+  } finally {
+    setIsLoading(false);
+  }
+  };
 
   {/* タスク送信処理 */}
   const handleSubmit = async (e) => {
