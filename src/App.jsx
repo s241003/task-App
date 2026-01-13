@@ -8,6 +8,7 @@ import NavigationBar from '../components/Function/NavigationBar';
 import CalendarPage from '../components/Function/Pages/CalendarPage';
 import AIChat from '../components/AI/AIChat';
 import TaskPage from '../components/Function/Pages/TaskPage';
+import SettingsPage from '../components/Function/Pages/SettingsPage';
 
 export const formatDate = (date) => {
   const year = date.getFullYear();
@@ -106,6 +107,7 @@ const App = () => {
           <Route path="/addTask" element={<AITaskColl onTaskCreated={handleAddTaskFromAI} />} />
           <Route path="/aichat" element={<AIChat />} />
           <Route path="/groupwork" element={<CalendarPage tasks={tasks} setTasks={setTasks} />} />
+          <Route path="/setting" element={<SettingPage />} />
           <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
         </Routes>
         {(!isNotFound) ? <NavigationBar />: null}

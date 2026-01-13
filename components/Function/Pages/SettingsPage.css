@@ -1,0 +1,41 @@
+.lightModeButton {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    color: black;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;    /*マウスを乗せたとき手の形になる */
+}
+  
+.lightModeButton:hover {
+  background-color: #030303;
+}
+
+.darkModeButton {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    color: black;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;    /*マウスを乗せたとき手の形になる */
+}
+  
+.darkModeButton:hover {
+  background-color: #030303;
+}
+
+.app-container.light {
+  background-color: #ffffff;
+  color: #111;
+}
+
+.app-container.dark {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+.theme-buttons {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+}

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./App.css";
+import TaskPage from '../components/Function/Pages/SettingsPage';
 
 function App() {
   // 現在選択中のタブ（初期値：カレンダー）
@@ -23,7 +24,7 @@ function App() {
         {activeTab === "groupwork" && <h1>👥 グループワーク画面</h1>}
         {activeTab === "task" && <h1>✅ タスク画面</h1>}
         {activeTab === "chat" && <h1>💬 チャット画面</h1>}
-        {activeTab === "setting" && <h1>⚙️ 設定画面</h1>}
+        {activeTab === "setting" && <h1>⚙️ 設定画面</h1>} 
       </div>
 
       {/* ===== 下部ナビゲーションバー ===== */}
