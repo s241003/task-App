@@ -24,8 +24,7 @@ function App() {
         {activeTab === "groupwork" && <h1>👥 グループワーク画面</h1>}
         {activeTab === "task" && <h1>✅ タスク画面</h1>}
         {activeTab === "chat" && <h1>💬 チャット画面</h1>}
-        /* {activeTab === "setting" && <h1>⚙️ 設定画面</h1>} */
-        {activeTab === "setting" && <ThemeToggle>}
+        {activeTab === "setting" && <h1>⚙️ 設定画面</h1>} 
       </div>
 
       {/* ===== 下部ナビゲーションバー ===== */}
