@@ -1,5 +1,6 @@
 import { DBname, onTaskCreated } from "../../src/App";
 import Modal from "react-modal";
+import askQwen from "../../src/qwen.js";
 import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -12,23 +13,6 @@ export const supabase = createClient(
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import '../../src/dateInput.css';
-
-
-export async function askQwen(prompt) {
-  const QwenURL = "http://localhost:11434/api/generate";
-  const res = await fetch(QwenURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "qwen2.5:7b",
-      prompt: prompt,
-      stream: false
-    })
-  });
-
-  const data = await res.json();
-  return data.response;
-}
 
 {/* supabase保存 */}
 async function saveTaskToSupabase(taskData) {

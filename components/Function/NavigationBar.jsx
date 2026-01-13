@@ -73,9 +73,10 @@ function NavigationBar({ onPageChange,selectedDate, currentDate, isOpen, setIsOp
             flex: 1;
             text-align: center;
             background: none;
-            font-size: 2.2vh;
+            font-size: 2vh;
+            white-space: nowrap;
             color: #59606f;
-            font-weight: 500;
+            font-weight: 600;
             height: 100%;
             cursor: pointer;
             transition: all 0.2s;
