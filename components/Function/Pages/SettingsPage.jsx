@@ -1,24 +1,30 @@
-function lightMode() {
-  const lightClick = () => {
-    alert("押されました！");
-  };
+import { useState } from "react";
+
+function ThemeToggle() {
+  const [isDark, setIsDark] = useState(false);
 
   return (
-    <button className="lightModeButton" onClick={lightClick}>
-      ライトモード
-    </button>
+    <div className={isDark ? "app dark" : "app light"}>
+      <div className="buttons">
+        <button
+          className="darkModeButton"
+          onClick={() => setIsDark(true)}
+        >
+          ダークモード
+        </button>
+
+        <button
+          className="lightModeButton"
+          onClick={() => setIsDark(false)}
+        >
+          ライトモード
+        </button>
+      </div>
+
+      <p>これはテキストです</p>
+    </div>
   );
 }
 
-function darkMode() {
-  const darkClick = () => {
-    alert("押されました！");
-  };
-
-  return (
-    <button className="darkModeButton" onClick={darkClick}>
-      ダークモード
-    </button>
-  );
-}
+export default ThemeToggle;
 
