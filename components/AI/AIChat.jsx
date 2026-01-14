@@ -86,7 +86,10 @@ export default function AIChat({setTasks,setPopUpText}) {
 
 制約:
 - JSON以外の文章は一切出力しない。
-- start_date は必ず「2026-01-13」にする。
+- start_date はタスクの取り組み開始日。ユーザから指定がない限りは「${new Date().getFullYear}-${new Date().getMonth +1}-${new Date().getDate}」にする。
+- end_date はタスクの締切日。ユーザから指定がない限りは妥当な日付を推測する。
+- subTasks はタスクを達成するために必要なステップを3〜7個生成する。
+- estimated_time はタスク名からそのタスクを始めてから完了するまでにかかる妥当な分数を推測する。
 - end_date はタスク内容から妥当な日付を推測する。
 - subTasks は必要な場合のみ3〜7個生成する。
 - estimated_time はタスク名からそのタスクを始めてから完了するまでにかかる妥当な分数を推測する。

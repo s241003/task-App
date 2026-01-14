@@ -151,7 +151,6 @@ const App = () => {
         })
           setTasks(loadedTasks)
           localStorage.setItem('tasks', JSON.stringify(loadedTasks))
-          console.log({tasks});
         } catch (err) {
           console.warn('Supabase読み込み失敗:', err.message)
         }

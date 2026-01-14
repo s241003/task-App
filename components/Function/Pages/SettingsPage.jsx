@@ -1,10 +1,13 @@
-import React,{ useContext } from 'react';
+import React,{ useState,useContext } from 'react';
 import { useAuth } from '../AuthProvider';
-import {  Button,  TextField,  Container,  Paper,  Box,  Typography,  Stack,  Alert,} from "@mui/material";
+import {  Button,  TextField,  Container,  Paper,  Box,  Typography,  Stack,  Alert,Switch,} from "@mui/material";
 import { signOut } from './LoginPage';
 
 function Settings({ theme,setTheme }) {
     const { user } = useAuth();
+    const [name, setName] = useState("");
+    const [needSub, setNeedSub] = useState(false);
+
 
   return (
     <div className="page-content">
@@ -15,9 +18,22 @@ function Settings({ theme,setTheme }) {
 
       <div>
         <Typography variant="h5" fontWeight="bold" textAlign="center" mt={3}>ユーザー情報</Typography>
-           <Typography variant="h6" textAlign="center" m={2}>{user ? `ログイン中: ${user?.email}`:"ログインしていません。" }</Typography>
-        <Typography variant="h6" textAlign="center" m={2}>{user ? `ユーザID: ${user?.id}`:"ログインしていません。" }</Typography>
-        
+           <Typography variant="h6" textAlign="center" m={1}>{user ? `ログイン中: ${user?.email}`:"ログインしていません。" }</Typography>
+        <Typography variant="h6" textAlign="center" m={1}>{user ? `ユーザID: ${user?.id}`:"ログインしていません。" }</Typography>
+
+        <Typography variant="h5" fontWeight="bold" textAlign="center" my={3}>カスタマイズ</Typography>
+        <TextField
+          label="あなたの名前"
+          type="text"
+          fullWidth
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+         <Switch
+          label="need"
+          value={needSub}
+          onChange={(e) => setNeedSub(e.target.value)}
+        />
 
 
 

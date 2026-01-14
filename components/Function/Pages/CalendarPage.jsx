@@ -3,8 +3,8 @@ import '../../../src/App.css';
 import "./CalendarPage.css";
 import AITaskColl from "../../AI/AITaskColl";
 import { formatDate ,parseDate ,formatDateDisplay } from '../../../src/App';
-import { Button } from "reactstrap";
 import { useParams, useNavigate } from "react-router-dom";
+import { Modal,Typography,Button,Box } from "@mui/material";
 
 
 function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDate, setSelectedDate, onTaskClick, isOpen, setIsOpen }) {
@@ -12,9 +12,10 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
   const [expandedTasks, setExpandedTasks] = useState({});
   const [taskInput, setTaskInput] = useState('');
   const [isNavigating, setIsNavigating] = useState(false);
+  const [open, setOpen] = useState(Object.keys(tasks).length === 0);
   const { current } = useParams();
   const navigate= useNavigate();
-
+  
 
   useEffect(()=>{
     const [ curYear,curMonth, ] = current.split("-");
@@ -301,6 +302,36 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
 
   return (
     <div>
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 350,
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h6">タスクが１個もありません</Typography>
+
+          <Typography sx={{ mt: 2 }}>
+            いますぐAIとタスクを設定しに行きましょう！
+          </Typography>
+
+          <Button
+            variant="contained"
+            sx={{ mt: 3 }}
+            onClick={() => navigate("/aichat")}
+          >
+            AIとタスクを作る
+          </Button>
+        </Box>
+      </Modal>
       <div className="calendarContainer">
         <div className="calendarHeader">
           <div className=" header">

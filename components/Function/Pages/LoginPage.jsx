@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { supabase } from "../../AI/AITaskColl";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   TextField,
@@ -9,6 +10,7 @@ import {
   Typography,
   Stack,
   Alert,
+  Modal,
 } from "@mui/material";
 
 // 認証関数
@@ -71,15 +73,18 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSignUp = async () => {
     const user = await signUp(email, password);
-    setMessage(user ? "サインアップ成功！" : "サインアップ失敗");
+    setMessage(user ? "サインアップ成功！\nメールから承認してください！" : "サインアップ失敗");
   };
 
   const handleSignIn = async () => {
     const user = await signIn(email, password);
     setMessage(user ? "ログイン成功！" : "ログイン失敗");
+    setTimeout(() => navigate("/"), 1000);
+    
   };
 
   const handleGoogleLogin = async () => {
@@ -88,6 +93,8 @@ export default function Login() {
 
   return (
     <Container maxWidth="sm" sx={{ mt: 8 }}>
+
+
       <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
         <Typography variant="h5" fontWeight="bold" textAlign="center" mb={3}>
           ログイン

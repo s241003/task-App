@@ -6,17 +6,6 @@ import './index.css';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import {AuthProvider} from '../components/Function/AuthProvider.jsx';
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#1976d2",
-    },
-    grey: {
-      200: "#eeeeee",
-    },
-  },
-});
-
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
