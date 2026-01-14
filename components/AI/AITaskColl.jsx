@@ -7,34 +7,11 @@ export const supabase = createClient(
   import.meta.env.VITE_SUPABASE_API_KEY
 );
 
-  // import.meta.env.SUPABASE_URL
-  // import.meta.env.SUPABASE_API_KEY
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import '../../src/dateInput.css';
+import { useAuth } from "../Function/AuthProvider";
 
-{/* supabase保存 */}
-async function saveTaskToSupabase(taskData) {
-  const { data, error } = await supabase
-    .from(DBname)
-    .insert([
-      {
-        task_name: taskData.tas,
-        sub_tasks: taskData.sub,
-        importance: taskData.imp,
-        estimated_time: taskData.est,
-        start_date: taskData.sta,
-        end_date: taskData.end,
-      },
-    ]);
-
-  if (error) {
-    console.error('保存失敗:', error);
-    throw error;
-  }
-  return data;
-}
 
 function AITaskColl({isOpen,setIsOpen}) {
 
@@ -62,6 +39,7 @@ function AITaskColl({isOpen,setIsOpen}) {
   const [isHidden, setIsHidden] = useState(false);
 
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchScheduleData();
@@ -78,9 +56,6 @@ function AITaskColl({isOpen,setIsOpen}) {
     setEstimated(`${hours*60+parseInt(minutes)}`);
   },[minutes,hours]);
 
-  useEffect(()=>{
-    console.log(estimated+"分");
-  },[estimated]);
 
   useEffect(() => {
     document.addEventListener("keydown", pressEsc, false);
@@ -207,6 +182,30 @@ function AITaskColl({isOpen,setIsOpen}) {
     } finally {
       setIsLoadAI(false);
     }
+  };
+
+  {/* supabase保存 */}
+  const saveTaskToSupabase = async (taskData) => {
+
+    const { data, error } = await supabase
+      .from(DBname)
+      .insert([
+        {
+          task_name: taskData.tas,
+          sub_tasks: taskData.sub,
+          importance: taskData.imp,
+          estimated_time: taskData.est,
+          start_date: taskData.sta,
+          end_date: taskData.end,
+          userid: user?.id,
+        },
+      ]);
+
+    if (error) {
+      console.error('保存失敗:', error);
+      throw error;
+    }
+    return data;
   };
 
   const fetchScheduleData = async () => {

@@ -1,12 +1,28 @@
+import React,{ useContext } from 'react';
+import { useAuth } from '../AuthProvider';
+import {  Button,  TextField,  Container,  Paper,  Box,  Typography,  Stack,  Alert,} from "@mui/material";
+import { signOut } from './LoginPage';
+
 function Settings({ theme,setTheme }) {
+    const { user } = useAuth();
+
   return (
     <div className="page-content">
-      <h1>設定</h1>
+      <Typography variant="h4" fontWeight="bold" textAlign="center">アカウント設定</Typography>
+      <Button variant="outlined" color="error" onClick={() => {signOut()}}>
+        ログアウト
+      </Button>
 
       <div>
+        <Typography variant="h5" fontWeight="bold" textAlign="center" mt={3}>ユーザー情報</Typography>
+           <Typography variant="h6" textAlign="center" m={2}>{user ? `ログイン中: ${user?.email}`:"ログインしていません。" }</Typography>
+        <Typography variant="h6" textAlign="center" m={2}>{user ? `ユーザID: ${user?.id}`:"ログインしていません。" }</Typography>
+        
+
+
 
         {/* 🌙 テーマ設定 */}
-        <div className="setting-item">
+        {/*<div className="setting-item">
           <h3>テーマ設定</h3>
           <p>現在のテーマ: {theme === 'light' ? '🌞 ライトモード' : '🌙 ダークモード'}</p>
           <button className="theme-toggle-btn" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
@@ -14,14 +30,13 @@ function Settings({ theme,setTheme }) {
           </button>
         </div>
 
-        {/* ℹ️ アプリ情報 */}
+
         <div className="setting-item">
           <h3>アプリケーション情報</h3>
           <p>バージョン: 1.0.0</p>
           <p>React + Vite で構築されたカレンダーアプリ</p>
         </div>
 
-        {/* 🔧 今後の機能 */}
         <div className="setting-item">
           <h3>今後追加予定の設定:</h3>
           <ul>
@@ -31,6 +46,7 @@ function Settings({ theme,setTheme }) {
             <li>データのエクスポート・インポート</li>
           </ul>
         </div>
+        */}
       </div>
     </div>
   )

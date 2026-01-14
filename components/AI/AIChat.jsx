@@ -5,7 +5,6 @@ import {
   Container, Card, CardHeader, CardBody,
   ListGroup, ListGroupItem, Input, Button, InputGroup, Spinner
 } from "reactstrap";
-import { createClient } from '@supabase/supabase-js';
 import { supabase } from "./AITaskColl";
 import { DBname } from "../../src/App.jsx"
 import { useNavigate } from "react-router-dom";
@@ -41,11 +40,6 @@ export default function AIChat({setTasks,setPopUpText}) {
   useEffect(() => {
     localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
   }, [messages]);
-
-
-  useEffect(()=>{
-  console.log("withAI changed:", withAI);
-  },[withAI])
 
   //プロンプト群
   const general =`

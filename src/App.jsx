@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import React, { useState, useEffect,useContext, use } from 'react';
 import AITaskColl, { supabase } from "../components/AI/AITaskColl";
 import { Router, Route, Routes, Link, Navigate, useNavigate } from "react-router-dom";
 import './App.css';
@@ -12,6 +11,7 @@ import TaskDetailPage from '../components/Function/Pages/TaskDetailPage';
 import GroupWorkPage from "../components/Function/Pages/GroupWorkPage";
 import Settings from "../components/Function/Pages/SettingsPage"
 import Login from "../components/Function/Pages/LoginPage"
+import { useAuth ,ProtectedRoute } from '../components/Function/AuthProvider.jsx';
 
 
 export const formatDate = (date) => {
@@ -80,6 +80,7 @@ export const DBname = "tasks";
 
 {/* タスク追加関数 */}
 export const onTaskCreated = (data) => {
+
   // AITaskColl から送信されたデータを使用 (data.sta を日付キーとして使用)
   const targetKey = data.sta;
   if (!targetKey) return;  // 日付が設定されていない場合は処理しない
@@ -94,6 +95,7 @@ export const onTaskCreated = (data) => {
         imp: parseInt(data.imp),
         sta: data.sta,
         end: data.end,
+        userid: data.userid,
       };
       newTasks[targetKey].push(newTask);
       localStorage.setItem('tasks', JSON.stringify({ ...prevTasks, [targetKey]: [...(prevTasks[targetKey] || []), newTask] }));
@@ -114,6 +116,9 @@ const App = () => {
   const [isNotFound, setIsNotFound] = useState(false);
   const [isOpen ,setIsOpen] = useState(false);
   const [popUpText ,setPopUpText ] = useState(``);
+  const { user } = useAuth();
+
+
 
   {/* _init_ supabase読み込み */}
   useEffect(() => {
@@ -126,7 +131,7 @@ const App = () => {
 
         if (error) throw error
         const loadedTasks = {}
-        data.forEach((row) => {
+        data.map((row) => {
           const task = {
             task: row.task_name,
             sub: row.sub_tasks,
@@ -137,7 +142,9 @@ const App = () => {
             end: row.end_date,
             state: row.state,
             id: row.id,
+            userid: row.userid,
           }
+          if (task.userid != user?.id) return; // ユーザーIDが一致しない場合はスキップ
           const key = formatDate(new Date(task.sta))
           if (!loadedTasks[key]) loadedTasks[key] = []
           loadedTasks[key].push(task)
@@ -150,7 +157,8 @@ const App = () => {
         }
       }
       fetchTasks()
-  }, [])
+  }, [user])
+
 
   const navigate = useNavigate();
 
@@ -229,22 +237,21 @@ const App = () => {
 
     // ルーティング
     <div className="flex flex-col gap-5">
-      <div className="app-container">
-        <PopUp text={popUpText}  />
-        <AITaskColl isOpen={isOpen} setIsOpen={setIsOpen}/>
-        <Routes>
-          <Route path="/" element={<Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`} replace/>} />
-          <Route path="/calendar/:current" element={<CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} isOpen={isOpen} setIsOpen={setIsOpen} />} />
-          <Route path="/tasks" element={<TaskPage tasks={tasks} onTaskClick={handleTaskClick} />} />
-          <Route path="/addTask" element={<AITaskColl />} />
-          <Route path="/taskdetail/:taskId" element={<TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} onUpdateTask={handleUpdateTask} setPopUpText={setPopUpText} />} />
-          <Route path="/aichat" element={<AIChat setTasks={setTasks} setPopUpText={setPopUpText} />} />
-          <Route path="/groupwork" element={<GroupWorkPage />} />
-          <Route path="/settings" element={<Settings theme={theme} setTheme={setTheme}/>} />
-          <Route path="/login" element={<Login />} />
-          <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
-        </Routes>
-      </div>
+        <div className="app-container">
+          <PopUp text={popUpText}  />
+          <AITaskColl isOpen={isOpen} setIsOpen={setIsOpen}/>
+          <Routes>
+            <Route path="/" element={<ProtectedRoute><Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`} replace/></ProtectedRoute>} />
+            <Route path="/calendar/:current" element={<ProtectedRoute><CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} isOpen={isOpen} setIsOpen={setIsOpen} /></ProtectedRoute>} />
+            <Route path="/tasks" element={<ProtectedRoute><TaskPage tasks={tasks} onTaskClick={handleTaskClick} /></ProtectedRoute>} />
+            <Route path="/taskdetail/:taskId" element={<ProtectedRoute><TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} onUpdateTask={handleUpdateTask} setPopUpText={setPopUpText} /></ProtectedRoute>} />
+            <Route path="/aichat" element={<ProtectedRoute><AIChat setTasks={setTasks} setPopUpText={setPopUpText} /></ProtectedRoute>} />
+            <Route path="/groupwork" element={<GroupWorkPage />} />
+            <Route path="/settings" element={<ProtectedRoute><Settings theme={theme} setTheme={setTheme}/></ProtectedRoute>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
+          </Routes>
+        </div>
         {(!isNotFound) ? <NavigationBar selectedDate={selectedDate} currentDate={currentDate} isOpen={isOpen} setIsOpen={setIsOpen}/>: null}
     </div>
   );
