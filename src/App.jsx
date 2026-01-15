@@ -43,17 +43,17 @@ const App = () => {
  // -----------------------------------------------------------------------------------------------
   // モードの状態を App で管理する
   const [isDark, setIsDark] = useState(false);
-  // return (
-  //   // クラス名を isDark に応じて切り替える
-  //   <div className={`app-container ${isDark ? 'dark' : 'light'}`}>
-  //     <Routes>
-  //       {/* ... 他のルート ... */}
-  //       {/* SettingsPage に isDark と setIsDark を渡す */}
-  //       <Route path="/setting" element={<SettingsPage isDark={isDark} setIsDark={setIsDark} />} />
-  //     </Routes>
-  //     <NavigationBar />
-  //   </div>
-  // );
+  return (
+    // クラス名を isDark に応じて切り替える
+    <div className={`app-container ${isDark ? 'dark' : 'light'}`}>
+      <Routes>
+        {/* ... 他のルート ... */}
+        {/* SettingsPage に isDark と setIsDark を渡す */}
+        <Route path="/setting" element={<SettingsPage isDark={isDark} setIsDark={setIsDark} />} />
+      </Routes>
+      <NavigationBar />
+    </div>
+  );
 };
 //-------------------------------------------------------------------------------------------------------
   const [tasks, setTasks] = useState(() => {
@@ -128,21 +128,6 @@ const App = () => {
         </Routes>
         {(!isNotFound) ? <NavigationBar />: null}
     </div>
-     // -----------------------------------------------------------------------------------------------
-  // モードの状態を App で管理する
-  return (
-    // クラス名を isDark に応じて切り替える
-    <div className={`app-container ${isDark ? 'dark' : 'light'}`}>
-      <Routes>
-        {/* ... 他のルート ... */}
-        {/* SettingsPage に isDark と setIsDark を渡す */}
-        <Route path="/setting" element={<SettingsPage isDark={isDark} setIsDark={setIsDark} />} />
-      </Routes>
-      <NavigationBar />
-    </div>
-  );
-};
-//-------------------------------------------------------------------------------------------------------
   );
 
 };
