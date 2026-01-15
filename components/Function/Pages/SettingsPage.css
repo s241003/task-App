@@ -1,6 +1,6 @@
 .lightModeButton {
     padding: 10px 20px;
-    background-color: #030303;
+    background-color: #aaaaaa;
     color: black;
     border-radius: 8px;
     font-size: 16px;
@@ -13,7 +13,7 @@
 
 .darkModeButton {
     padding: 10px 20px;
-    background-color: #ffffff;
+    background-color: #aaaaaa;
     color: black;
     border-radius: 8px;
     font-size: 16px;
