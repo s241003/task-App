@@ -343,7 +343,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
           }</h3>
           <div className="time-display">{formatTime(elapsedTime)}</div>
           <div className="stopwatch-buttons">
-          <ButtonGroup variant="contained" aria-label="outlined primary button group">
+          <ButtonGroup variant="contained" aria-label="outlined primary button group" style={{whiteSpace:"nowrap"}}>
             <Button onClick={() => setIsRunning(true)} disabled={isRunning}>▶開始</Button>
             <Button onClick={() => setIsRunning(false)} disabled={!isRunning}>⏸停止</Button>
             <Button onClick={() => setElapsedTime(0)}>⏹リセット</Button>
