@@ -14,23 +14,41 @@ export default async function askQwen(prompt) {
 }
 
 export async function askGroq(prompt) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000); // 15秒で強制終了
 
+  try {
+    const res = await fetch(import.meta.env.VITE_GROQ_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 512, // 長文で落ちるのを防ぐ
+        stream: false     // ストリーミングは不安定なのでオフ
+      }),
+      signal: controller.signal
+    });
 
-  const res = await fetch(import.meta.env.VITE_GROQ_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: "llama-3.1-8b-instant",
-      messages: [
-        { role: "user", content: prompt }
-      ]
-    })
-  });
+    clearTimeout(timeout);
 
-  const data = await res.json();
-  console.log(data);
-  return data.choices?.[0]?.message?.content || "";
+    // HTTPエラーを拾う
+    if (!res.ok) {
+      console.error("Groq HTTP error:", res.status, await res.text());
+      return "";
+    }
+
+    const data = await res.json();
+    console.log("Groq response:", data);
+
+    return data.choices?.[0]?.message?.content || "";
+
+  } catch (err) {
+    clearTimeout(timeout);
+    console.error("Groq request failed:", err);
+    return "";
+  }
 }

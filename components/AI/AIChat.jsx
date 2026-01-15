@@ -16,8 +16,9 @@ const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
 
 export default function AIChat({setTasks,setPopUpText}) {
   const CHAT_HISTORY_KEY = "chatHistory";
+  const CHAT_STATE = "chatState";
+  const CHAT_WITH="chatWithAI";
   const [messages, setMessages] = useState(() => {
-    // 初期化時にlocalStorageから履歴を読み込む
     const savedMessages = localStorage.getItem(CHAT_HISTORY_KEY);
     return savedMessages ? JSON.parse(savedMessages) : [];
   });
@@ -32,14 +33,31 @@ export default function AIChat({setTasks,setPopUpText}) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const [withAI, setWithAI] = useState(false);
-  const [withState, setWithState] = useState(0);
+  const [withAI, setWithAI] = useState(() => {
+    const savedWith = localStorage.getItem(CHAT_WITH);
+    return savedWith ? JSON.parse(savedWith) : false;
+  });
+  const [withState, setWithState] = useState(() => {
+    const savedState = localStorage.getItem(CHAT_STATE);
+    return savedState ? JSON.parse(savedState) : 0;
+  });
+  const aDay =new Date();
+  const today = `${aDay.getFullYear()}-${aDay.getMonth()+1}-${aDay.getDate()}`;
 
   const navigate=useNavigate();
 
   useEffect(() => {
     localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
   }, [messages]);
+
+  useEffect(() => {
+    localStorage.setItem(CHAT_STATE, JSON.stringify(withState));
+  }, [withState]);
+
+  useEffect(()=>{
+    localStorage.setItem(CHAT_WITH, JSON.stringify(withAI));
+  },[withAI]);
+
 
   //プロンプト群
   const general =`
@@ -72,6 +90,18 @@ export default function AIChat({setTasks,setPopUpText}) {
   const taskEstimateFirst = `あなたはタスク管理AI「ぷらとん」です。
 ユーザーの入力から達成すべきタスクを読み取り、
 必要な情報を推測して、次のJSON形式で必ず出力してください。
+また、制約を遵守してください。
+
+
+制約:
+- JSON以外の文章は一切出力しない。
+- start_date はタスクの取り組み開始日。ユーザから指定がない限りは「${today}」にする。
+- end_date はタスクの締切日。ユーザから指定がない限りは妥当な日付を推測する。
+- subTasks はタスクを達成するために必要なステップを3〜7個生成する。
+- estimated_time はタスク名からそのタスクを始めてから完了するまでにかかる妥当な分数を推測する。
+- end_date はタスク内容から妥当な日付を推測する。
+- subTasks は必要な場合のみ3〜7個生成する。
+- estimated_time はタスク名からそのタスクを始めてから完了するまでにかかる妥当な分数を推測する。
 
 出力形式（型定義）:
 {
@@ -84,15 +114,7 @@ export default function AIChat({setTasks,setPopUpText}) {
   "end_date": string                     // YYYY-MM-DD
 }
 
-制約:
-- JSON以外の文章は一切出力しない。
-- start_date はタスクの取り組み開始日。ユーザから指定がない限りは「${new Date().getFullYear}-${new Date().getMonth +1}-${new Date().getDate}」にする。
-- end_date はタスクの締切日。ユーザから指定がない限りは妥当な日付を推測する。
-- subTasks はタスクを達成するために必要なステップを3〜7個生成する。
-- estimated_time はタスク名からそのタスクを始めてから完了するまでにかかる妥当な分数を推測する。
-- end_date はタスク内容から妥当な日付を推測する。
-- subTasks は必要な場合のみ3〜7個生成する。
-- estimated_time はタスク名からそのタスクを始めてから完了するまでにかかる妥当な分数を推測する。
+
 
 ユーザー入力:
 ${input}
@@ -102,8 +124,29 @@ ${input}
   const taskEstimate = `
   あなたはタスク管理AI(ぷらとん)です。
   ユーザとあなたで考えている現在のタスク内容とこれまでの会話履歴を踏まえ、
-  ユーザーの追加情報をもとにタスク内容を修正して、
+  ユーザーとチャットをしながらタスク内容を修正して、
   出力形式に従った以下のJSON形式で必ず出力してください。
+  また、制約を遵守してください。
+
+    出力形式:
+{
+  "message": "ユーザの入力への返信メッセージ。具体的に",
+  "taskName": 10文字以内のタイトル,
+  "subTasks": ["必要なら3〜7個のステップ"],
+  "importance": 数値1〜5 (5が最重要),
+  "estimated_time": 数値（そのタスクを達成するまでにかかる見込み分数）,
+  "start_date": "YYYY-MM-DD",
+  "end_date": "YYYY-MM-DD"
+}
+
+制約:
+- JSON以外の文章は一切出力しない。
+- importance はタスクの重要度。1〜5の数値で出力する。
+- start_date はタスク開始日。
+- end_date は期日。
+- estimated_time はタスク名からそのタスクを始めてから完了するまでにかかる妥当な分数。
+- message はユーザーへの返信メッセージ。
+　タスクの修正があった場合は具体的な修正内容を含めること。
 
 現在のタスク内容:
 {
@@ -116,17 +159,7 @@ ${input}
   end_date: ${endDate}
 }
 
-  出力形式:
-{
-  "message": "ユーザへの返信メッセージ",
-  "taskName": 10文字以内のタイトル,
-  "subTasks": ["必要なら3〜7個のステップ"],
-  "importance": 数値1〜5 (5が最重要),
-  "estimated_time": 数値（そのタスクを達成するまでにかかる見込み分数）,
-  "start_date": "YYYY-MM-DD",
-  "end_date": "YYYY-MM-DD"
-}
-  ユーザー入力:
+ユーザー入力:
   ${input}
 これまでの会話履歴:
 ${messages!=[]?messages.map(m => `${m.role === "user" ? "ユーザ" : "アシスタント"}:${m.content}\n`).join("\n"):"なし"}

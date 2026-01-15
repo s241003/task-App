@@ -1,16 +1,17 @@
-import React,{ useState,useContext } from 'react';
+import React,{ useState,useEffect } from 'react';
 import { useAuth } from '../AuthProvider';
-import {  Button,  TextField,  Container,  Paper,  Box,  Typography,  Stack,  Alert,Switch,} from "@mui/material";
+import {  Button,  TextField,  Container,  Paper,  Box,  Typography,  Stack,  Alert,Switch,FormControlLabel } from "@mui/material";
 import { signOut } from './LoginPage';
 
 function Settings({ theme,setTheme }) {
     const { user } = useAuth();
     const [name, setName] = useState("");
-    const [needSub, setNeedSub] = useState(false);
+    const [allowSub, setAllowSub] = useState(false);
+    const [daysPerWork, setDaysPerWork] = useState("");
 
 
   return (
-    <div className="page-content">
+    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" fontWeight="bold" textAlign="center">アカウント設定</Typography>
       <Button variant="outlined" color="error" onClick={() => {signOut()}}>
         ログアウト
@@ -19,9 +20,9 @@ function Settings({ theme,setTheme }) {
       <div>
         <Typography variant="h5" fontWeight="bold" textAlign="center" mt={3}>ユーザー情報</Typography>
            <Typography variant="h6" textAlign="center" m={1}>{user ? `ログイン中: ${user?.email}`:"ログインしていません。" }</Typography>
-        <Typography variant="h6" textAlign="center" m={1}>{user ? `ユーザID: ${user?.id}`:"ログインしていません。" }</Typography>
 
         <Typography variant="h5" fontWeight="bold" textAlign="center" my={3}>カスタマイズ</Typography>
+
         <TextField
           label="あなたの名前"
           type="text"
@@ -29,10 +30,9 @@ function Settings({ theme,setTheme }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-         <Switch
-          label="need"
-          value={needSub}
-          onChange={(e) => setNeedSub(e.target.value)}
+         <FormControlLabel
+         control={<Switch value={allowSub} onChange={(e) => setAllowSub(!allowSub)} defaultChecked />}
+          label={`サブタスクを${allowSub ?'有':'無'}効にする`}
         />
 
 
@@ -64,7 +64,7 @@ function Settings({ theme,setTheme }) {
         </div>
         */}
       </div>
-    </div>
+    </Container>
   )
 }
 

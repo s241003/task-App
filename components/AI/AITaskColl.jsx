@@ -93,12 +93,12 @@ function AITaskColl({isOpen,setIsOpen}) {
 
 以下の形式で出力してください（説明文やマークダウンは不要、JSONのみ）:
 {
-  "taskName": "タスクの内容",
-  "subTasks": ["サブタスク1", "サブタスク2", "サブタスク3"],
-  "importance": 1~5のint型整数,
+  "taskName": string,
+  "subTasks": [stringの配列],
+  "importance": int型整数 (1〜5),
   "estimated_time": int型整数,
-  "Concrete": true or false,
-  "reason": "Concreteとestimated_timeの判定理由（任意）"
+  "Concrete": boolean,
+  "reason": string
 }
 
 ルール:
@@ -106,41 +106,19 @@ function AITaskColl({isOpen,setIsOpen}) {
 2. subTasks: そのタスクを達成するために必要な具体的なステップを3〜7個程度の配列にする
 3. impotance: 1を最もどうでもいい、5を最重要として、そのタスクがユーザにとってどれくらい重要であるか判断する
 4. estimated_time:そのタスクを達成するまでに累計何分かかるかを推定する
-5. Concrete: 
+5. Concrete:
+Concreteとestimated_timeの判定理由をかく。
    - True: 入力が具体的で、明確なサブタスクを生成できる場合
    - False: 入力が曖昧すぎて、適切なサブタスクを生成できない場合
-     （例: "勉強する"、"頑張る"、"やる"などの抽象的すぎる入力）
+     （例: "勉強する"、"頑張る"、"やる"、"英検合格"などの抽象的すぎる入力）
      これがTrueの場合、reason以外の項目はnullでいい
 . reason: Concreteとestimated_timeの判定理由を簡潔に（Falseの場合は特に重要）
-
-例1（Concrete=true）:
-入力: "英検2級に合格する"
-出力:
-{
-  "taskName": "英検2級合格",
-  "subTasks": ["リスニング対策", "リーディング対策", "ライティング対策", "過去問演習", "模擬試験受験"],
-  "importance": 4,
-  "estimated_time": 15000,
-  "Concrete": true,
-  "reason": "concrete:具体的な目標があり、明確なステップに分解可能,estimated_time: 一般に英検2級に合格するには200~300時間必要と言われているため"
-}
-
-例2（Concrete=false）:
-入力: "勉強する"
-出力:
-{
-  "taskName": "勉強",
-  "subTasks": [],
-  "importance": null,
-  "estimated_time":null,
-  "Concrete": false,
-  "reason": "concrete:何を勉強するのか不明確。具体的な科目や目標を指定してください"
-}
 `.trim();
       const rawResponse = await askGroq(prompt);
+      console.log(prompt);
+      console.log(rawResponse);
       const response = JSON.parse(rawResponse);
       console.log(response);
-      console.log(response.taskName);
 
 
       // Concrete判定の処理

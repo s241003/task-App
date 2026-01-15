@@ -1,11 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Modal from "react-modal";
-
+//import Modal from "react-modal";
+import dayjs from "dayjs";
 import PopUp, { calcDays } from "../../../src/App"
+import { Container,Modal,Typography,Button,Box,FormControl,InputLabel,MenuItem,Select,TextField } from "@mui/material";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
 /*import "../../../src/App.css";*/
 
-Modal.setAppElement("#root");
+//Modal.setAppElement("#root");
 
 function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText }) {
   const [ task, setTask ] = useState({});
@@ -138,135 +141,104 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
         </div>
       </div>
 
-        <Modal
-          style={{
-              overlay: {
-                backgroundColor: "rgba(0, 0, 0, 0.6)",
-              },
-              content: {
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                padding: "3rem",
-                borderRadius: "0.8rem",
-                border: "none",
-                height:"35vh",
-                background: "#fff",
-                overflow:"hidden",
-                boxShadow: "0 3px 14px -1px #faaaaa",
-              },
+      <Modal open={isOpen} onClose={() => setIsOpen(false)}>
+        <Container maxWidth="sm">
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 350,
+              bgcolor: "background.paper",
+              borderRadius: 2,
+              boxShadow: 24,
+              p: 4,
+              textAlign: "center",
+              fontSize: 16
             }}
-           isOpen={isOpen}
-           onRequestClose={() => setIsOpen(false)}
-           contentLabel="Example Modal"
-            onAfterOpen={() => { document.getElementsByClassName("modalClose")[0].focus(); }}
-        >
-          <div classname="modalContent">
-            <h2 style={{color:"red", fontWeight:"500",marginBottom: "2rem" }}>タスク<b>『{task.task}』</b>を削除しますか？</h2>
-            <div className="modalBtns">
-              <button className="modalBtn bg-red-500 right-0 bottom-0" onClick={handleDelete}>はい</button>
-              <button className="modalClose modalBtn bg-gray-400 right-0 bottom-0" onClick={() => setIsOpen(false)}>いいえ</button>
-            </div>
-          </div>
-        </Modal>
+          >
+              <Typography variant="h6" mb={2} fontWeight={500}>タスク<b>『{task.task}』</b>を削除しますか？</Typography>
+                <Button variant="contained" color="error" mr={2} onClick={handleDelete}>はい</Button>
+                <Button variant="text" color="secondary" ml={2} onClick={() => setIsOpen(false)}>いいえ</Button>
+          </Box>
+        </Container>
+      </Modal>
 
-        <Modal
-          style={{
-              overlay: {
-                backgroundColor: "rgba(0, 0, 0, 0.6)",
-              },
-              content: {
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                padding: "3vh 3vw 3vh 3vw",
-                borderRadius: "0.8rem",
-                border: "none",
-                width: "60vw",
-                height:"70vh",
-                background: "#fff",
-                overflow:"hidden",
-                boxShadow: "0 3px 14px -1px #aaaafa",
-              },
+      <Modal open={isUpdate} onClose={() => setIsUpdate(false)}>
+        <Container maxWidth="sm">
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 360,
+              bgcolor: "background.paper",
+              borderRadius: 2,
+              boxShadow: 24,
+              p: 4,
+              textAlign: "center",
+              fontSize: 16
             }}
-           isOpen={isUpdate}
-           onRequestClose={() => setIsUpdate(false)}
-            onAfterOpen={() => { document.getElementsByClassName("modalCloseU")[0].focus(); }}
-        >
-          <div classname="modalContent">
-            <h2>『{task.task}』の内容を編集</h2>
-            <div className="inputForm flex flex-col gap-2">
-              <div className="flex flex-col"><span>タスク名</span><input type="text" value={newTitle} onChange={(e) => setNewTitle(e.target.value)}  /></div>
+          >
+            <Typography variant="h6" mb={2} fontWeight={500}>『{task.task}』の内容を編集</Typography>
+            <div className="inputForm flex flex-col gap-3">
+              <div className="flex flex-col"><TextField label="タスク名" value={newTitle} onChange={(e) => setNewTitle(e.target.value)}  /></div>
 
-              <div className="flex flex-row gap-4 w-full">
-                <div className="flex flex-col w-3/8">
-                  <span>重要度</span>
-                  <select
-                    className="select"
+                <FormControl width="40%" mt={2}>
+                  <InputLabel id="importance">重要度</InputLabel>
+                  <Select
+                    labelId="importance"
+                    id="demo-simple-select"
                     value={newImp}
+                    label="重要度"
                     onChange={(e) => setNewImp(e.target.value)}
                   >
-                    <option value="1">🟦 低</option>
-                    <option value="2">🟩 やや低</option>
-                    <option value="3">🟨 中</option>
-                    <option value="4">🟧 やや高</option>
-                    <option value="5">🟥 高</option>
-                  </select>
-                </div>
-                <div className="flex flex-col w-1/2">
-                  <span className="white-nowrap">達成までに必要な時間</span>
+                    <MenuItem value={1}>🟦 低</MenuItem>
+                    <MenuItem value={2}>🟩 やや低</MenuItem>
+                    <MenuItem value={3}>🟨 中</MenuItem>
+                    <MenuItem value={4}>🟧 やや高</MenuItem>
+                    <MenuItem value={5}>🟥 高</MenuItem>
+                  </Select>
+                </FormControl>
                   <div className="flex flex-row items-center w-full gap-2">
-                    <input
-                      id="hours"
+
+                    <TextField
+                      label="見込み時間"
                       type="number"
-                      min="0"
+                      size="small"
                       value={newHours}
                       onChange={(e) => setNewHours(e.target.value)}
-                      className="w-15 py-2 px-2 border rounded-md text-center"
                     />
-                    <label htmlFor="hours" className="text-base text-gray-600 whitespace-nowrap">時間</label>
-
-                    <input
-                      id="minutes"
+                    <Typography p={0.5} style={{whiteSpace:"nowrap"}}>時間</Typography>
+                    <TextField
+                      label=""
                       type="number"
-                      min={-1}
-                      max={60}
+                      size="small"
                       value={newMins}
-                      onChange={(e) =>
-                        {const v = Number(e.target.value);
-                          if (v < 0) setNewMins(59);
-                          else if (v > 59) setNewMins(0);
-                          else setNewMins(v);
-                        }}
-                      className="w-15 py-2 px-2 border rounded-md text-center"
+                      onChange={(e) => setNewMins(e.target.value)}
                     />
-                    <label htmlFor="minutes" className="text-base text-gray-600">分</label>
+                    <Typography p={0.5}>分</Typography>
                   </div>
-                </div>
-              </div>
 
               <div className="ml-1">
-                <div className="flex flex-col w-full">
-                  <span>期間</span>
-                  <div>
-                    <input className="w-2/5! date-input mr-2!" type="date" value={newStart} onChange={(e) => setNewStart(e.target.value)} />から
-                    <input className="w-2/5! date-input mr-2! ml-2!" type="date" value={newEnd} onChange={(e) => setNewEnd(e.target.value)} />
-                  </div>
+                <div className="flex flex-row w-full mb-4 items-center">
+                  <TextField label="開始日" type="date" value={newStart} inputProps={{ className: "date-input" }} onChange={(e) => setNewStart(e.target.value)} />
+                    <Typography style={{whiteSpace:"nowrap"}}>から</Typography>
+                  <TextField label="締切日" type="date" value={newEnd} inputProps={{ className: "date-input" }} onChange={(e) => setNewEnd(e.target.value)} />
                 </div>
               </div>
             </div>
-            <button
-              style={{ transition:"0.3s ease",background: (newTitle==task.task&&newImp==task.imp&&newStart==task.sta&&newEnd==task.end&&newEst==task.est)?"#fde9d0": "rgba(122,122,255,0.9)"}}
-              className="modalBtn top-0 right-0"
+            <Button color="primary" variant="contained" size="large"
               disabled={newTitle==task.task&&newImp==task.imp&&newStart==task.sta&&newEnd==task.end&&newEst==task.est}
               onClick={(handleUpdate)}>
                 更新する
-              </button>
-            <button className="modalCloseU modalBtn top-0 right-0 bg-gray-400" onClick={() => setIsUpdate(false)}>キャンセル</button>
-              
-
-          </div>
-        </Modal>
+              </Button>
+            <Button variant="text" color="secondary" size="large" onClick={() => setIsUpdate(false)}>キャンセル</Button>
+          </Box>
+        </Container>
+      </Modal>
 
       <div className="task-detail-container">
         <h1 className="task-title">{currentTask.task}</h1>
@@ -304,30 +276,6 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
       </div>
 
       <style jsx>{`
-        .inputForm{
-          margin:1rem;
-          display: 
-        }
-        .inputForm span{
-          font-weight:700;
-          font-size:0.9rem;
-        }
-        .inputForm input,select{
-          width: 100%;
-          color: #0f0f0f;
-          background: #f8fafc;
-          padding: 12px;
-          margin-top:0.3rem;
-          margin-bottom:0.4rem;
-          border-radius: 9px;
-          border: 1px solid #e6edf3;
-          font-size: 16px;
-        }
-        .select{
-          width: 100%;
-          font-size: 0.9rem;
-          align-items:left;
-        }
 
         .buttons{
           width:100%;

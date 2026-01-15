@@ -4,13 +4,22 @@ import { NavLink, useNavigate } from "react-router-dom";
 //import { RiChatAiLine } from "react-icons/ri";
 import AIChat from "../AI/AIChat";
 import AITaskColl from "../AI/AITaskColl";
+import { Box,BottomNavigation,BottomNavigationAction,Fab,Container } from "@mui/material";
+import ChatIcon from "@mui/icons-material/Chat";
+import ListIcon from "@mui/icons-material/List";
+import AddIcon from "@mui/icons-material/Add";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import SettingsIcon from "@mui/icons-material/Settings";
 
-function NavigationBar({ onPageChange,selectedDate, currentDate, isOpen, setIsOpen }) {
 
+
+function NavigationBar({ selectedDate, currentDate, isOpen, setIsOpen }) {
+  const [value, setValue] = useState(0);
 
   const pages = [
-    { id: 'aichat', label: 'チャット' },
     { id: 'tasks', label: 'タスク' },
+    { id: 'aichat', label: 'チャット' },
+    {id:"addtask", label:"タスク追加"},
     { id: `calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`, label: 'カレンダー' },
     { id: 'settings', label: '設定' },
     //{ id: 'settings', label: '設定' },
@@ -19,16 +28,42 @@ function NavigationBar({ onPageChange,selectedDate, currentDate, isOpen, setIsOp
 
   return (
     <div>
-      <div className="navigation-container z-50 no-underline">
-        <nav className="navigation-bar bg-gray-500">
+      <Box sx={{height:"auto", width: "100%", position: "fixed", bottom: 0, left: 0,whiteSpace:"nowrap", zIndex:800}}>
+        <BottomNavigation
+          sx={{ bgcolor: '#ececef', padding:"" }}
+          value={value}
+          onChange={(e, newValue) => {
+            setValue(newValue);
+            if (newValue === 0) {
+              navigate("/tasks");
+            } else if (newValue === 1) {
+              navigate("/aichat");
+            } else if (newValue === 2) {
+              setIsOpen(true);
+            } else if (newValue === 3) {
+              navigate(`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`);
+            } else if (newValue === 4) {
+              navigate("/settings");
+            }
+          }}
+        >
+          <BottomNavigationAction label="タスク" icon={<ListIcon />}/>
+          <BottomNavigationAction label="チャット" icon={<ChatIcon />}/>
+          <BottomNavigationAction icon={<Fab color="primary"><AddIcon /></Fab>}/>
+          <BottomNavigationAction label="カレンダー" icon={<CalendarMonthIcon />}/>
+          <BottomNavigationAction label="設定" icon={<SettingsIcon />}/>
+        </BottomNavigation>
+      </Box>
+
+        {/*<nav className="navigation-bar bg-gray-500">
             {pages.flatMap((page, index) => {
               const navLink = (
+
                 <NavLink
                   key={page.id}
                   to={`/${page.id}`}
                   activeClassName="active"
                   className="nav-button"
-                  onClick={() => onPageChange?.(page.id)}
                 >
                   {page.label}
                 </NavLink>
@@ -41,7 +76,7 @@ function NavigationBar({ onPageChange,selectedDate, currentDate, isOpen, setIsOp
               }
               return [navLink];
             })}
-        </nav>
+        </nav>*/}
 
 
         <style jsx>{`
@@ -118,7 +153,6 @@ function NavigationBar({ onPageChange,selectedDate, currentDate, isOpen, setIsOp
 
         `}</style>
       </div>
-    </div>
   )
 }
 
