@@ -179,27 +179,6 @@ const App = () => {
     console.log({task, normalizedTask});
   };
 
-  // タスク更新時のハンドラー (作業時間更新)
-  const handleUpdateTask = (task, loggedTime) => {
-    const dateKey = formatDate(new Date(task.startDate));
-    setTasks((prevTasks) => {
-      const updatedTasks = { ...prevTasks };
-      if (updatedTasks[dateKey]) {
-        updatedTasks[dateKey] = updatedTasks[dateKey].map(existingTask => {
-          const tTitle = existingTask.task || existingTask.title;
-          const tStart = existingTask.sta || existingTask.startDate;
-          const tEnd = existingTask.end || existingTask.endDate;
-          if (tTitle === task.title && tStart === task.startDate && tEnd === task.endDate) {
-            return { ...existingTask, loggedTime };
-          }
-          return existingTask;
-        });
-      }
-      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-      return updatedTasks;
-    });
-  };
-
   // 戻るハンドラー
   const handleBack = () => {
     setSelectedTask(null);
@@ -243,7 +222,7 @@ const App = () => {
             <Route path="/" element={<ProtectedRoute><Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`} replace/></ProtectedRoute>} />
             <Route path="/calendar/:current" element={<ProtectedRoute><CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} isOpen={isOpen} setIsOpen={setIsOpen} /></ProtectedRoute>} />
             <Route path="/tasks" element={<ProtectedRoute><TaskPage tasks={tasks} onTaskClick={handleTaskClick} /></ProtectedRoute>} />
-            <Route path="/taskdetail/:taskId" element={<ProtectedRoute><TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} onUpdateTask={handleUpdateTask} setPopUpText={setPopUpText} /></ProtectedRoute>} />
+            <Route path="/taskdetail/:taskId" element={<ProtectedRoute><TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} setPopUpText={setPopUpText} /></ProtectedRoute>} />
             <Route path="/aichat" element={<ProtectedRoute><AIChat setTasks={setTasks} setPopUpText={setPopUpText} /></ProtectedRoute>} />
             <Route path="/groupwork" element={<GroupWorkPage />} />
             <Route path="/settings" element={<ProtectedRoute><Settings theme={theme} setTheme={setTheme}/></ProtectedRoute>} />

@@ -1,24 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-//import Modal from "react-modal";
-import dayjs from "dayjs";
 import PopUp, { calcDays } from "../../../src/App"
-import { Container,Modal,Typography,Button,Box,FormControl,InputLabel,MenuItem,Select,TextField } from "@mui/material";
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { Container,Modal,Typography,Button,ButtonGroup,Box,FormControl,InputLabel,MenuItem,Select,TextField } from "@mui/material";
+import { supabase } from '../../AI/AITaskColl';
+import dayjs from "dayjs";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
-/*import "../../../src/App.css";*/
 
-//Modal.setAppElement("#root");
 
 function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText }) {
   const [ task, setTask ] = useState({});
   const { taskId } = useParams();
-  const [currentTask, setCurrentTask] = useState("")
+  const [currentTask, setCurrentTask] = useState("");
   const [elapsedTime, setElapsedTime] = useState(task?.loggedTime || 0);
   const [isRunning, setIsRunning] = useState(false)
   const [ isOpen , setIsOpen ] = useState(false);
   const [ isUpdate , setIsUpdate ] = useState(false);
   const timerRef = useRef(null);
+  const today = dayjs().format("YYYY-MM-DD");
+
 
   /* タスク更新関連 */
   const [ newTitle,setNewTitle ] = useState("");
@@ -29,6 +30,34 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
   const [newMins, setNewMins] = useState(0);
   const [newEst, setNewEst] = useState("");
   const [newDoing, setNewDoing] = useState(0);
+
+  const fetchTasks = async () => {
+    let sum=0;
+    try {
+      const { data, error } =
+      await supabase
+        .from("doingTime")
+        .select('*')
+
+      if (error) throw error
+      const loadedTasks = {}
+      data.map((row) => {
+        const task = {
+          id: row.taskid,
+          date: row.date,
+          doing: row.workedTime,
+        }
+        if (task.id != currentTask.id||task.date!=today) return; // ユーザーIDが一致しない場合はスキップ
+        sum+=parseInt(task.doing);
+      })
+      } catch (err) {
+        console.warn('Supabase読み込み失敗:', err.message)
+      }
+      console.log({sum});
+      return sum;
+    }
+
+  const [todayWork,setTodayWork] = useState(() => fetchTasks());
 
   useEffect(()=>{
     const flatArray = Object.values(tasks).flat();
@@ -80,15 +109,62 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
     return `${h}:${m}:${s}`
   }
 
+  const saveTimeSupabase = async (taskId, time) => {
+  // ① doingTime テーブルに記録
+  const { data: insertData, error: insertError } = await supabase
+    .from('doingTime')
+    .insert([
+      {
+        taskid: taskId,
+        date: today,
+        workedTime: time,
+      },
+    ]);
+
+  if (insertError) {
+    console.error('Insert Error:', insertError);
+    return;
+  }
+  console.log('Insert success:', insertData);
+
+  // ② 現在の doing_time を取得
+  const { data: taskData, error: selectError } = await supabase
+    .from("tasks")
+    .select("doing_time")
+    .eq("id", taskId)
+    .single();
+
+  if (selectError) {
+    console.error("Select Error:", selectError);
+    return;
+  }
+
+  const currentDoing = taskData.doing_time || 0;
+
+  // ③ doing_time に加算して更新
+  const { error: updateError } = await supabase
+    .from("tasks")
+    .update({
+      doing_time: currentDoing + time
+    })
+    .eq("id", taskId);
+
+  if (updateError) {
+    console.error("Update Error:", updateError);
+  } else {
+    console.log("Update success");
+  }
+};
+
+
   // 💾 --- 時間を記録する処理 ---
-  const handleSaveTime = () => {
-    if (onUpdateTask && currentTask) {
-      onUpdateTask(currentTask, elapsedTime)
-      // 保存した状態も更新しておく
-      const updated = { ...currentTask, loggedTime: elapsedTime }
-      localStorage.setItem('selectedTask', JSON.stringify(updated))
-      alert('作業時間を記録しました！')
-    }
+  const handleSaveTime = async () => {
+    const updated = { ...currentTask, loggedTime: elapsedTime }
+    localStorage.setItem('selectedTask', JSON.stringify(updated))
+    await saveTimeSupabase(currentTask.id, Math.floor(elapsedTime/60));
+
+    alert('作業時間を記録しました！')
+
   }
 
   // ⬅ --- 戻るときにlocalStorage削除 ---
@@ -132,12 +208,12 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
 
   return (
     
-    <div className="relative">
+    <Container className="relative">
       <div className="buttons">
         <button className="back-btn" onClick={handleBackClick}>← 戻る</button>
         <div className="flex flex-row gap-2 absolute right-0 top-0">
-          <button className="delete-btn" onClick={()=>setIsOpen(true)}>🗑️</button>
-          <button className="edit-btn" onClick={()=>setIsUpdate(true)}>📝</button>
+          <Button className="delete-btn" onClick={()=>setIsOpen(true)}><DeleteIcon /></Button>
+          <Button className="edit-btn" onClick={()=>setIsUpdate(true)}><EditIcon /></Button>
         </div>
       </div>
 
@@ -224,9 +300,9 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
 
               <div className="ml-1">
                 <div className="flex flex-row w-full mb-4 items-center">
-                  <TextField label="開始日" type="date" value={newStart} inputProps={{ className: "date-input" }} onChange={(e) => setNewStart(e.target.value)} />
+                  <TextField label="開始日" type="date" value={newStart} inputProps={{ className: "date-input p-2.5" }} onChange={(e) => setNewStart(e.target.value)} />
                     <Typography style={{whiteSpace:"nowrap"}}>から</Typography>
-                  <TextField label="締切日" type="date" value={newEnd} inputProps={{ className: "date-input" }} onChange={(e) => setNewEnd(e.target.value)} />
+                  <TextField label="締切日" type="date" value={newEnd} inputProps={{ className: "date-input p-2.5" }} onChange={(e) => setNewEnd(e.target.value)} />
                 </div>
               </div>
             </div>
@@ -261,16 +337,18 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
         {/* --- ストップウォッチ --- */}
         <div className="stopwatch-section">
           <p> 作業時間を記録</p>
-          <h3>{Math.floor((currentTask.est-currentTask.doing)/calcDays(currentTask.sta,currentTask.end))>0
-          ?`今日はあと${Math.floor((currentTask.est-currentTask.doing)/calcDays(currentTask.sta,currentTask.end))}分取り組もう！`
+          <h3>{Math.floor((currentTask.est-todayWork)/calcDays(currentTask.sta,currentTask.end))>0
+          ?`今日はあと${Math.floor((currentTask.est-todayWork)/calcDays(currentTask.sta,currentTask.end))}分取り組もう！`
           :"おっ！目標時間達成だ！やるなあ！"
           }</h3>
           <div className="time-display">{formatTime(elapsedTime)}</div>
           <div className="stopwatch-buttons">
-            <button onClick={() => setIsRunning(true)} disabled={isRunning}>▶ 開始</button>
-            <button onClick={() => setIsRunning(false)} disabled={!isRunning}>⏸ 停止</button>
-            <button onClick={() => setElapsedTime(0)}>⏹ リセット</button>
-            <button onClick={handleSaveTime}> 記録する</button>
+          <ButtonGroup variant="contained" aria-label="outlined primary button group">
+            <Button onClick={() => setIsRunning(true)} disabled={isRunning}>▶開始</Button>
+            <Button onClick={() => setIsRunning(false)} disabled={!isRunning}>⏸停止</Button>
+            <Button onClick={() => setElapsedTime(0)}>⏹リセット</Button>
+            <Button onClick={handleSaveTime}>記録</Button>
+          </ButtonGroup>
           </div>
         </div>
       </div>
@@ -301,9 +379,9 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
         }
         .delete-btn {
           border-radius: 0.75rem;
-          color: rgba(255,40,40,0.9);
+          color: #bb0000;
           background: rgba(255,30,30,0.7);
-          padding: 0.5rem 0.8rem;
+          padding: 0.5rem 0.2rem;
           transition: 0.3s ease;
         }
         .delete-btn:hover {
@@ -313,7 +391,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
           border-radius: 0.75rem;
           color: #000000;
           background: rgba(40,40,235,0.7);
-          padding: 0.5rem 0.8rem;
+          padding: 0.5rem 0.2rem;
           transition: 0.3s ease;
         }
         .edit-btn:hover {
@@ -383,7 +461,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
           cursor: not-allowed;
         }
       `}</style>
-    </div>
+    </Container>
   )
 }
 

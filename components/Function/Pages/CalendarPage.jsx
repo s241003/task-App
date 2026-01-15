@@ -5,6 +5,7 @@ import AITaskColl from "../../AI/AITaskColl";
 import { formatDate ,parseDate ,formatDateDisplay } from '../../../src/App';
 import { useParams, useNavigate } from "react-router-dom";
 import { Modal,Typography,Button,Box } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
 
 function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDate, setSelectedDate, onTaskClick, isOpen, setIsOpen }) {
@@ -355,7 +356,7 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
       
 
         <div className="task-container">
-          <Button onClick={()=> setIsOpen(true) } >タスク作成</Button>
+          <Button variant="contained" color="primary" onClick={()=> setIsOpen(true) } >タスク作成</Button>
           <div className="task-list-section">
             <h3 style={{ margin: '2rem' }}>{formatDate(selectedDate)} のタスク</h3>
             {selectedTasks.length === 0 ? (
