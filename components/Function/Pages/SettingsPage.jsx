@@ -13,17 +13,16 @@ const SettingsPage = () => {
       
       <div className="theme-buttons">
         <button
-          className="darkModeButton"
-          onClick={() => setIsDark(true)}
-        >
-          ダークモード
-        </button>
-
-        <button
           className="lightModeButton"
           onClick={() => setIsDark(false)}
         >
           ライトモード
+        </button>
+        <button
+          className="darkModeButton"
+          onClick={() => setIsDark(true)}
+        >
+          ダークモード
         </button>
       </div>
 
