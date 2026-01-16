@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation  } from "react-router-dom";
 //import { IconContext } from 'react-icons'
 //import { RiChatAiLine } from "react-icons/ri";
 import AIChat from "../AI/AIChat";
@@ -14,7 +14,23 @@ import SettingsIcon from "@mui/icons-material/Settings";
 
 
 function NavigationBar({ selectedDate, currentDate, isOpen, setIsOpen }) {
-  const [value, setValue] = useState(0);
+
+      const location = useLocation();
+  const pathToIndex =()=> {
+    if (location.pathname.startsWith('/tasks')){
+      return 0;
+    } else if (location.pathname.startsWith('/aichat')){
+      return 1;
+    } else if (location.pathname.startsWith('/calendar')){
+        return 3;
+    } else if (location.pathname.startsWith('/settings')){
+        return 4; 
+    }
+  };
+  const [value, setValue] = useState(pathToIndex());
+  
+  
+
 
   const pages = [
     { id: 'tasks', label: 'タスク' },
@@ -25,6 +41,7 @@ function NavigationBar({ selectedDate, currentDate, isOpen, setIsOpen }) {
     //{ id: 'settings', label: '設定' },
   ]
   const navigate = useNavigate();
+  
 
   return (
     <div>
