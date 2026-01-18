@@ -208,7 +208,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
 
   return (
     
-    <Container className="relative">
+    <Container sx={{my: 4, bgcolor: '#f5f5f5', padding: 3, borderRadius: 4}} className="relative">
       <div className="buttons">
         <button className="back-btn" onClick={handleBackClick}>← 戻る</button>
         <div className="flex flex-row gap-2 absolute right-0 top-0">
@@ -316,7 +316,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
         </Container>
       </Modal>
 
-      <div className="task-detail-container">
+      <div  className="task-detail-container">
         <h1 className="task-title">{currentTask.task}</h1>
 
         <div className="task-info-section">
@@ -326,7 +326,10 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
           </div>
         </div>
 
-        {currentTask.sub}<br/>
+
+        {currentTask.sub}
+
+      
         重要度:{["🟦低","🟩やや低","🟨中","🟧やや高","🟥高"][currentTask.imp-1]}<br/>
         必要な時間:{currentTask.est}分<br/>
         取り組んだ時間:{currentTask.doing}分<br/>

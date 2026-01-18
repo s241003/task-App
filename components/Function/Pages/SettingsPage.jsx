@@ -11,7 +11,7 @@ function Settings({ theme,setTheme }) {
 
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="sm" sx={{ my: 4, bgcolor: '#f5f5f5', padding: 3, borderRadius: 4 }}>
       <Typography variant="h4" fontWeight="bold" textAlign="center">アカウント設定</Typography>
       <Button variant="outlined" color="error" onClick={() => {signOut()}}>
         ログアウト

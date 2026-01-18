@@ -13,8 +13,7 @@ import '../../src/dateInput.css';
 import { useAuth } from "../Function/AuthProvider";
 
 
-function AITaskColl({isOpen,setIsOpen}) {
-
+function AITaskColl({isOpen,setIsOpen,selectedDate}) {
   //array
   const [schedules, setSchedules] = useState([]);
 
@@ -23,8 +22,8 @@ function AITaskColl({isOpen,setIsOpen}) {
   const [subTasks,setSubTasks] = useState('')
   const [importance, setImportance] = useState('');
   const [estimated, setEstimated] = useState("");
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   //int
   const [hours, setHours] = useState(0);
@@ -51,6 +50,11 @@ function AITaskColl({isOpen,setIsOpen}) {
       navigate(-1);
     }
   }, []);
+
+  useEffect(()=>{
+    setStartDate(selectedDate);
+    setEndDate(selectedDate);
+  },[selectedDate]);
 
   useEffect(()=>{
     setEstimated(`${hours*60+parseInt(minutes)}`);

@@ -2,9 +2,10 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useState, useEffect } from "react";
 import  askQwen ,{ askGroq }  from "../../src/qwen.js";
 import {
-  Container, Card, CardHeader, CardBody,
+ Card, CardHeader, CardBody,
   ListGroup, ListGroupItem, Input, Button, InputGroup, Spinner
 } from "reactstrap";
+import { Container } from "@mui/material";
 import { supabase } from "./AITaskColl";
 import { DBname } from "../../src/App.jsx"
 import { useNavigate } from "react-router-dom";
@@ -317,7 +318,6 @@ const saveTask = async () => {
 }
 
 const onTaskCreated = () => {
-  // AITaskColl から送信されたデータを使用 (data.sta を日付キーとして使用)
   const targetKey = startDate;
   if (!targetKey) return;  // 日付が設定されていない場合は処理しない
   if (typeof setTasks === 'function') {
@@ -340,7 +340,7 @@ const onTaskCreated = () => {
 };
 
   return (
-    <Container style={{margin:"2vh 2vw",position:"fixed",top:"1vh",left:"2vw",maxWidth:"90vw",height:"90vh",display:"flex",justifyContent:"center"}}>
+    <Container maxWidth="sm" minWidth="sm" maxHeight="sm" sx={{my: 2, bgcolor: '#f5f5f5', padding: 2, borderRadius: 4 }}>
       <Card style={{ fontSize: "2vw" }}> {/* 全体フォントサイズ拡大 */}
         <CardHeader style={{fontSize:"3.3vh"}} className="text-bg-secondary px-3 py-2">
           <>AI Chat</>
@@ -349,12 +349,12 @@ const onTaskCreated = () => {
               </Button>
         </CardHeader>
         <CardBody >
-          <ListGroup style={{ maxHeight: "63vh", overflowY: "auto", }}>
+          <ListGroup style={{ overflowY: "auto", }} className="chat">
             {messages.map((m, i) => (
               <ListGroupItem
                 key={i}
                 className="border-0"
-                style={{ listStyleType: "none", paddingLeft: 0 }} // 中点削除
+                style={{ listStyleType: "none", paddingLeft: 0 }}
               >
                 <div
                   className="d-flex"

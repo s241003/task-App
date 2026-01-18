@@ -105,8 +105,10 @@ export const onTaskCreated = (data) => {
 };
 
 const App = () => {
+  const [open, setOpen] = useState(false);
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("tasks")
+    saved ? setOpen(false) : setOpen(true);
     return saved ? JSON.parse(saved) : {}
   })
   const [selectedTask, setSelectedTask] = useState(null);
@@ -157,7 +159,6 @@ const App = () => {
       }
       fetchTasks()
   }, [user])
-
 
   const navigate = useNavigate();
 
@@ -215,22 +216,20 @@ const App = () => {
 
     // ルーティング
     <div className="flex flex-col gap-5">
-        <div className="app-container">
-          <PopUp text={popUpText}  />
-          <AITaskColl isOpen={isOpen} setIsOpen={setIsOpen}/>
-          <Routes>
-            <Route path="/" element={<ProtectedRoute><Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`} replace/></ProtectedRoute>} />
-            <Route path="/calendar/:current" element={<ProtectedRoute><CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} isOpen={isOpen} setIsOpen={setIsOpen} /></ProtectedRoute>} />
-            <Route path="/tasks" element={<ProtectedRoute><TaskPage tasks={tasks} onTaskClick={handleTaskClick} /></ProtectedRoute>} />
-            <Route path="/taskdetail/:taskId" element={<ProtectedRoute><TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} setPopUpText={setPopUpText} /></ProtectedRoute>} />
-            <Route path="/aichat" element={<ProtectedRoute><AIChat setTasks={setTasks} setPopUpText={setPopUpText} /></ProtectedRoute>} />
-            <Route path="/groupwork" element={<GroupWorkPage />} />
-            <Route path="/settings" element={<ProtectedRoute><Settings theme={theme} setTheme={setTheme}/></ProtectedRoute>} />
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
-          </Routes>
-        </div>
-        {(!isNotFound) ? <NavigationBar selectedDate={selectedDate} currentDate={currentDate} isOpen={isOpen} setIsOpen={setIsOpen}/>: null}
+      <PopUp text={popUpText}  />
+      <AITaskColl isOpen={isOpen} setIsOpen={setIsOpen} selectedDate={formatDate(selectedDate)} />
+      <Routes>
+        <Route path="/" element={<ProtectedRoute><Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`} replace/></ProtectedRoute>} />
+        <Route path="/calendar/:current" element={<ProtectedRoute><CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} isOpen={isOpen} setIsOpen={setIsOpen} open={open} setOpen={setOpen} /></ProtectedRoute>} />
+        <Route path="/tasks" element={<ProtectedRoute><TaskPage tasks={tasks} onTaskClick={handleTaskClick} /></ProtectedRoute>} />
+        <Route path="/taskdetail/:taskId" element={<ProtectedRoute><TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} setPopUpText={setPopUpText} /></ProtectedRoute>} />
+        <Route path="/aichat" element={<ProtectedRoute><AIChat setTasks={setTasks} setPopUpText={setPopUpText} /></ProtectedRoute>} />
+        <Route path="/groupwork" element={<GroupWorkPage />} />
+        <Route path="/settings" element={<ProtectedRoute><Settings theme={theme} setTheme={setTheme}/></ProtectedRoute>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<NotFound setIsNotFound={setIsNotFound} />} />
+      </Routes>
+      <ProtectedRoute>{(!isNotFound) ? <NavigationBar selectedDate={selectedDate} currentDate={currentDate} isOpen={isOpen} setIsOpen={setIsOpen}/>: null}</ProtectedRoute>
     </div>
   );
 

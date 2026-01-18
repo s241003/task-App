@@ -3,7 +3,6 @@ import { NavLink, useNavigate, useLocation  } from "react-router-dom";
 //import { IconContext } from 'react-icons'
 //import { RiChatAiLine } from "react-icons/ri";
 import AIChat from "../AI/AIChat";
-import AITaskColl from "../AI/AITaskColl";
 import { Box,BottomNavigation,BottomNavigationAction,Fab,Container } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import ListIcon from "@mui/icons-material/List";
@@ -47,7 +46,7 @@ function NavigationBar({ selectedDate, currentDate, isOpen, setIsOpen }) {
     <div>
       <Box sx={{height:"auto", width: "100%", position: "fixed", bottom: 0, left: 0,whiteSpace:"nowrap", zIndex:800}}>
         <BottomNavigation
-          sx={{ bgcolor: '#ececef', padding:"" }}
+          sx={{ bgcolor: '#ececef' }}
           value={value}
           onChange={(e, newValue) => {
             setValue(newValue);
@@ -66,34 +65,11 @@ function NavigationBar({ selectedDate, currentDate, isOpen, setIsOpen }) {
         >
           <BottomNavigationAction label="タスク" icon={<ListIcon />}/>
           <BottomNavigationAction label="チャット" icon={<ChatIcon />}/>
-          <BottomNavigationAction icon={<Fab color="primary"><AddIcon /></Fab>}/>
+          <BottomNavigationAction icon={<Fab color="primary"><AddIcon  /></Fab>}/>
           <BottomNavigationAction label="カレンダー" icon={<CalendarMonthIcon />}/>
           <BottomNavigationAction label="設定" icon={<SettingsIcon />}/>
         </BottomNavigation>
       </Box>
-
-        {/*<nav className="navigation-bar bg-gray-500">
-            {pages.flatMap((page, index) => {
-              const navLink = (
-
-                <NavLink
-                  key={page.id}
-                  to={`/${page.id}`}
-                  activeClassName="active"
-                  className="nav-button"
-                >
-                  {page.label}
-                </NavLink>
-              );
-              if (index === 1) {
-                return [
-                  navLink,
-                  <button key="addtask" className="addtask-button " onClick={() => setIsOpen(true)}>＋</button>
-                ];
-              }
-              return [navLink];
-            })}
-        </nav>*/}
 
 
         <style jsx>{`

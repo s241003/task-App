@@ -4,16 +4,15 @@ import "./CalendarPage.css";
 import AITaskColl from "../../AI/AITaskColl";
 import { formatDate ,parseDate ,formatDateDisplay } from '../../../src/App';
 import { useParams, useNavigate } from "react-router-dom";
-import { Modal,Typography,Button,Box } from "@mui/material";
+import { Container, Modal,Typography,Button,Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 
-function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDate, setSelectedDate, onTaskClick, isOpen, setIsOpen }) {
+function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDate, setSelectedDate, onTaskClick, isOpen, setIsOpen, open, setOpen }) {
   const [today, setToday] = useState(new Date());
   const [expandedTasks, setExpandedTasks] = useState({});
   const [taskInput, setTaskInput] = useState('');
   const [isNavigating, setIsNavigating] = useState(false);
-  const [open, setOpen] = useState(Object.keys(tasks).length === 0);
   const { current } = useParams();
   const navigate= useNavigate();
   

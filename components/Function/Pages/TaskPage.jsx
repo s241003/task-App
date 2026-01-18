@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { formatDate } from '../../../src/App'
 import AITaskColl from '../../AI/AITaskColl'
+import { Container } from '@mui/material'
 
 function TaskPage({ tasks, onTaskClick }) {
   const [showModal, setShowModal] = useState(false)
@@ -22,7 +23,7 @@ function TaskPage({ tasks, onTaskClick }) {
   }
 
   return (
-    <>
+    <Container maxWidth="sm" sx={{ my: 4, bgcolor: '#f5f5f5', padding: 3, borderRadius: 4 }}>
       <div className="page-content">
         <h1 className="text-red-500">タスク管理</h1>
 
@@ -35,17 +36,14 @@ function TaskPage({ tasks, onTaskClick }) {
           {todayTasks.length === 0 ? (
             <p className="empty-message">今日のタスクはありません</p>
           ) : (
-            <div className="task-buttons">
+            <div className="task-buttons mt-2">
               {todayTasks.map((task, index) => (
                 <button
                   key={index}
                   className="task-item-btn"
                   onClick={() => onTaskClick(task)}
                 >
-                  <div
-                    className="priority-bar"
-                    style={{ backgroundColor: getPriorityColor(task.imp) }}
-                  ></div>
+
                   <div className="task-btn-content">
                     <strong>{task.task}</strong>
                     <div className="task-btn-meta">
@@ -60,13 +58,6 @@ function TaskPage({ tasks, onTaskClick }) {
             </div>
           )}
         </div>
-
-        {/* モーダル */}
-        {showModal && (
-          <div className="modal-overlay">
-            <AITaskColl />
-          </div>
-        )}
       </div>
 
       {/* CSS */}
@@ -97,6 +88,7 @@ function TaskPage({ tasks, onTaskClick }) {
           transition: 0.2s;
           color: var(--text-color);
           text-align: left;
+          background:#dfdfdf;
         }
 
         .task-item-btn:hover {
@@ -164,7 +156,7 @@ function TaskPage({ tasks, onTaskClick }) {
           background: #9ca3af;
         }
       `}</style>
-    </>
+    </Container>
   )
 }
 
