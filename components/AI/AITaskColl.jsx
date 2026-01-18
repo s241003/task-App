@@ -108,11 +108,15 @@ function AITaskColl({isOpen,setIsOpen}) {
 4. estimated_time:そのタスクを達成するまでに累計何分かかるかを推定する
 5. Concrete:
 Concreteとestimated_timeの判定理由をかく。
-   - True: 入力が具体的で、明確なサブタスクを生成できる場合
+6. - True: 入力が具体的で、明確なサブタスクを生成できる場合
    - False: 入力が曖昧すぎて、適切なサブタスクを生成できない場合
      （例: "勉強する"、"頑張る"、"やる"、"英検合格"などの抽象的すぎる入力）
      これがTrueの場合、reason以外の項目はnullでいい
 . reason: Concreteとestimated_timeの判定理由を簡潔に（Falseの場合は特に重要）
+
+  - 出力は JSON のみ
+  - JSON の前後に一切の文章を付けない
+  - コードブロックも禁止
 `.trim();
       const rawResponse = await askGroq(prompt);
       console.log(prompt);
