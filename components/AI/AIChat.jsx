@@ -61,14 +61,24 @@ export default function AIChat({setTasks,setPopUpText}) {
 
   //プロンプト群
   const general =`
-    あなたは親切なチャットアシスタントです。
-    ユーザーの入力に対して温かみをもって答えてください。
-    ただし、返答は簡潔にわかりやすく、5行以内にまとめてください。
-    また、なるべく最後はユーザへの疑問形で終わらせ、会話を続けやすくしてください。
-    チャット履歴を参考にして、日本語のみで回答してください。
+あなたはタスク設定専門のチャットアシスタントです。
+以下のルールに従って返答してください：
 
-    <これまでのチャット履歴>${messages!=[]?messages.map(m => `${m.role === "user" ? "ユーザ" : "アシスタント"}:${m.content}\n`).join("\n"):"なし"}
-    答えるべきユーザーの入力:${input}
+- 返答は日本語のみ
+- 文量は2行以内、30文字以内
+- 最後はユーザーへの質問で終える
+- 質問文は一つにする
+- 履歴は参考にするが、繰り返さない
+
+【チャット履歴】
+${messages.length > 0 ? messages.map(m => `${m.role}:${m.content}`).join("\n") : "なし"}
+
+【ユーザー入力】
+${input}
+
+【出力形式】
+アシスタントとしての返答のみを書く。
+
   `.trim();
   /*` Qwen用
     <|im_start|>system
@@ -91,34 +101,34 @@ export default function AIChat({setTasks,setPopUpText}) {
   const startTask = "あなたの達成したいタスクを一緒に考えましょう。達成したいことを教えてください。";
   const taskEstimateFirst = `あなたはタスク管理AI「ぷらとん」です。
 ユーザーの入力から達成すべきタスクを読み取り、
-必要な情報を推測して、次のJSON形式で必ず出力してください。
-また、制約を遵守してください。
+次の JSON 形式「のみ」で出力してください。
 
+【重要ルール】
+- JSON 以外の文章は一切出力しない。
+- コードブロックは禁止。
+- キー名・構造は以下のテンプレートと完全に一致させる。
+- subTasks は文字列の配列（オブジェクト禁止）。配列の中にオブジェクトを入れることも禁止。
+- taskName は ユーザ入力から推測したタスク内容を10文字以内に要約する。
+- importance はタスクの重要度。1〜5の数値で出力する。
+- estimated_time は「タスクの現実的な所要時間」を推測する。
+  1日以上かかるタスクは 1440分以上で表す。
+  免許取得・資格取得・学習系タスクは数十〜数百時間かかることが多い。
+  短時間タスク（30分〜2時間）と誤認しないこと。
+- start_date は指定がなければ "${today}"。
+- end_date は内容から妥当な日付を推測する。
 
-制約:
-- JSON以外の文章は一切出力しない。
-- start_date はタスクの取り組み開始日。ユーザから指定がない限りは「${today}」にする。
-- end_date はタスクの締切日。ユーザから指定がない限りは妥当な日付を推測する。
-- subTasks はタスクを達成するために必要なステップを3〜7個生成する。
-- estimated_time はタスク名からそのタスクを始めてから完了するまでにかかる妥当な分数を推測する。
-- end_date はタスク内容から妥当な日付を推測する。
-- subTasks は必要な場合のみ3〜7個生成する。
-- estimated_time はタスク名からそのタスクを始めてから完了するまでにかかる妥当な分数を推測する。
-
-出力形式（型定義）:
+【出力テンプレート】
 {
-  "message": string,                     // ユーザーへの返信
-  "taskName": string,                    // 10文字以内のタイトル
-  "subTasks": string[],                  // 3〜7個のステップ
-  "importance": number,                  // 1〜5
-  "estimated_time": number,              // 分数
-  "start_date": string,                  // YYYY-MM-DD
-  "end_date": string                     // YYYY-MM-DD
+  "message": "",
+  "taskName": "",
+  "subTasks": [],
+  "importance": 1,
+  "estimated_time": 0,
+  "start_date": "",
+  "end_date": ""
 }
 
-
-
-ユーザー入力:
+【ユーザー入力】
 ${input}
 `
 .trim();
@@ -332,14 +342,14 @@ const onTaskCreated = () => {
   return (
     <Container style={{margin:"2vh 2vw",position:"fixed",top:"1vh",left:"2vw",maxWidth:"90vw",height:"90vh",display:"flex",justifyContent:"center"}}>
       <Card style={{ fontSize: "2vw" }}> {/* 全体フォントサイズ拡大 */}
-        <CardHeader style={{fontSize:"3.3vh"}} className="text-bg-secondary px-3 py-2.2">
+        <CardHeader style={{fontSize:"3.3vh"}} className="text-bg-secondary px-3 py-2">
           <>AI Chat</>
           <Button color="danger" style={{fontSize:"2vh"}} className="px-3 py-1.5 ml-5! mx-2 rounded-full!" onClick={clearHistory}>
                 履歴をクリア
               </Button>
         </CardHeader>
-        <CardBody>
-          <ListGroup style={{  maxHeight: "50vh", overflowY: "auto" }}>
+        <CardBody >
+          <ListGroup style={{ maxHeight: "63vh", overflowY: "auto", }}>
             {messages.map((m, i) => (
               <ListGroupItem
                 key={i}
@@ -353,15 +363,16 @@ const onTaskCreated = () => {
                   <div
                     style={{
                       maxWidth: "75%",
-                      backgroundColor: m.role === "user" ? "#cce5ff" : "#f1f1f1",
+                      backgroundColor: m.role === "user" ? "#cce5ff" : "#dadada",
                       color: "#000",
-                      borderRadius: "16px", // 丸みを強調
-                      padding: "12px 16px", // 吹き出しを大きく
-                      fontSize: "1.1rem",   // 吹き出し内の文字サイズ拡大
-                      textAlign: "left"
+                      borderRadius: "0.6rem", // 丸みを強調
+                      padding: "1.2vh 1.5vw 1.2vh 2.1vw", // 吹き出しを大きく
+                      fontSize: "1rem",   // 吹き出し内の文字サイズ拡大
+                      textAlign: "left",
+                      
                     }}
                   >
-                    <div style={{ fontSize: "0.9rem", fontWeight: "bold", marginBottom: 6 }}>
+                    <div style={{ fontSize: "0.9rem", fontWeight: "bold", marginBottom: "0" }}>
                       {m.role === "user" ? "あなた" : "AI"}
                     </div>
                     <div style={{ whiteSpace: "pre-wrap" }}>{m.content}</div>

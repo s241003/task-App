@@ -279,7 +279,7 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
       display: '-webkit-box',
       WebkitBoxOrient: 'vertical',
       WebkitLineClamp: 2,
-      fontSize: "0.8rem",
+      fontSize: "3vw",
       padding: "0.7vh 0 0.7vh 0.7vw",
       transition: "all 0.2s ease",
       whiteSpace: "nowrap",
@@ -297,7 +297,7 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
     },
     taskBetween:(imp)=> ({
       borderColor: getPriorityColor(imp),
-      opacity: "0.75",
+      opacity: "0.8",
     }),
   };
 

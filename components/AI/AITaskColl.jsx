@@ -260,7 +260,7 @@ Concreteとestimated_timeの判定理由をかく。
       setIsLoading(false);
 
       // モーダルを閉じる
-      navigate(-1);
+      setIsOpen(false);
     } catch (error) {
       console.error('タスク保存中にエラーが発生しました:', error);
       setError('タスクの保存に失敗。もう一度試してください。');
@@ -375,6 +375,7 @@ Concreteとestimated_timeの判定理由をかく。
       fontWeight: '700',
       alignSelf: 'center',
       zIndex: "10",
+      whiteSpace: 'nowrap',
     }),
     actionRow: {
       display: 'flex',
@@ -645,7 +646,7 @@ Concreteとestimated_timeの判定理由をかく。
 
         {/* 以下 AI結果ウィンドウ */}
 
-        {/* <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
 
           {(taskData || error) && (
             <button
@@ -656,7 +657,7 @@ Concreteとestimated_timeの判定理由をかく。
               リセット
             </button>
           )}
-        </div>*/}
+        </div>
 
       {/* エラーメッセージ表示 */}
       {error && (
@@ -719,33 +720,6 @@ Concreteとestimated_timeの判定理由をかく。
             <h4 style={{ margin: '0 0 15px 0', color: AMBER.deep, fontSize: '18px' }}>
             　AIによる解析結果
             </h4>
-
-            <div style={{ marginBottom: '15px' }}>
-              <strong style={{ color: AMBER.deep }}>タスク:</strong>
-              <p style={{ 
-                margin: '5px 0', 
-                fontSize: '16px', 
-                color: AMBER.base,
-                fontWeight: 'bold'
-              }}>
-                {taskData.taskName}
-              </p>
-            </div>
-
-            <div style={{ marginBottom: '15px' }}>
-              <strong style={{ color: AMBER.deep }}>サブタスク一覧:</strong>
-              <ul style={{ 
-                margin: '5px 0', 
-                paddingLeft: '20px',
-                color: AMBER.base
-              }}>
-                {taskData.subTasks && taskData.subTasks.map((subTask, index) => (
-                  <li key={index} style={{ marginBottom: '5px' }}>
-                    {subTask}
-                  </li>
-                ))}
-              </ul>
-            </div>
 
             {taskData.reason && (
               <div style={{ 
