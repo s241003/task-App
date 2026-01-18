@@ -36,7 +36,7 @@ function TaskPage({ tasks, onTaskClick }) {
           {todayTasks.length === 0 ? (
             <p className="empty-message">今日のタスクはありません</p>
           ) : (
-            <div className="task-buttons mt-2">
+            <div className="task-buttons mt-2 tasking">
               {todayTasks.map((task, index) => (
                 <button
                   key={index}
@@ -76,6 +76,7 @@ function TaskPage({ tasks, onTaskClick }) {
           display: flex;
           flex-direction: column;
           gap: 10px;
+          overflow-y: auto;
         }
 
         .task-item-btn {

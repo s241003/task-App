@@ -8,7 +8,7 @@ body {
   max-height:auto;
 }
 
-.chat {
+.chat, .tasking {
   height: calc(100vh - 336px);
 }
 

@@ -278,25 +278,29 @@ function CalendarPage({ tasks, setTasks, currentDate, setCurrentDate, selectedDa
       display: '-webkit-box',
       WebkitBoxOrient: 'vertical',
       WebkitLineClamp: 2,
-      fontSize: "3vw",
-      padding: "0.7vh 0 0.7vh 0.7vw",
+      fontSize: "0.75rem",
+      padding: "0.7vh 0 0.7vh 1vw",
       transition: "all 0.2s ease",
       whiteSpace: "nowrap",
     }),
     taskStart: {
-      borderTopLeftRadius: "0.65rem",
-      borderBottomLeftRadius: "0.65rem",
+      borderTopLeftRadius: "0.3rem",
+      borderBottomLeftRadius: "0.3rem",
+      marginLeft:"0.5vw",
     },
     taskEnd: {
-      borderTopRightRadius: "0.65rem",
-      borderBottomRightRadius: "0.65rem",
+      borderTopRightRadius: "0.3rem",
+      borderBottomRightRadius: "0.3rem",
+      marginRight:"0.5vw",
     },
     taskSingle: {
-      borderRadius: "0.65rem",
+      borderRadius: "0.3rem",
+      marginRight:"0.5vw",
+      marginLeft:"0.5vw",
     },
     taskBetween:(imp)=> ({
       borderColor: getPriorityColor(imp),
-      opacity: "0.8",
+      opacity: "0.7",
     }),
   };
 

@@ -411,7 +411,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
 
         .stopwatch-section {
           margin-top: 30px;
-          background: #f3f4f6;
+          background: rgba(220,220,220,0.6);
           padding: 16px;
           border-radius: 10px;
           text-align: center;

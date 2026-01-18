@@ -118,7 +118,7 @@ h1, h2, h3 {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0.5vh 0.5vw;
+  padding: 0;
   border-radius: 0.2rem;
   cursor: pointer;
   border: 0.5px solid;
@@ -176,9 +176,9 @@ h1, h2, h3 {
   border-radius:100%;
   display: flex;
   position: absolute;
+  top: -0.5vh;
+  left: -0.6vh;
   justify-content: flex-start;
-  top: -0.2rem;
-  left: -0.488rem;
   z-index:-1;
 }
 
@@ -194,8 +194,10 @@ h1, h2, h3 {
 .holiNumberContainer{
   display: flex;
   flex-direction:row;
+  position: relative;
   gap: 0.6rem;
   margin-bottom: 0.5rem;
+  padding: 0.5vh 0.5vw;
 }
 
 /* タスクがある日の目印 */
@@ -244,9 +246,6 @@ h1, h2, h3 {
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
 }
 
-.hasTaskAccent {
-  /*box-shadow: inset 0 0 0 2px rgba(20, 218, 152, 0.841);*/
-}
 
 /* --- タスク関連 --- */
 .task-container {
