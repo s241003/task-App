@@ -1,76 +1,63 @@
-/* --- レイアウト設定 --- */
-
-.settings-wrapper {
-  padding: 30px;
-}
-
-.settings-title {
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 40px;
-}
-
-/* 文字とボタンを横に並べるコンテナ */
 .setting-row {
   display: flex;
-  align-items: center; /* 垂直方向の中央揃え */
-  gap: 30px;           /* 文字とボタンの間の隙間 */
+  align-items: center;
+  gap: 30px;
   padding: 10px;
 }
 
-/* 「theme」という文字のスタイル */
 .setting-label {
-  font-size: 28px;     /* 文字を大きく */
+  font-size: 28px;
   font-weight: bold;
-  text-transform: uppercase;
 }
 
-/* ボタンを横に並べるコンテナ（もとの theme-buttons） */
-.theme-button-group {
-  display: flex;
-  gap: 10px;
-}
-
-/* --- ボタンのデザイン（もとのスタイルを継承） --- */
-
-.lightModeButton, 
-.darkModeButton {
-  padding: 10px 20px;
-  background-color: #aaaaaa; /* もとのグレー */
-  color: black;
-  border-radius: 8px;
-  font-size: 16px;
+/* トグルスイッチの外枠 */
+.theme-switch-container {
+  width: 80px;
+  height: 40px;
+  background-color: #aaaaaa; /* もとのボタンの色 */
+  border-radius: 25px;
+  position: relative;
   cursor: pointer;
-  border: none;             /* 枠線を消す */
-  transition: background-color 0.2s;
+  transition: background-color 0.3s ease;
+  padding: 5px;
+  display: flex;
+  align-items: center;
 }
 
-/* マウスを乗せたとき（もとの黒色） */
-.lightModeButton:hover,
-.darkModeButton:hover {
-  background-color: #030303;
-  color: white;             /* 背景が黒くなるので文字を白に */
+/* ダークモード（左側）の時の背景色 */
+.theme-switch-container.is-dark {
+  background-color: #030303; /* もとのホバー時の色 */
 }
 
-/* 現在選択されているボタンの強調 */
-.theme-button-group button.active {
-  background-color: #007bff; /* 選択中は青色にする（任意） */
-  color: white;
-  font-weight: bold;
+/* スイッチ内の丸いノブ */
+.theme-switch-nob {
+  width: 30px;
+  height: 30px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  
+  /* ★ここがポイント：アニメーションの設定 */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* --- App.jsx のテーマ切り替え連動 --- */
+/* --- 配置の制御 --- */
 
-/* App.css に書くか、ここに書いてもOKです */
-.is-light .setting-label {
-  color: #111;
+/* ダークモード（左側）：移動なし */
+.theme-switch-container.is-dark .theme-switch-nob {
+  transform: translateX(0px);
 }
 
-.is-dark .setting-label {
-  color: #f9fafb;
+/* ライトモード（右側）：右にスライド */
+.theme-switch-container.is-light .theme-switch-nob {
+  transform: translateX(40px); /* 枠の幅に合わせて調整 */
 }
 
 .current-status {
-  margin-top: 30px;
+  margin-top: 20px;
   font-size: 18px;
 }
