@@ -3,31 +3,21 @@ import './SettingsPage.css';
 
 const SettingsPage = ({ isDark, setIsDark }) => {
 
-  // 設定の選択肢
+  // 設定項目をオブジェクトの配列で管理
   const themeOptions = [
-    {
-      id: 'light',
-      label: 'ライト',
-      value: false,
-      className: 'lightModeButton'
-    },
-    {
-      id: 'dark',
-      label: 'ダーク',
-      value: true,
-      className: 'darkModeButton'
-    }
+    { id: 'light', label: 'ライトモード', value: false, className: 'lightModeButton' },
+    { id: 'dark', label: 'ダークモード', value: true, className: 'darkModeButton' }
   ];
 
   return (
-    <div className="settings-wrapper" style={{ padding: '20px' }}>
+    <div className="settings-wrapper">
       <h1 className="settings-title">設定</h1>
       
-      {/* ラベルとボタンを横並びにするコンテナ */}
-      <div className="theme-setting-container">
-        <span className="theme-label-large">theme</span>
+      {/* この div が「theme」と「ボタン群」を横並びにします */}
+      <div className="setting-row">
+        <span className="setting-label">theme</span>
         
-        <div className="theme-buttons-row">
+        <div className="theme-button-group">
           {themeOptions.map((option) => (
             <button
               key={option.id}
@@ -40,9 +30,9 @@ const SettingsPage = ({ isDark, setIsDark }) => {
         </div>
       </div>
 
-      <div className="settings-info">
-        <p>現在のモード: <strong>{isDark ? "ダーク" : "ライト"}</strong></p>
-      </div>
+      <p className="current-status">
+        現在のモード: <strong>{isDark ? "ダーク" : "ライト"}</strong>
+      </p>
     </div>
   );
 }
