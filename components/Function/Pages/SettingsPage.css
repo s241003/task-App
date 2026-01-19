@@ -15,7 +15,7 @@
 .theme-switch-container {
   width: 80px;
   height: 40px;
-  background-color: #aaaaaa; /* ライト時の背景（グレー） */
+  background-color: #ffffff;
   border-radius: 25px;
   position: relative;
   cursor: pointer;
