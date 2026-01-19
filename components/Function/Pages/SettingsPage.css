@@ -1,3 +1,4 @@
+/* --- レイアウト設定 --- */
 .setting-row {
   display: flex;
   align-items: center;
@@ -14,7 +15,7 @@
 .theme-switch-container {
   width: 80px;
   height: 40px;
-  background-color: #aaaaaa; /* もとのボタンの色 */
+  background-color: #aaaaaa; /* ライト時の背景（グレー） */
   border-radius: 25px;
   position: relative;
   cursor: pointer;
@@ -24,15 +25,15 @@
   align-items: center;
 }
 
-/* ダークモード（左側）の時の背景色 */
-.theme-switch-container.is-dark {
-  background-color: #030303; /* もとのホバー時の色 */
+/* ダークモード（右側）の時の背景色 */
+.theme-switch-container.state-dark {
+  background-color: #030303; /* ダーク時の背景（黒） */
 }
 
 /* スイッチ内の丸いノブ */
 .theme-switch-nob {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   background-color: white;
   border-radius: 50%;
   display: flex;
@@ -41,20 +42,20 @@
   font-size: 18px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   
-  /* ★ここがポイント：アニメーションの設定 */
+  /* アニメーションの設定 */
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* --- 配置の制御 --- */
 
-/* ダークモード（左側）：移動なし */
-.theme-switch-container.is-dark .theme-switch-nob {
+/* ライトモード：左側に配置（移動なし） */
+.theme-switch-container.state-light .theme-switch-nob {
   transform: translateX(0px);
 }
 
-/* ライトモード（右側）：右にスライド */
-.theme-switch-container.is-light .theme-switch-nob {
-  transform: translateX(40px); /* 枠の幅に合わせて調整 */
+/* ダークモード：右側に配置（移動あり） */
+.theme-switch-container.state-dark .theme-switch-nob {
+  transform: translateX(38px); /* 枠のサイズに合わせて微調整 */
 }
 
 .current-status {
