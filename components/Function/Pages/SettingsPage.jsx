@@ -2,7 +2,7 @@ import React from 'react';
 import './SettingsPage.css';
 
 const SettingsPage = ({ isDark, setIsDark }) => {
-  // スイッチをクリックしたときに true/false を入れ替える
+  // クリックでモードを反転させる
   const toggleTheme = () => setIsDark(!isDark);
 
   return (
@@ -12,14 +12,13 @@ const SettingsPage = ({ isDark, setIsDark }) => {
       <div className="setting-row">
         <span className="setting-label">theme</span>
         
-        {/* トグルスイッチ全体 */}
+        {/* スイッチ全体 */}
         <div 
-          className={`theme-switch-container ${isDark ? 'is-dark' : 'is-light'}`}
+          className={`theme-switch-container ${isDark ? 'state-dark' : 'state-light'}`}
           onClick={toggleTheme}
         >
           {/* スイッチ内の動く丸（ノブ） */}
           <div className="theme-switch-nob">
-            {/* アイコンなどを入れたい場合はここに配置できます */}
             {isDark ? '🌙' : '☀️'}
           </div>
         </div>
