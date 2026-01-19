@@ -1,41 +1,76 @@
-.lightModeButton {
-    padding: 10px 20px;
-    background-color: #aaaaaa;
-    color: black;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;    /*マウスを乗せたとき手の形になる */
-}
-  
-.lightModeButton:hover {
-  background-color: #030303;
+/* --- レイアウト設定 --- */
+
+.settings-wrapper {
+  padding: 30px;
 }
 
-.darkModeButton {
-    padding: 10px 20px;
-    background-color: #aaaaaa;
-    color: black;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;    /*マウスを乗せたとき手の形になる */
+.settings-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 40px;
 }
-  
+
+/* 文字とボタンを横に並べるコンテナ */
+.setting-row {
+  display: flex;
+  align-items: center; /* 垂直方向の中央揃え */
+  gap: 30px;           /* 文字とボタンの間の隙間 */
+  padding: 10px;
+}
+
+/* 「theme」という文字のスタイル */
+.setting-label {
+  font-size: 28px;     /* 文字を大きく */
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* ボタンを横に並べるコンテナ（もとの theme-buttons） */
+.theme-button-group {
+  display: flex;
+  gap: 10px;
+}
+
+/* --- ボタンのデザイン（もとのスタイルを継承） --- */
+
+.lightModeButton, 
+.darkModeButton {
+  padding: 10px 20px;
+  background-color: #aaaaaa; /* もとのグレー */
+  color: black;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;             /* 枠線を消す */
+  transition: background-color 0.2s;
+}
+
+/* マウスを乗せたとき（もとの黒色） */
+.lightModeButton:hover,
 .darkModeButton:hover {
   background-color: #030303;
+  color: white;             /* 背景が黒くなるので文字を白に */
 }
 
-.app-container.light {
-  background-color: #ffffff;
+/* 現在選択されているボタンの強調 */
+.theme-button-group button.active {
+  background-color: #007bff; /* 選択中は青色にする（任意） */
+  color: white;
+  font-weight: bold;
+}
+
+/* --- App.jsx のテーマ切り替え連動 --- */
+
+/* App.css に書くか、ここに書いてもOKです */
+.is-light .setting-label {
   color: #111;
 }
 
-.app-container.dark {
-  background-color: #111827;
+.is-dark .setting-label {
   color: #f9fafb;
 }
 
-.theme-buttons {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
+.current-status {
+  margin-top: 30px;
+  font-size: 18px;
 }
