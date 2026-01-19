@@ -8,6 +8,7 @@ const SettingsPage = ({ isDark, setIsDark }) => {
   return (
     <div className="settings-wrapper" style={{ padding: '20px' }}>
       <h1>設定</h1>
+      <p1>theme</p1>
       <div className="theme-buttons">
         <button className="lightModeButton" onClick={() => setIsDark(false)}>ライトモード</button>
         <button className="darkModeButton" onClick={() => setIsDark(true)}>ダークモード</button>
