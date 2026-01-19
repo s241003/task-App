@@ -1,22 +1,10 @@
 /* App.css */
-.app-container.light {
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: #f4f7f6;
-  color: #ffffff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  margin: 0;
-}
 
 .app-container {
   width: 90%;
   /* max-width: 80rem; */
   max-width: none;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   padding: 4rem;
   display: flex;
   flex-direction: column;
@@ -25,10 +13,12 @@ body {
 
 .is-light .app-container.is-light {
   background: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .is-dark .app-container {
   background: black;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 480px) {
