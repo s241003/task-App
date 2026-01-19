@@ -23,11 +23,11 @@ body {
   gap: 2rem;
 }
 
-  .app-container.is-light {
+.is-light .app-container.is-light {
   background: white;
 }
 
-.app-container.is-dark {
+.is-dark .app-container {
   background: black;
 }
 
