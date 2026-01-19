@@ -22,12 +22,20 @@
 
 /* ヘッダー */
 .calendar-header {
-  background: #f9fafb;
   padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #e5e7eb;
+}
+
+.id-light .calendar-header {
+  background: #f9fafb !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.is-dark .calendar-header {
+  background: #060504 !important;
+  border-bottom: 1px solid #1a1814 !important;
 }
 
 /* 曜日行 */
