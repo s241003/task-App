@@ -40,7 +40,7 @@ function NavigationBar({ selectedDate, currentDate, isOpen, setIsOpen }) {
     //{ id: 'settings', label: '設定' },
   ]
   const navigate = useNavigate();
-  
+
 
   return (
     <div>

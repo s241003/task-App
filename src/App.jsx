@@ -12,6 +12,7 @@ import GroupWorkPage from "../components/Function/Pages/GroupWorkPage";
 import Settings from "../components/Function/Pages/SettingsPage"
 import Login from "../components/Function/Pages/LoginPage"
 import { useAuth ,ProtectedRoute } from '../components/Function/AuthProvider.jsx';
+import OneSignal from 'react-onesignal'
 
 
 export const formatDate = (date) => {
@@ -105,6 +106,7 @@ export const onTaskCreated = (data) => {
 };
 
 const App = () => {
+
   const [open, setOpen] = useState(false);
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("tasks")
@@ -119,8 +121,6 @@ const App = () => {
   const [isOpen ,setIsOpen] = useState(false);
   const [popUpText ,setPopUpText ] = useState(``);
   const { user } = useAuth();
-
-
 
   {/* _init_ supabase読み込み */}
   useEffect(() => {
@@ -221,7 +221,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<ProtectedRoute><Navigate to={`/calendar/${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`} replace/></ProtectedRoute>} />
         <Route path="/calendar/:current" element={<ProtectedRoute><CalendarPage tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} currentDate={currentDate} setCurrentDate={setCurrentDate} onTaskClick={handleTaskClick} isOpen={isOpen} setIsOpen={setIsOpen} open={open} setOpen={setOpen} /></ProtectedRoute>} />
-        <Route path="/tasks" element={<ProtectedRoute><TaskPage tasks={tasks} onTaskClick={handleTaskClick} /></ProtectedRoute>} />
+        <Route path="/tasks" element={<ProtectedRoute><TaskPage tasks={tasks} onTaskClick={handleTaskClick} setIsOpen={setIsOpen} /></ProtectedRoute>} />
         <Route path="/taskdetail/:taskId" element={<ProtectedRoute><TaskDetailPage tasks={tasks} onBack={handleBack} del={deleteTask} update={updateTask} setPopUpText={setPopUpText} /></ProtectedRoute>} />
         <Route path="/aichat" element={<ProtectedRoute><AIChat setTasks={setTasks} setPopUpText={setPopUpText} /></ProtectedRoute>} />
         <Route path="/groupwork" element={<GroupWorkPage />} />

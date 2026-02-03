@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { formatDate } from '../../../src/App'
 import AITaskColl from '../../AI/AITaskColl'
-import { Container } from '@mui/material'
+import { Container,Button } from '@mui/material'
 
-function TaskPage({ tasks, onTaskClick }) {
+function TaskPage({ tasks, onTaskClick, setIsOpen }) {
   const [showModal, setShowModal] = useState(false)
 
   const today = formatDate(new Date())
@@ -23,16 +23,14 @@ function TaskPage({ tasks, onTaskClick }) {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ my: 4, bgcolor: '#f5f5f5', padding: 3, borderRadius: 4 }}>
+    <Container maxWidth="sm" sx={{ my: 4, bgcolor: '#f5f5f5', padding: 3, borderRadius: 4 }} style={{minHeight:"80vh"}}>
       <div className="page-content">
         <h1 className="text-red-500">タスク管理</h1>
-
-        <button className="add-task-btn" onClick={handleAddClick}>
-          ＋ タスクを追加
-        </button>
-
         <div className="task-list-section">
-          <h3>📅 今日のタスク</h3>
+          <h3>📅 今日のタスク 📅</h3>
+          <Button variant="contained" onClick={()=>setIsOpen(true)}>
+          ＋ タスクを追加
+          </Button>
           {todayTasks.length === 0 ? (
             <p className="empty-message">今日のタスクはありません</p>
           ) : (
