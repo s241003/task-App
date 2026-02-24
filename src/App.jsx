@@ -13,6 +13,7 @@ import Settings from "../components/Function/Pages/SettingsPage"
 import Login from "../components/Function/Pages/LoginPage"
 import { useAuth ,ProtectedRoute } from '../components/Function/AuthProvider.jsx';
 import OneSignal from 'react-onesignal'
+import { Button,  TextField,  Container,  Paper,  Box,  Typography } from "@mui/material";
 
 
 export const formatDate = (date) => {
@@ -51,10 +52,10 @@ export const NotFound = ({ setIsNotFound }) =>{
   },[setIsNotFound])
 
   return(
-    <div>
-      <h1>404: NOT FOUND</h1>
+    <Container maxWidth="sm" sx={{ my: 4, padding: 3, borderRadius: 4 }} style={{display:"flex", justifyContent: "center"}}>
+      <Typography variant="h2">404: NOT FOUND</Typography>
       <div>お探しのページは見つかりませんでした。<br/><Link to="/">ホームへ</Link></div>
-    </div>
+    </Container>
   )
 };
 
@@ -132,6 +133,7 @@ const App = () => {
           .select('*')
 
         if (error) throw error
+
         const loadedTasks = {}
         data.map((row) => {
           const task = {
@@ -213,8 +215,6 @@ const App = () => {
   }
 
   return (
-
-    // ルーティング
     <div className="flex flex-col gap-5">
       <PopUp text={popUpText}  />
       <AITaskColl isOpen={isOpen} setIsOpen={setIsOpen} selectedDate={formatDate(selectedDate)} />

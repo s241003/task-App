@@ -1,4 +1,4 @@
-import { DBname, onTaskCreated } from "../../src/App";
+import { DBname, onTaskCreated, calcDays } from "../../src/App";
 import Modal from "react-modal";
 import askQwen, { askGroq } from "../../src/qwen.js";
 import { createClient } from '@supabase/supabase-js';
@@ -311,7 +311,7 @@ Concreteとestimated_timeの判定理由をかく。
       maxHeight: 'auto',
       backgroundColor: 'white',
       borderRadius: '12px',
-      padding: '4vh 2vw',
+      padding: '4vh 4vw',
       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
       position: 'relative',
       overflowY: "auto",
@@ -509,7 +509,7 @@ Concreteとestimated_timeの判定理由をかく。
                   setText(e.target.value);
                   if (error) setError(null); // 入力時にエラーをクリア
                 }}
-                placeholder="具体的に：例「英検2級に合格する」"
+                placeholder="なるべく具体的に"
                 disabled={isLoadAI || isLoading}
                 style={
                   error && needsMoreDetail
@@ -542,7 +542,7 @@ Concreteとestimated_timeの判定理由をかく。
                 setSubTasks(e.target.value);
                 if (error) setError(null);
               }}
-              placeholder="スペースで区切って入力（例: リスニング リーディング ライティング）"
+              placeholder="スペースで区切って入力"
               disabled={isLoadAI || isLoading}
               style={ error && needsMoreDetail ? { ...styles.fullInput, border: '2px solid #f59e0b' } : styles.fullInput }
             />
@@ -572,7 +572,7 @@ Concreteとestimated_timeの判定理由をかく。
             </div>
 
             <div style={{ ...styles.formGroup }}>
-              <label style={styles.labelStyle} htmlFor="estimated">必要な時間</label>
+              <label style={styles.labelStyle} htmlFor="estimated">完了まで<span className="text-sm text-gray-500 ml-3.5">{(estimated!=0) ? `(※1日あたり${estimated/calcDays(startDate,endDate)>=60 ? Math.round(estimated/calcDays(startDate,endDate)/6)/10 + "時間" : Math.round(estimated/calcDays(startDate,endDate)*10)/10 + "分"})` : ""}</span></label>
 
               {/* 推定かかり時間 */}
               <div className="flex flex-row items-center w-3/4" style={{gap:"1vw"}}>
@@ -650,7 +650,7 @@ Concreteとestimated_timeの判定理由をかく。
 
         {/* 以下 AI結果ウィンドウ */}
 
-        <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+        {/*<div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
 
           {(taskData || error) && (
             <button
@@ -662,8 +662,9 @@ Concreteとestimated_timeの判定理由をかく。
             </button>
           )}
         </div>
+        */}
 
-      {/* エラーメッセージ表示 */}
+      
       {error && (
         <div
           style={
@@ -714,7 +715,7 @@ Concreteとestimated_timeの判定理由をかく。
         </div>
       )}
 
-      {/* 成功時の結果表示 */}
+      {/*
       {taskData && !error && (
         <div>
           <button onClick={() => setIsHidden(!isHidden)}>
@@ -726,7 +727,7 @@ Concreteとestimated_timeの判定理由をかく。
             </h4>
 
             {taskData.reason && (
-              <div style={{ 
+              <div style={{
                 marginTop: '10px',
                 padding: '10px',
                 background: '#fff',
@@ -751,8 +752,7 @@ Concreteとestimated_timeの判定理由をかく。
                 <strong>期間:</strong> {startDate || '未設定'} 〜 {endDate || '未設定'}
               </p>
             </div>
-
-            {/* デバッグ用（本番環境では削除推奨） */}
+            
             <details style={{ marginTop: '15px' }}>
               <summary style={{ 
                 cursor: 'pointer', 
@@ -768,6 +768,7 @@ Concreteとestimated_timeの判定理由をかく。
           </div>
         </div>
        )}
+        */}
       </div>
     </Modal>
   );

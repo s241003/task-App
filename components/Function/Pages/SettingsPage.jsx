@@ -32,7 +32,7 @@ function Settings({ theme,setTheme }) {
         />
          <FormControlLabel
          control={<Switch value={allowSub} onChange={(e) => setAllowSub(!allowSub)} defaultChecked />}
-          label={`サブタスクを${allowSub ?'有':'無'}効にする`}
+          label={`サブタスクを無効にする`}
         />
 
 

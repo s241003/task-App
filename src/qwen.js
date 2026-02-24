@@ -27,8 +27,8 @@ export async function askGroq(prompt) {
       body: JSON.stringify({
         model: "llama-3.1-8b-instant",
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 512, // 長文で落ちるのを防ぐ
-        stream: false     // ストリーミングは不安定なのでオフ
+        max_tokens: 512,
+        stream: false
       }),
       signal: controller.signal
     });

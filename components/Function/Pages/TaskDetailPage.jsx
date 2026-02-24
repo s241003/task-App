@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PopUp, { calcDays } from "../../../src/App"
-import { Container,Modal,Typography,Button,ButtonGroup,Box,FormControl,InputLabel,MenuItem,Select,TextField } from "@mui/material";
+import { Container,Modal,Typography,Button,ButtonGroup,Box,FormControl,InputLabel,MenuItem,Select,TextField,FormControlLabel,FormGroup,Checkbox } from "@mui/material";
 import { supabase } from '../../AI/AITaskColl';
 import dayjs from "dayjs";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -30,6 +30,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
   const [newMins, setNewMins] = useState(0);
   const [newEst, setNewEst] = useState("");
   const [newDoing, setNewDoing] = useState(0);
+  const [subs,setSubs] = useState("");
 
   const fetchTasks = async () => {
     let sum=0;
@@ -87,6 +88,9 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
 
   useEffect(() => {
     setCurrentTask(task);
+    if (typeof task.sub==="string"){
+      setSubs(task.sub.replace(/[\[\]]/g,"").replace(/\"/g,"").replace(/,,/g,","));
+    }
   }, [task])
 
   // ⏱ --- タイマー動作 ---
@@ -101,6 +105,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
     return () => clearInterval(timerRef.current)
   }, [isRunning])
 
+
   // 🕒 --- 時間フォーマット ---
   const formatTime = (seconds) => {
     const h = String(Math.floor(seconds / 3600)).padStart(2, '0')
@@ -108,6 +113,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
     const s = String(seconds % 60).padStart(2, '0')
     return `${h}:${m}:${s}`
   }
+
 
   const saveTimeSupabase = async (taskId, time) => {
   // ① doingTime テーブルに記録
@@ -317,7 +323,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
       </Modal>
 
       <div  className="task-detail-container">
-        <h1 className="task-title">{currentTask.task}</h1>
+        <h1 className="task-title mb-2">{["🟦","🟩","🟨","🟧","🟥"][currentTask.imp-1]}{currentTask.task}</h1>
 
         <div className="task-info-section">
           <div className="info-item">
@@ -325,12 +331,12 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
             <span className="info-value">{currentTask.sta} 〜 {currentTask.end}</span>
           </div>
         </div>
+        <FormGroup>
+        {(subs.trim()?subs.split(",").map(sub => (
+            <FormControlLabel control={<Checkbox size="small" />} label={sub}  />
+        )):"")}
+        </FormGroup>
 
-
-        {currentTask.sub}
-
-      
-        重要度:{["🟦低","🟩やや低","🟨中","🟧やや高","🟥高"][currentTask.imp-1]}<br/>
         必要な時間:{currentTask.est}分<br/>
         取り組んだ時間:{currentTask.doing}分<br/>
         残り日数:{calcDays(currentTask.sta,currentTask.end)}日<br/>
