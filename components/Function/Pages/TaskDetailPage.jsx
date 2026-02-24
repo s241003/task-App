@@ -203,10 +203,6 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
     setPopUpText("タスクの更新できました！\n※少し遅れて反映されます");
   }
 
-
-
-
-
   // ⚠ --- currentTaskがまだ読み込まれていない場合 ---
   if (!currentTask) {
     return <div className="page-content">読み込み中...</div>
@@ -323,7 +319,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
       </Modal>
 
       <div  className="task-detail-container">
-        <h1 className="task-title mb-2">{["🟦","🟩","🟨","🟧","🟥"][currentTask.imp-1]}{currentTask.task}</h1>
+        <h1 className="mb-2">{["🟦","🟩","🟨","🟧","🟥"][currentTask.imp-1]}{currentTask.task}</h1>
 
         <div className="task-info-section">
           <div className="info-item">
@@ -336,12 +332,12 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
             <FormControlLabel control={<Checkbox size="small" />} label={sub}  />
         )):"")}
         </FormGroup>
-
-        必要な時間:{currentTask.est}分<br/>
-        取り組んだ時間:{currentTask.doing}分<br/>
-        残り日数:{calcDays(currentTask.sta,currentTask.end)}日<br/>
-        1日あたり約:{Math.floor((currentTask.est-currentTask.doing)/calcDays(currentTask.sta,currentTask.end))}分 取り組む必要がある<br/>
-
+        <div className="flex flex-col gap-2">
+          <div>必要な時間:{currentTask.est}分</div>
+          <div>取り組んだ時間:{currentTask.doing}分</div>
+          <div>残り日数:{calcDays(currentTask.sta,currentTask.end)}日</div>
+          <div>1日あたり約:{Math.floor((currentTask.est-currentTask.doing)/calcDays(currentTask.sta,currentTask.end))}分 取り組む必要がある</div>
+        </div>
 
         {/* --- ストップウォッチ --- */}
         <div className="stopwatch-section">
@@ -369,7 +365,7 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
           position:relative;
           border-radius:0.75rem;
           font-size: 1.1rem;
-          margin-bottom: 7vh;
+          margin-bottom: 5vh;
           top:0;
           left:0;
           padding: 0.5rem;
@@ -406,12 +402,6 @@ function TaskDetailPage({ tasks, onBack ,del ,update ,onUpdateTask ,setPopUpText
         .edit-btn:hover {
           background: rgba(50,50,235,0.6);
         }
-
-        /* モーダル関連 */
-
-        
-        
-
 
         /* ストップウォッチ関連 */
 
